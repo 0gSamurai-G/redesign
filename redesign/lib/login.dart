@@ -428,6 +428,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:redesign/home.dart';
 import 'package:redesign/navigation.dart';
 import 'package:redesign/register.dart';
@@ -507,286 +508,293 @@ class _LoginScreenState extends State<LoginScreen> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: charcoal,
-      body: Stack(
-        children: [
-          /// TOP GRADIENT BACKGROUND
-          Container(
-            height: size.height * 0.45,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(48),
-                bottomRight: Radius.circular(48),
+  backgroundColor: const Color(0xFF000000),
+  resizeToAvoidBottomInset: true, // ✅ IMPORTANT
+  body: Stack(
+    children: [
+      /// TOP GRADIENT BACKGROUND
+      Container(
+        height: size.height * 0.45,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(48),
+            bottomRight: Radius.circular(48),
+          ),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1DB954),
+              Color(0x801DB954),
+              Color(0x001DB954),
+            ],
+            stops: [0.0, 0.4, 1.0],
+          ),
+        ),
+      ),
+
+      /// ABSTRACT BACKGROUND SHAPE
+      Positioned(
+        top: -10,
+        left: 30,
+        right: -50,
+        child: Opacity(
+          opacity: 0.6,
+          child: Transform.rotate(
+            angle: -0.5,
+            child: Text(
+              'Z',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.luckiestGuy(
+                fontSize: size.width * 1.1,
+                color: Colors.white,
+                height: 1,
+                letterSpacing: -8,
               ),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1DB954),
-                  Color(0xFF0F5132),
+            ),
+          ),
+        ),
+      ),
+
+      /// LOGIN CARD + REGISTER TEXT
+      SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+  padding: EdgeInsets.only(
+    bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 300), // ✅ unchanged
+
+            /// LOGIN CARD
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.08),
+                  ),
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Welcome Back!',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Ready to get back on the field?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.65),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      _InputField(
+                        controller: _emailController,
+                        icon: Icons.email_outlined,
+                        hint: 'user@playz.com',
+                        fillColor: inputColor,
+                        validator: (value) =>
+                            value == null || value.isEmpty
+                                ? 'Email is required'
+                                : null,
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      _InputField(
+                        controller: _passwordController,
+                        icon: Icons.lock_outline,
+                        hint: '••••••••',
+                        obscure: true,
+                        fillColor: inputColor,
+                        validator: (value) =>
+                            value == null || value.length < 6
+                                ? 'Minimum 6 characters'
+                                : null,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _rememberMe,
+                            activeColor: spotifyGreen,
+                            onChanged: (v) =>
+                                setState(() => _rememberMe = v ?? false),
+                          ),
+                          Text(
+                            'Remember me',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: spotifyGreen,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _handleLogin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: spotifyGreen,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Sign In',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Icon(Icons.arrow_forward,
+                                        color: Colors.black),
+                                  ],
+                                ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                                color: Colors.white.withOpacity(0.15)),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'or continue with',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.5),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                                color: Colors.white.withOpacity(0.15)),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      Row(
+                        children: const [
+                          Expanded(
+                            child: _SocialButton(
+                              icon: Icons.g_mobiledata,
+                              label: 'Google',
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: _SocialButton(
+                              icon: Icons.apple,
+                              label: 'Apple',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            /// REGISTER
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account?",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (_) => RegisterScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Register here',
+                      style: TextStyle(
+                        color: spotifyGreen,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-
-          /// ABSTRACT BACKGROUND SHAPE
-          Positioned(
-            top: -40,
-            left: -40,
-            right: -48,
-            child: Opacity(
-              opacity: 0.4,
-              child: Image.asset(
-                'assets/logo_shapez.png',
-                height: size.height * 0.48,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-
-          /// LOGIN CARD + REGISTER TEXT
-          Column(
-            children: [
-              const SizedBox(height: 300),
-
-              /// LOGIN CARD
-              SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.08),
-                    ),
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Welcome Back!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Ready to get back on the field?',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.65),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        /// EMAIL
-                        _InputField(
-                          controller: _emailController,
-                          icon: Icons.email_outlined,
-                          hint: 'user@playz.com',
-                          fillColor: inputColor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Email is required';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        /// PASSWORD
-                        _InputField(
-                          controller: _passwordController,
-                          icon: Icons.lock_outline,
-                          hint: '••••••••',
-                          obscure: true,
-                          fillColor: inputColor,
-                          validator: (value) {
-                            if (value == null || value.length < 6) {
-                              return 'Minimum 6 characters';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        /// REMEMBER ME + FORGOT PASSWORD
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _rememberMe,
-                              activeColor: spotifyGreen,
-                              onChanged: (value) {
-                                setState(() => _rememberMe = value ?? false);
-                              },
-                            ),
-                            Text(
-                              'Remember me',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                            ),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text(
-                                'Forgot Password?',
-                                style: TextStyle(
-                                  color: spotifyGreen,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        /// SIGN IN BUTTON
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleLogin,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: spotifyGreen,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 22,
-                                    width: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.black,
-                                    ),
-                                  )
-                                : const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Sign In',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Icon(Icons.arrow_forward,
-                                          color: Colors.black),
-                                    ],
-                                  ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 28),
-
-                        /// DIVIDER
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                  color: Colors.white.withOpacity(0.15)),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text(
-                                'or continue with',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white.withOpacity(0.5),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                  color: Colors.white.withOpacity(0.15)),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        /// SOCIAL LOGIN
-                        Row(
-                          children: const [
-                            Expanded(
-                              child: _SocialButton(
-                                icon: Icons.g_mobiledata,
-                                label: 'Google',
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: _SocialButton(
-                                icon: Icons.apple,
-                                label: 'Apple',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              /// --------------------------------------------------
-              /// REGISTER HERE (BELOW LOGIN CARD)
-              /// --------------------------------------------------
-              Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account?",
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: () {
-                        // TODO: Navigate to Register Screen
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
-                          return RegisterScreen();
-                          }));
-                      },
-                      child: const Text(
-                        'Register here',
-                        style: TextStyle(
-                          color: spotifyGreen,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
-    );
+    ],
+  ),
+);
+
   }
 }
 

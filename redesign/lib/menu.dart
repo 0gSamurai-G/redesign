@@ -32,7 +32,7 @@ class _MoreScreenState extends State<MoreScreen> {
         top: true,
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(0,0,0,80),
+          padding: const EdgeInsets.fromLTRB(0,0,0,100),
           children: [
             const _ProfileHeader(),
             const SizedBox(height: 16),
@@ -143,15 +143,28 @@ class _ProfileHeader extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              backgroundColor: AppColors.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: const Text('Edit'),
-          ),
+  onPressed: () {},
+  style: TextButton.styleFrom(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    backgroundColor: AppColors.surface, // dark surface
+    foregroundColor: Colors.white,      // text color
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+      side: BorderSide(
+        color: Colors.white.withOpacity(0.15), // subtle outline
+      ),
+    ),
+  ),
+  child: Text(
+    'Edit',
+    style: GoogleFonts.inter(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.2,
+    ),
+  ),
+)
+
         ],
       ),
     );
@@ -218,6 +231,7 @@ class _ToolsGrid extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GridView.builder(
+        padding: EdgeInsets.zero,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: tools.length,

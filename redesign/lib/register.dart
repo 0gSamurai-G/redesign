@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:redesign/login.dart';
 import 'package:redesign/navigation.dart';
 
@@ -78,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: charcoal,
+      backgroundColor: Color(0xFF000000),
       body: Stack(
         children: [
           /// TOP GRADIENT
@@ -89,31 +90,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 bottomLeft: Radius.circular(48),
                 bottomRight: Radius.circular(48),
               ),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1DB954),
-                  Color(0xFF0F5132),
-                ],
-              ),
+              gradient: const LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xFF1DB954),
+    Color(0x801DB954),
+    Color(0x001DB954),
+  ],
+  stops: [0.0, 0.4, 1.0],
+)
+
+
             ),
           ),
 
-          /// ABSTRACT SHAPE
+          /// ABSTRACT BACKGROUND SHAPE
           Positioned(
-            top: -40,
-            left: -40,
-            right: -48,
-            child: Opacity(
-              opacity: 0.35,
-              child: Image.asset(
-                'assets/logo_shapez.png',
-                height: size.height * 0.48,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+  top: -10,
+  left: 30,
+  right: -50,
+  child: Opacity(
+    opacity: 0.6,
+    child: Transform.rotate(
+      angle: -0.5, // ≈ 30 degrees in radians (30° = 0.5236)
+      child: Text(
+        'Z',
+        textAlign: TextAlign.center,
+        style: GoogleFonts.luckiestGuy(
+          fontSize: size.width * 1.1, // responsive scaling
+          color: Colors.white,    // Spotify green
+          height: 1,
+          letterSpacing: -8,
+        ),
+      ),
+    ),
+  ),
+),
 
           /// REGISTER CARD
           Column(
