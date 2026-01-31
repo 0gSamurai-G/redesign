@@ -1,10 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:redesign/payment_success.dart';
 
 const kBgColor = Colors.black;
 const kCardColor = Color(0xFF1A1A1A);
 const kGreen = Color(0xFF1DB954);
 const kMuted = Color(0xFFA7A7A7);
-
+const Color kBottomSheetColor = Color(0xFF121212);
 
 class ConfirmSlotScreen extends StatefulWidget {
   const ConfirmSlotScreen({super.key});
@@ -14,12 +16,23 @@ class ConfirmSlotScreen extends StatefulWidget {
 }
 
 class _ConfirmSlotScreenState extends State<ConfirmSlotScreen> {
-  int selectedDate = 0;
-  int players = 4;
-  bool soloQueue = true;
+  bool soloQueue = false;
+int players = 4;
+double radius = 10;
+bool bringOwnEquipment = false;
+bool splitAndPay = false;
+ int baseSlotPrice = 1000;
+late final ScrollController _timelineController;
+
+static const double _slotWidth = 90;
+static const int _totalHours = 24;
+static const int _startHour = 12; // Timeline starts at 6 AM
+
+  DateTime? selectedDate;
   bool payToJoin = true;
-  double radius = 5;String selectedType = 'Turf';
-String selectedSize = '5-a-side';
+  String? selectedType;
+  String? selectedSize;
+  final Set<String> _selectedAddons = {};
 
 final List<String> typeOptions = [
   'Turf',
@@ -34,15 +47,35 @@ final List<String> sizeOptions = [
   '7-a-side',
   '11-a-side',
 ];
+bool get _isReadyToPay {
+  if (selectedDate == null) return false;
+  if (selectedSport == null) return false;
+  if (selectedType == null || selectedType!.isEmpty) return false;
+  if (selectedSize == null || selectedSize!.isEmpty) return false;
+  if (_startTime == null || _endTime == null) return false;
+  return _endTime!.hour > _startTime!.hour;
+}
+int get _totalAmount {
+  int basePrice = 1000;
 
-late final ScrollController _timelineController;
-TimeOfDay _startTime = const TimeOfDay(hour: 8, minute: 0);
-TimeOfDay _endTime = const TimeOfDay(hour: 9, minute: 0);
+  // Example for later:
+  // if (proBallSelected) basePrice += 200;
+
+  return basePrice;
+}
+
+TimeOfDay? _startTime;
+TimeOfDay? _endTime;
+String? selectedSport;
 
 @override
 void initState() {
   super.initState();
   _timelineController = ScrollController();
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _autoScrollToNextHour();
+  });
 }
 
 @override
@@ -51,12 +84,14 @@ void dispose() {
   super.dispose();
 }
 
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: kBgColor,
+      extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
@@ -72,7 +107,7 @@ void dispose() {
 
       /// SCROLLABLE BODY
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 110),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -93,10 +128,11 @@ void dispose() {
             const SizedBox(height: 32),
 
             _sectionTitle('Add-ons & Equipment'),
-            _addonCard('Pro Match Ball', '+ ₹200', true),
-            _addonCard('Extra Bibs (Set of 10)', '+ ₹150', false),
-            _addonCard('Referee Service', '+ ₹300', false),
-            const SizedBox(height: 32),
+            const SizedBox(height: 5),
+            _addonCard('Pro Match Ball', '+ ₹200'),
+            _addonCard('Extra Bibs (Set of 10)', '+ ₹150'),
+            _addonCard('Referee Service', '+ ₹300'),
+            const SizedBox(height: 28),
 
             _soloQueueSection(),
             const SizedBox(height: 32),
@@ -131,14 +167,14 @@ Widget _dateSelector() {
           itemCount: 7,
           itemBuilder: (_, index) {
             final date = today.add(Duration(days: index));
-            final bool selected = index == selectedDate;
+            final bool selected = selectedDate != null && _isSameDate(selectedDate!, date);
 
             final String day = _weekdayShort(date.weekday);
             final String month = _monthShort(date.month);
             final String dateNum = date.day.toString();
 
             return GestureDetector(
-              onTap: () => setState(() => selectedDate = index),
+              onTap: () => setState(() => selectedDate = date),
               child: Container(
                 width: 72,
                 margin: const EdgeInsets.only(right: 12),
@@ -213,6 +249,10 @@ Widget _dateSelector() {
   );
 }
 
+bool _isSameDate(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
 String _weekdayShort(int weekday) {
   const days = [
     'Mon',
@@ -247,31 +287,61 @@ String _monthShort(int month) {
 
   // ------------------------------------------------------------
   // SPORT SELECTOR
-  Widget _sportSelector() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          _pill('Football', true),
-          _pill('Cricket', false),
-          _pill('Tennis', false),
-        ],
-      ),
-    );
-  }
+Widget _sportSelector() {
+  final sports = ['Football', 'Cricket', 'Tennis'];
 
-  Widget _pill(String label, bool active) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: sports.map((sport) {
+        final bool isActive = selectedSport == sport;
+
+        return _sportPill(
+          label: sport,
+          active: isActive,
+          onTap: () {
+            setState(() => selectedSport = sport);
+          },
+        );
+      }).toList(),
+    ),
+  );
+}
+Widget _sportPill({
+  required String label,
+  required bool active,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    borderRadius: BorderRadius.circular(30),
+    onTap: onTap,
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       decoration: BoxDecoration(
+        color: active ? kGreen.withOpacity(0.15) : Colors.black,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: active ? kGreen : Colors.grey.shade700),
+        border: Border.all(
+          color: active ? kGreen : Colors.grey.shade700,
+          width: active ? 1.4 : 1,
+        ),
       ),
-      child: Text(label,
-          style: TextStyle(color: active ? kGreen : Colors.white)),
-    );
-  }
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active ? kGreen : Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+        ),
+      ),
+    ),
+  );
+}
+
 
   // ------------------------------------------------------------
   // DROPDOWNS
@@ -322,12 +392,12 @@ Widget _dropdownRow() {
 void _openBottomSheet({
   required String title,
   required List<String> options,
-  required String selected,
+  String? selected,
   required ValueChanged<String> onSelected,
 }) {
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors.black,
+    backgroundColor: kBottomSheetColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
@@ -384,7 +454,7 @@ void _openBottomSheet({
 
 Widget _dropdownCard({
   required String label,
-  required String value,
+  String? value,
   required VoidCallback onTap,
 }) {
   return InkWell(
@@ -418,11 +488,11 @@ Widget _dropdownCard({
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  value,
+                  value ?? 'Select',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: value == null ? kMuted : Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -444,21 +514,42 @@ Widget _dropdownCard({
 
   // ------------------------------------------------------------
   // AVAILABILITY
+  void _autoScrollToNextHour() {
+  final now = DateTime.now();
+  final int currentHour = now.hour;
+
+  final int targetIndex =
+      (currentHour - _startHour).clamp(0, _totalHours - 1);
+
+  final double offset = targetIndex * _slotWidth;
+
+  _timelineController.animateTo(
+    offset,
+    duration: const Duration(milliseconds: 400),
+    curve: Curves.easeOut,
+  );
+}
+
+
+
 Widget _availabilityTimeline() {
-  final List<_TimeSlot> slots = [
-    _TimeSlot(start: '4 AM', end: '5 AM', isFree: false),
-    _TimeSlot(start: '5 AM', end: '6 AM', isFree: false),
-    _TimeSlot(start: '6 AM', end: '7 AM', isFree: true),
-    _TimeSlot(start: '7 AM', end: '8 AM', isFree: true),
-    _TimeSlot(start: '8 AM', end: '9 AM', isFree: false),
-  ];
+  final List<_TimeSlot> slots = List.generate(_totalHours, (index) {
+    final int start = _startHour + index;
+    final int end = start + 1;
+
+    return _TimeSlot(
+      start: _formatHour(start),
+      end: _formatHour(end),
+      isFree: index.isEven, // mock availability (replace with API)
+    );
+  });
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: const Text(
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Text(
           'Availability',
           style: TextStyle(
             color: kMuted,
@@ -469,29 +560,31 @@ Widget _availabilityTimeline() {
       ),
       const SizedBox(height: 12),
 
-      /// ✅ SINGLE SCROLL VIEW (THIS IS THE KEY)
-      SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 16),
+      /// SINGLE SCROLLABLE TIMELINE
+      SingleChildScrollView(
+        controller: _timelineController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// TIME LABELS (UNIQUE: 4 5 6 7 8 9)
+            /// TIME LABELS (6 AM → 6 PM)
             Row(
               children: [
                 _TimeLabel(slots.first.start),
-                ...slots.map((slot) => _TimeLabel(slot.end)).toList(),
+                ...slots.map((s) => _TimeLabel(s.end)).toList(),
               ],
             ),
 
             const SizedBox(height: 6),
 
-            /// TIMELINE BLOCKS
+            /// BLOCKS
             Row(
               children: List.generate(slots.length, (index) {
                 final slot = slots[index];
-                final isFirst = index == 0;
-                final isLast = index == slots.length - 1;
+                final bool isFirst = index == 0;
+                final bool isLast = index == slots.length - 1;
 
                 return Row(
                   children: [
@@ -500,13 +593,11 @@ Widget _availabilityTimeline() {
                       isFirst: isFirst,
                       isLast: isLast,
                     ),
-
-                    /// Separator (except last)
                     if (!isLast)
                       Container(
                         width: 2,
                         height: 44,
-                        color: Colors.black,
+                        color: Colors.grey.shade800,
                       ),
                   ],
                 );
@@ -519,15 +610,15 @@ Widget _availabilityTimeline() {
       const SizedBox(height: 12),
 
       /// LEGEND
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
         child: Row(
-          children: const [
-            _LegendDot(color: Color.fromARGB(255, 255, 44, 44)),
+          children: [
+            _LegendDot(color: Color(0xFFD60101)),
             SizedBox(width: 6),
             Text('Booked', style: TextStyle(color: kMuted)),
             SizedBox(width: 16),
-            _LegendDot(color: Color.fromARGB(255, 0, 255, 132)),
+            _LegendDot(color: Color(0xFF00B45D)),
             SizedBox(width: 6),
             Text('Free', style: TextStyle(color: kMuted)),
           ],
@@ -537,6 +628,13 @@ Widget _availabilityTimeline() {
   );
 }
 
+
+String _formatHour(int hour) {
+  final int h = hour % 24;
+  final int displayHour = h == 0 ? 12 : h > 12 ? h - 12 : h;
+  final String period = h >= 12 ? 'PM' : 'AM';
+  return '$displayHour $period';
+}
 
 
 
@@ -574,7 +672,7 @@ Widget _availabilityTimeline() {
 
 Widget _timeCard({
   required String label,
-  required TimeOfDay time,
+  required TimeOfDay? time,
   required VoidCallback onTap,
 }) {
   return InkWell(
@@ -611,8 +709,8 @@ Widget _timeCard({
             children: [
               Text(
                 _formatTime(time),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: time == null ? kMuted : Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   height: 1.1,
@@ -631,7 +729,8 @@ Widget _timeCard({
     ),
   );
 }
-String _formatTime(TimeOfDay time) {
+String _formatTime(TimeOfDay? time) {
+  if (time == null) return '--:--';
   final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
   final period = time.period == DayPeriod.am ? 'AM' : 'PM';
   return '$hour:00 $period';
@@ -639,104 +738,268 @@ String _formatTime(TimeOfDay time) {
 
   // ------------------------------------------------------------
   // ADDONS
-  Widget _addonCard(String title, String price, bool selected) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        margin: const EdgeInsets.only(top: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? kGreen : Colors.grey.shade800),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(title, style: const TextStyle(color: Colors.white)),
+Widget _addonCard(String title, String price) {
+  final selected = _selectedAddons.contains(title);
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+    child: Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias, // 🔑 CONTAINS SPLASH
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            if (selected) {
+              _selectedAddons.remove(title);
+            } else {
+              _selectedAddons.add(title);
+            }
+          });
+        },
+        splashColor: kGreen.withOpacity(0.15),
+        highlightColor: kGreen.withOpacity(0.08),
+        child: Ink(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black, // Spotify dark base
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? kGreen : Colors.grey.shade800,
+              width: 1.2,
             ),
-            Text(price, style: const TextStyle(color: kGreen)),
-            const SizedBox(width: 8),
-            Icon(selected ? Icons.check_circle : Icons.circle_outlined,
-                color: selected ? kGreen : kMuted),
-          ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Text(
+                price,
+                style: const TextStyle(
+                  color: kGreen,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                selected
+                    ? Icons.check_circle
+                    : Icons.circle_outlined,
+                color: selected ? kGreen : kMuted,
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   // ------------------------------------------------------------
   // SOLO QUEUE
-  Widget _soloQueueSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border.all(color: kGreen),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SwitchListTile(
-              value: soloQueue,
-              activeColor: kGreen,
-              title: const Text('Solo Queue Mode',
-                  style: TextStyle(color: Colors.white)),
-              subtitle: const Text(
-                'Allow others to join and split cost',
-                style: TextStyle(color: kMuted),
-              ),
-              onChanged: (v) => setState(() => soloQueue = v),
-            ),
-            const SizedBox(height: 16),
-      
-            _sectionTitle('Total Players Needed'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                    onPressed: () => setState(() => players--),
-                    icon: const Icon(Icons.remove, color: Colors.white)),
-                Text('$players Players',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-                IconButton(
-                    onPressed: () => setState(() => players++),
-                    icon: const Icon(Icons.add, color: Colors.white)),
-              ],
-            ),
-      
-            const SizedBox(height: 16),
-            _sectionTitle('Matchmaking Radius'),
-            Slider(
-              value: radius,
-              min: 1,
-              max: 10,
-              divisions: 9,
-              label: '${radius.toInt()} km',
-              activeColor: kGreen,
-              onChanged: (v) => setState(() => radius = v),
-            ),
-      
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: kGreen, style: BorderStyle.solid),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Posting for 4 Players • ₹250/person • Intermediate',
-                style: TextStyle(color: kGreen),
+Widget _soloQueueSection() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF121212), // Spotify dark surface
+        border: Border.all(color: kGreen),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// SOLO QUEUE TOGGLE
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: soloQueue,
+            activeColor: kGreen,
+            title: const Text(
+              'Solo Queue Mode',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
+            subtitle: const Text(
+              'Allow others to join and split cost',
+              style: TextStyle(color: kMuted),
+            ),
+            onChanged: (v) => setState(() => soloQueue = v),
+          ),
+
+          /// EXTRA OPTIONS (ONLY WHEN ENABLED)
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: _soloQueueExtras(),
+            crossFadeState: soloQueue
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 250),
+            sizeCurve: Curves.easeOut,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _soloQueueExtras() {
+  final int perPersonAmount =
+      splitAndPay ? (baseSlotPrice / players).ceil() : baseSlotPrice;
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SizedBox(height: 16),
+
+      /// TOTAL PLAYERS
+      const Text(
+        'Total Players Needed',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
         ),
       ),
-    );
-  }
+      const SizedBox(height: 8),
+
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            onPressed: players > 1
+                ? () => setState(() => players--)
+                : null,
+            icon: const Icon(Icons.remove),
+            color: Colors.white,
+          ),
+          Text(
+            '$players Players',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          IconButton(
+            onPressed: () => setState(() => players++),
+            icon: const Icon(Icons.add),
+            color: Colors.white,
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 20),
+
+      /// SPLIT & PAY TOGGLE
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        value: splitAndPay,
+        activeColor: kGreen,
+        title: const Text(
+          'Split & Pay',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          splitAndPay
+              ? 'Each player pays ₹$perPersonAmount'
+              : 'Host pays full amount',
+          style: const TextStyle(color: kMuted),
+        ),
+        onChanged: (v) => setState(() => splitAndPay = v),
+      ),
+
+      const SizedBox(height: 16),
+
+      /// MATCHMAKING RADIUS (UP TO 20 KM)
+      const Text(
+        'Matchmaking Radius',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      SliderTheme(
+  data: SliderTheme.of(context).copyWith(
+    valueIndicatorColor: kGreen, // background of label
+    valueIndicatorTextStyle: const TextStyle(
+      color: Colors.black, // 👈 label text color
+      fontWeight: FontWeight.w500,
+    ),
+    activeTrackColor: kGreen,
+    inactiveTrackColor: Colors.grey.shade800,
+    thumbColor: kGreen,
+  ),
+  child: Slider(
+    value: radius,
+    min: 1,
+    max: 20,
+    divisions: 19,
+    label: '${radius.toInt()} km',
+    onChanged: (v) => setState(() => radius = v),
+    activeColor: kGreen,
+  ),
+),
+
+
+      const SizedBox(height: 12),
+
+      /// BRING YOUR OWN EQUIPMENT
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        value: bringOwnEquipment,
+        activeColor: kGreen,
+        title: const Text(
+          'Bring Your Own Equipment',
+          style: TextStyle(color: Colors.white),
+        ),
+        subtitle: const Text(
+          'Players will bring their own gear',
+          style: TextStyle(color: kMuted),
+        ),
+        onChanged: (v) => setState(() => bringOwnEquipment = v),
+      ),
+
+      const SizedBox(height: 12),
+
+      /// SUMMARY CARD
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(color: kGreen),
+          borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFF121212),
+        ),
+        child: Text(
+          splitAndPay
+              ? 'Posting for $players Players • ₹$perPersonAmount / person • ${radius.toInt()} km'
+              : 'Posting for $players Players • Host pays ₹$baseSlotPrice • ${radius.toInt()} km'
+              '${bringOwnEquipment ? ' • BYO Equipment' : ''}',
+          style: const TextStyle(
+            color: kGreen,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+
 
   // ------------------------------------------------------------
   // FINAL PAYMENT
@@ -762,47 +1025,126 @@ String _formatTime(TimeOfDay time) {
     );
   }
 
-  Widget _policyBox() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: kCardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Venue Policy',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
-          Text('• Non-refundable within 4 hours',
-              style: TextStyle(color: kMuted)),
-          Text('• Steel studs prohibited',
-              style: TextStyle(color: kMuted)),
-        ],
-      ),
-    );
-  }
+Widget _policyBox() {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: kCardColor, // Spotify dark surface
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: Colors.grey.shade800),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        /// HEADER
+        Row(
+          children: const [
+            Icon(
+              Icons.info_outline,
+              color: kGreen,
+              size: 18,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Venue Policy',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        /// POLICY ITEMS
+        _policyItem('Non-refundable within 4 hours'),
+        _policyItem('Steel studs are prohibited'),
+      ],
+    ),
+  );
+}
+
+Widget _policyItem(String text) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(top: 6),
+          child: Icon(
+            Icons.circle,
+            size: 6,
+            color: kMuted,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: kMuted,
+              fontSize: 13,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+void _onPayPressed() {
+  // This is where Razorpay / Stripe / Cashfree goes later
+  debugPrint('Proceeding to pay ₹$_totalAmount');
+  Navigator.of(context).push(MaterialPageRoute(builder: (_){return BookingConfirmationScreen();}));
+}
 
   // ------------------------------------------------------------
   // CTA BAR
-  Widget _bottomBar() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: kGreen,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+Widget _bottomBar() {
+  final bool enabled = _isReadyToPay;
+
+  return ClipRRect(
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+        decoration: const BoxDecoration(
+          color: Color.fromRGBO(0, 0, 0, 0.8),
+          border: Border(
+            top: BorderSide(color: Color(0xFF1A1A1A)),
+          ),
         ),
-        onPressed: () {},
-        child: const Text('Pay & Confirm',
-            style: TextStyle(fontSize: 18, color: Colors.black)),
+        child: ElevatedButton(
+          onPressed: enabled ? _onPayPressed : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: enabled ? kGreen : const Color(0xFF2A2A2A),
+            foregroundColor: Colors.black,
+            elevation: enabled ? 2 : 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+          child: Text(
+            enabled ? 'Pay ₹$_totalAmount' : 'Complete details to pay',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: enabled ? Colors.black : kMuted,
+            ),
+          ),
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   // ------------------------------------------------------------
   // HELPERS
@@ -855,7 +1197,9 @@ String _formatTime(TimeOfDay time) {
   Future<void> _pickTime({required bool isStart}) async {
   final picked = await showTimePicker(
     context: context,
-    initialTime: isStart ? _startTime : _endTime,
+    initialTime: isStart
+        ? (_startTime ?? const TimeOfDay(hour: 8, minute: 0))
+        : (_endTime ?? const TimeOfDay(hour: 9, minute: 0)),
     helpText: 'Select Hour',
     builder: (context, child) {
       return Theme(
@@ -889,15 +1233,15 @@ String _formatTime(TimeOfDay time) {
       _startTime = selected;
 
       /// 🧠 AUTO-FIX: End time must always be AFTER start time
-      if (_endTime.hour <= _startTime.hour) {
+      if (_endTime == null || _endTime!.hour <= _startTime!.hour) {
         _endTime = TimeOfDay(
-          hour: (_startTime.hour + 1).clamp(0, 23),
+          hour: (_startTime!.hour + 1).clamp(0, 23),
           minute: 0,
         );
       }
     } else {
       /// 🚫 BLOCK INVALID END TIME
-      if (selected.hour <= _startTime.hour) {
+      if (_startTime != null && selected.hour <= _startTime!.hour) {
         return; // silently ignore invalid selection
       }
       _endTime = selected;
