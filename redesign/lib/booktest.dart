@@ -624,6 +624,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:redesign/home.dart';
+import 'package:redesign/turfdetails.dart';
 import 'package:shimmer/shimmer.dart';
 
 /* ============================================================
@@ -1225,127 +1227,132 @@ class _TurfCardState extends State<_TurfCard>
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    /// 🔥 NAVIGABLE CONTENT ONLY
+    InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            // builder: (_) => const UserHomePage(),
+            builder: (_) => const TurfDetailScreen(),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              data.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: BookTurfScreen.accent,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              data.location,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: BookTurfScreen.muted,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            Row(
               children: [
-                Text(
-                  data.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: BookTurfScreen.accent,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  data.location,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: BookTurfScreen.muted,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                Row(
-                  children: [
-                    // const Icon(Icons.star,
-                    //     size: 14, color: Colors.amber),
-                    const SizedBox(width: 4),
-                    Text.rich(
-  TextSpan(
-    children: [
-      TextSpan(
-        text: '⭐ ',
-        style: GoogleFonts.inter(
-          fontSize: 13, // star slightly bigger
-          height: 1,
-        ),
-      ),
-      TextSpan(
-        text: '4.6',
-        style: GoogleFonts.inter(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-      ),
-    ],
-  ),
-),
-
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        '(128 reviews) • 2.4 km away',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(text: '⭐ '),
+                      TextSpan(
+                        text: '4.6',
                         style: GoogleFonts.inter(
-                          color: BookTurfScreen.muted,
-                          fontSize: 12,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-
-                const SizedBox(height: 14),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: RichText(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: BookTurfScreen.muted,
-                          ),
-                          children: [
-                            const TextSpan(text: 'Starts from '),
-                            TextSpan(
-                              text: '₹${data.price}',
-                              style: const TextStyle(
-                                color: BookTurfScreen.accent,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const TextSpan(
-                              text: '/hr',
-                              style: TextStyle(
-                                color: BookTurfScreen.accent,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    '(128 reviews) • 2.4 km away',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: BookTurfScreen.muted,
+                      fontSize: 12,
                     ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: BookTurfScreen.accent,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 10,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Text('Book'),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    ),
+
+    /// 🔥 PRICE + BOOK (NOT NAVIGABLE)
+    Row(
+      children: [
+        Expanded(
+          child: RichText(
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: BookTurfScreen.muted,
+              ),
+              children: [
+                const TextSpan(text: 'Starts from '),
+                TextSpan(
+                  text: '₹${data.price}',
+                  style: const TextStyle(
+                    color: BookTurfScreen.accent,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                  ),
+                ),
+                const TextSpan(text: '/hr'),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        ElevatedButton(
+          onPressed: () {
+            // 👉 booking flow only
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: BookTurfScreen.accent,
+            foregroundColor: Colors.black,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 10,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: const Text('Book'),
+        ),
+      ],
+    ),
+  ],
+)
+
           ),
         ],
       ),

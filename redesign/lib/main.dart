@@ -23,6 +23,7 @@ class PlayZApp extends StatelessWidget {
         fontFamily: 'Inter',
       ),
       home: const SplashScreen(),
+      //  home: const TurfDetailScreen(),
     );
   }
 }

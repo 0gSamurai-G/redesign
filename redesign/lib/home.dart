@@ -57,11 +57,11 @@ class UserHomePage extends StatelessWidget {
             _HeroCTA(),
             SizedBox(height: 28),
             _QuickAccessTiles(),
-            SizedBox(height: 32),
+            SizedBox(height: 28),
             _PopularVenues(),
-            SizedBox(height: 32),
+            SizedBox(height: 28),
             _ExploreBySport(),
-            SizedBox(height: 32),
+            SizedBox(height: 28),
             _FeaturedEvents(),
             SizedBox(height: 20),
             _OfficialAppInfo(),
@@ -366,63 +366,22 @@ class _QuickAccessTiles extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-
-        /// Responsive grid logic
         final crossAxisCount = width >= 600 ? 3 : 2;
-        final spacing = 14.0;
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: GridView.builder(
+            padding: EdgeInsets.zero,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.zero,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: spacing,
-              mainAxisSpacing: spacing,
-              childAspectRatio: width < 360 ? 1.25 : 1.4, // 👈 safe on small phones
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
+              childAspectRatio: width < 360 ? 1.15 : 1.3,
             ),
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              const items = [
-                _QuickTile(
-                  Icons.groups,
-                  'Groups',
-                  'Find your crew',
-                ),
-                _QuickTile(
-                  Icons.calendar_month,
-                  'Bookings',
-                  'Reserve slot',
-                  badge: '2 Active',
-                ),
-                _QuickTile(
-                  Icons.people_outline,
-                  'Friends',
-                  'Build squad',
-                ),
-                _QuickTile(
-                  Icons.emoji_events,
-                  'Rankings',
-                  'Track stats',
-                  badge: 'New',
-                ),
-                _QuickTile(
-                  Icons.scoreboard_outlined,
-                  'Scoreboard',
-                  'Live & personal scores',
-                ),
-                _QuickTile(
-                  Icons.smart_toy_outlined,
-                  'AI Trainer',
-                  'Train smarter',
-                  badge: 'Beta',
-                ),
-              ];
-
-              return items[index];
-            },
+            itemCount: _tiles.length,
+            itemBuilder: (_, i) => _tiles[i],
           ),
         );
       },
@@ -430,107 +389,177 @@ class _QuickAccessTiles extends StatelessWidget {
   }
 }
 
+const _tiles = [
+  _QuickTile(Icons.groups, 'Groups', 'Find your crew'),
+  _QuickTile(Icons.calendar_month, 'Bookings', 'Reserve slots', badge: '2 Active'),
+  _QuickTile(Icons.people_outline, 'Friends', 'Build squad'),
+  _QuickTile(Icons.emoji_events, 'Rankings', 'Track stats', badge: 'New'),
+  _QuickTile(Icons.scoreboard_outlined, 'Scoreboard', 'Live scores'),
+  _QuickTile(Icons.smart_toy_outlined, 'AI Trainer', 'Train smarter', badge: 'Beta', highlight: true),
+];
+
+
 class _QuickTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final String? badge;
+  final bool highlight;
+
+  /// 🔑 Interaction hooks
+  final VoidCallback? onTap;
+  final QuickAction? action;
 
   const _QuickTile(
     this.icon,
     this.title,
     this.subtitle, {
     this.badge,
+    this.highlight = false,
+    this.onTap,
+    this.action,
   });
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () {
+          // 🔔 Centralized future handling
+          if (onTap != null) {
+            onTap!();
+          } else if (action != null) {
+            _handleQuickAction(context, action!);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: () {},
-      child: Container(
-        padding: EdgeInsets.all(width < 360 ? 12 : 14),
-        decoration: BoxDecoration(
-          color: UserHomePage.bg,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white24),
-        ),
-        child: Stack(
-          children: [
-            /// BADGE (SAFE)
-            if (badge != null)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: UserHomePage.accent,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    badge!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+            /// Spotify card surface
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                UserHomePage.surface,
+                UserHomePage.surface.withOpacity(0.9),
+              ],
+            ),
+
+            /// Depth
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.35),
+                blurRadius: 10,
+                offset: const Offset(0, 6),
+              ),
+            ],
+
+            /// Optional highlight
+            border: highlight
+                ? Border.all(color: UserHomePage.accent.withOpacity(0.6))
+                : Border.all(color: Colors.white.withOpacity(0.06)),
+          ),
+          child: Stack(
+            children: [
+              /// BADGE
+              if (badge != null)
+                Positioned(
+                  top: 0,
+                  right: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: UserHomePage.accent.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: UserHomePage.accent,
+                      ),
                     ),
                   ),
                 ),
+
+              /// CONTENT
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    icon,
+                    size: 28,
+                    color:UserHomePage.accent
+                        
+                  ),
+                  const Spacer(),
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: UserHomePage.muted,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
-
-            /// CONTENT
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// ICON
-                Icon(
-                  icon,
-                  color: UserHomePage.accent,
-                  size: width < 360 ? 24 : 28,
-                ),
-
-                const Spacer(),
-
-                /// TITLE (SAFE)
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: width < 360 ? 13 : 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                /// SUBTITLE (SAFE)
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: UserHomePage.muted,
-                    fontSize: width < 360 ? 11 : 12,
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
+  /// 🧠 Central action handler (future-ready)
+  void _handleQuickAction(BuildContext context, QuickAction action) {
+    switch (action) {
+      case QuickAction.groups:
+        // Navigator.push(...)
+        break;
+      case QuickAction.bookings:
+        break;
+      case QuickAction.friends:
+        break;
+      case QuickAction.rankings:
+        break;
+      case QuickAction.scoreboard:
+        break;
+      case QuickAction.aiTrainer:
+        // Show coming soon / beta dialog
+        break;
+    }
+  }
 }
+enum QuickAction {
+  groups,
+  bookings,
+  friends,
+  rankings,
+  scoreboard,
+  aiTrainer,
+}
+
+
 
 /* ============================================================
    POPULAR VENUES

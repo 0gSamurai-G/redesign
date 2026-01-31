@@ -312,7 +312,7 @@ class _GameList extends StatelessWidget {
       hostName: 'Deepankar Shrikant Rokade Patil',
       time: 'Thu 4 Dec, 06:30',
       price: '₹100',
-      onboard: '2/22 Onboard',
+      onboard: '2/22',
       address:
           'Dnyankamal Society, Sr No 20/1, Abhinav Nagar, Pune (0.8 km)',
       avatarUrl: 'https://i.pravatar.cc/100?img=1',
@@ -323,7 +323,7 @@ class _GameList extends StatelessWidget {
       hostName: 'Deepankar Shrikant Rokade Patil',
       time: 'Thu 4 Dec, 06:30',
       price: '₹100',
-      onboard: '2/22 Onboard',
+      onboard: '2/22',
       address:
           'Dnyankamal Society, Sr No 20/1, Abhinav Nagar, Pune (0.8 km)',
       avatarUrl: 'https://i.pravatar.cc/100?img=1',
@@ -335,7 +335,7 @@ class _GameList extends StatelessWidget {
       hostName: 'Rahul Mahadev Kulkarni',
       time: 'Fri 5 Dec, 07:00',
       price: '₹150',
-      onboard: '5/18 Onboard',
+      onboard: '5/18',
       address:
           'Baner Sports Complex, Near High Street, Pune (1.4 km)',
       avatarUrl: 'https://i.pravatar.cc/100?img=2',
@@ -347,7 +347,7 @@ class _GameList extends StatelessWidget {
       hostName: 'Amit Prakash Deshmukh',
       time: 'Sat 6 Dec, 08:30',
       price: '₹80',
-      onboard: '8/16 Onboard',
+      onboard: '8/16',
       address:
           'Wakad Indoor Arena, Hinjewadi Road, Pune (2.1 km)',
       avatarUrl: 'https://i.pravatar.cc/100?img=3',
@@ -389,7 +389,8 @@ class _GameCard extends StatelessWidget {
           Row(
             children: [
               _Tag(data.type),
-              const SizedBox(width: 6),
+              // const SizedBox(width: 6),
+              _Tag("•"),
               _Tag(data.sport),
               const Spacer(),
               Text(
