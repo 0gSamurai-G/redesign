@@ -24,9 +24,11 @@ bool splitAndPay = false;
  int baseSlotPrice = 1000;
 late final ScrollController _timelineController;
 
+static const int _startHour = 1;   // 6 AM
+static const int _totalHours = 23; // 6 AM → 6 PM
 static const double _slotWidth = 90;
-static const int _totalHours = 24;
-static const int _startHour = 12; // Timeline starts at 6 AM
+static const double _separatorWidth = 2;
+
 
   DateTime? selectedDate;
   bool payToJoin = true;
@@ -74,9 +76,10 @@ void initState() {
   _timelineController = ScrollController();
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    _autoScrollToNextHour();
+    _waitForTimelineAndScroll();
   });
 }
+
 
 @override
 void dispose() {
@@ -514,21 +517,53 @@ Widget _dropdownCard({
 
   // ------------------------------------------------------------
   // AVAILABILITY
-  void _autoScrollToNextHour() {
+ void _autoScrollToNextHour() {
   final now = DateTime.now();
-  final int currentHour = now.hour;
 
-  final int targetIndex =
-      (currentHour - _startHour).clamp(0, _totalHours - 1);
+  int effectiveHour =
+      now.minute >= 30 ? now.hour + 1 : now.hour;
 
-  final double offset = targetIndex * _slotWidth;
+  effectiveHour = effectiveHour.clamp(
+    _startHour,
+    _startHour + _totalHours - 1,
+  );
+
+  final int index = effectiveHour - _startHour;
+
+  final double itemExtent = _slotWidth + _separatorWidth;
+  double offset = index * itemExtent;
+
+  final viewportWidth =
+      _timelineController.position.viewportDimension;
+
+  offset -= (viewportWidth - _slotWidth) / 2;
+
+  offset = offset.clamp(
+    _timelineController.position.minScrollExtent,
+    _timelineController.position.maxScrollExtent,
+  );
 
   _timelineController.animateTo(
     offset,
-    duration: const Duration(milliseconds: 400),
-    curve: Curves.easeOut,
+    duration: const Duration(milliseconds: 450),
+    curve: Curves.easeOutCubic,
   );
 }
+
+
+void _waitForTimelineAndScroll() {
+  if (!_timelineController.hasClients) {
+    // wait one more frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _waitForTimelineAndScroll();
+    });
+    return;
+  }
+
+  _autoScrollToNextHour();
+}
+
+  
 
 
 

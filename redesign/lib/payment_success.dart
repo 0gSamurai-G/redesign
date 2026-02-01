@@ -54,7 +54,7 @@ late Animation<double> _contentOpacity;
         top: false,
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+          padding: const EdgeInsets.fromLTRB(16, 50, 16, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
