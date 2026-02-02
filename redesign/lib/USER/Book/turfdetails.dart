@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/bookingdetails.dart';
+import 'package:redesign/USER/Book/bookingdetails.dart';
 import 'package:shimmer/shimmer.dart';
 
 class TurfDetailScreen extends StatefulWidget {

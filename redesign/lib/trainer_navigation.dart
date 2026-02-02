@@ -1,32 +1,32 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:redesign/booktest.dart';
-// import 'package:redesign/book.dart';
-import 'package:redesign/home.dart';
-import 'package:redesign/menu.dart';
-import 'package:redesign/play.dart';
-import 'package:redesign/trainer.dart';
+import 'package:redesign/TRAINER/trainer_create.dart';
+import 'package:redesign/TRAINER/trainer_home.dart';
+import 'package:redesign/TRAINER/trainer_menu.dart';
+import 'package:redesign/TRAINER/trainer_schedule.dart';
+import 'package:redesign/TRAINER/trainer_students.dart';
 
-class AppNavShell extends StatefulWidget {
-  const AppNavShell({super.key});
+class TrainerAppNavShell extends StatefulWidget {
+  const TrainerAppNavShell({super.key});
 
   @override
-  State<AppNavShell> createState() => _AppNavShellState();
+  State<TrainerAppNavShell> createState() =>
+      _TrainerAppNavShellState();
 }
 
-class _AppNavShellState extends State<AppNavShell> {
+class _TrainerAppNavShellState extends State<TrainerAppNavShell> {
   int _currentIndex = 0;
 
   static const accent = Color(0xFF1DB954);
   static const bg = Color(0xFF000000);
 
+  /// ✅ HOME IS FIRST (DEFAULT)
   final _pages = const [
-    UserHomePage(),
-    BookTurfScreen(),
-    GameDiaryScreen(),
-    TrainerDiscoveryScreen(),
-    MoreScreen(),
+    TrainerDashboardHomeScreen(), // Home
+    TrainerScheduleScreen(),
+    TrainerCreateOfferingsScreen(),
+    TrainerStudentsScreen(),
+    TrainerProfileScreen(),
   ];
 
   void _onTap(int index) {
@@ -45,7 +45,7 @@ class _AppNavShellState extends State<AppNavShell> {
       ),
       bottomNavigationBar: ClipRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
           child: Container(
             height: 80,
             decoration: BoxDecoration(
@@ -56,33 +56,33 @@ class _AppNavShellState extends State<AppNavShell> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
+              children: const [
                 _NavItem(
-                  filled: Icons.home,
+                  filled: Icons.home_rounded,
                   outlined: Icons.home_outlined,
                   label: 'Home',
                   index: 0,
                 ),
                 _NavItem(
-                  filled: Icons.calendar_month,
+                  filled: Icons.calendar_month_rounded,
                   outlined: Icons.calendar_month_outlined,
-                  label: 'Book',
+                  label: 'Schedule',
                   index: 1,
                 ),
                 _NavItem(
-                  filled: Icons.play_circle,
-                  outlined: Icons.play_circle_outline,
-                  label: 'Play',
+                  filled: Icons.add_circle,
+                  outlined: Icons.add_circle_outline,
+                  label: 'Create',
                   index: 2,
                 ),
                 _NavItem(
-                  filled: Icons.supervisor_account_sharp,
-                  outlined: Icons.supervisor_account_outlined,
-                  label: 'Trainer',
+                  filled: Icons.groups_rounded,
+                  outlined: Icons.groups_outlined,
+                  label: 'Students',
                   index: 3,
                 ),
                 _NavItem(
-                  filled: Icons.menu,
+                  filled: Icons.menu_rounded,
                   outlined: Icons.menu_outlined,
                   label: 'More',
                   index: 4,
@@ -97,18 +97,25 @@ class _AppNavShellState extends State<AppNavShell> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        selected ? item.filled : item.outlined,
+                        selected
+                            ? item.filled
+                            : item.outlined,
                         size: 26,
-                        color: selected ? accent : Colors.white60,
+                        color: selected
+                            ? accent
+                            : Colors.white60,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         item.label,
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight:
-                              selected ? FontWeight.w600 : FontWeight.w400,
-                          color: selected ? accent : Colors.white60,
+                          fontWeight: selected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                          color: selected
+                              ? accent
+                              : Colors.white60,
                         ),
                       ),
                     ],
@@ -122,6 +129,7 @@ class _AppNavShellState extends State<AppNavShell> {
     );
   }
 }
+
 
 /* ============================================================
    NAV ITEM MODEL
@@ -139,3 +147,8 @@ class _NavItem {
     required this.index,
   });
 }
+
+
+
+
+

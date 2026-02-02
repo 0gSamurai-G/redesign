@@ -624,8 +624,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:redesign/home.dart';
-import 'package:redesign/turfdetails.dart';
+import 'package:redesign/USER/Home/home.dart';
+import 'package:redesign/USER/Book/turfdetails.dart';
 import 'package:shimmer/shimmer.dart';
 
 /* ============================================================

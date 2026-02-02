@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/home.dart';
-import 'package:redesign/show_qr.dart';
+import 'package:redesign/USER/Home/home.dart';
+import 'package:redesign/USER/Book/show_qr.dart';
 import 'package:shimmer/shimmer.dart';
 
 const kBg = Colors.black;

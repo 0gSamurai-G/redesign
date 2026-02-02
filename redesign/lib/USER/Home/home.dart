@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 
-import 'package:redesign/book.dart';
+import 'package:redesign/USER/Book/book.dart';
+import 'package:redesign/USER/Home/Groups/groups.dart';
+import 'package:redesign/togglemode.dart';
+import 'package:redesign/trainer_navigation.dart';
 import 'package:shimmer/shimmer.dart';
+// enum AppMode { player, trainer }
 
 void main() {
   runApp(const PlayZApp());
@@ -31,7 +35,7 @@ class PlayZApp extends StatelessWidget {
 /* ============================================================
    USER HOME PAGE
    ============================================================ */
-class UserHomePage extends StatelessWidget {
+class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
 
   // Spotify-style palette
@@ -41,18 +45,42 @@ class UserHomePage extends StatelessWidget {
   static const Color muted = Color(0xFF9CA3AF);
 
   @override
+  State<UserHomePage> createState() => _UserHomePageState();
+}
+
+class _UserHomePageState extends State<UserHomePage> {
+  AppMode _mode = AppMode.player;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      backgroundColor: bg,
+      backgroundColor: UserHomePage.bg,
       // bottomNavigationBar: const _BottomNav(),
       body: SafeArea(
         top: true,
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(0, 0, 00, 80),
-          children:  [
-            _TopAppBar(),
+          children: [
+             _TopAppBar(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: TrainerModePillToggle(
+                mode: _mode,
+                onChanged: (m) {
+                  setState(() => _mode = m);
+                  if (_mode == AppMode.trainer) {
+                        // switch to player shell
+                        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=>TrainerAppNavShell()), (route)=>false);
+                      }
+              
+                  // Optional:
+                  // Navigate or switch shell here
+                },
+              ),
+            ),
+           
             SizedBox(height: 20),
             _HeroCTA(),
             SizedBox(height: 28),
@@ -389,13 +417,47 @@ class _QuickAccessTiles extends StatelessWidget {
   }
 }
 
-const _tiles = [
-  _QuickTile(Icons.groups, 'Groups', 'Find your crew'),
-  _QuickTile(Icons.calendar_month, 'Bookings', 'Reserve slots', badge: '2 Active'),
-  _QuickTile(Icons.people_outline, 'Friends', 'Build squad'),
-  _QuickTile(Icons.emoji_events, 'Rankings', 'Track stats', badge: 'New'),
-  _QuickTile(Icons.scoreboard_outlined, 'Scoreboard', 'Live scores'),
-  _QuickTile(Icons.smart_toy_outlined, 'AI Trainer', 'Train smarter', badge: 'Beta', highlight: true),
+final List<_QuickTile> _tiles = [
+  _QuickTile(
+    Icons.groups,
+    'Groups',
+    'Find your crew',
+    destination: GroupsScreen(),
+  ),
+  _QuickTile(
+    Icons.calendar_month,
+    'Bookings',
+    'Reserve slots',
+    badge: '2 Active',
+    // destination: BookingsScreen(),
+  ),
+  _QuickTile(
+    Icons.people_outline,
+    'Friends',
+    'Build squad',
+    // destination: FriendsScreen(),
+  ),
+  _QuickTile(
+    Icons.emoji_events,
+    'Rankings',
+    'Track stats',
+    badge: 'New',
+    // destination: RankingsScreen(),
+  ),
+  _QuickTile(
+    Icons.scoreboard_outlined,
+    'Scoreboard',
+    'Live scores',
+    // destination: ScoreboardScreen(),
+  ),
+  _QuickTile(
+    Icons.smart_toy_outlined,
+    'AI Trainer',
+    'Train smarter',
+    badge: 'Beta',
+    highlight: true,
+    // destination: AiTrainerScreen(),
+  ),
 ];
 
 
@@ -406,9 +468,8 @@ class _QuickTile extends StatelessWidget {
   final String? badge;
   final bool highlight;
 
-  /// 🔑 Interaction hooks
-  final VoidCallback? onTap;
-  final QuickAction? action;
+  /// ✅ SAFE navigation target
+  final Widget? destination;
 
   const _QuickTile(
     this.icon,
@@ -416,8 +477,7 @@ class _QuickTile extends StatelessWidget {
     this.subtitle, {
     this.badge,
     this.highlight = false,
-    this.onTap,
-    this.action,
+    this.destination,
   });
 
   @override
@@ -426,20 +486,19 @@ class _QuickTile extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        onTap: () {
-          // 🔔 Centralized future handling
-          if (onTap != null) {
-            onTap!();
-          } else if (action != null) {
-            _handleQuickAction(context, action!);
-          }
-        },
+        onTap: destination == null
+            ? null
+            : () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => destination!,
+                  ),
+                );
+              },
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-
-            /// Spotify card surface
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -448,8 +507,6 @@ class _QuickTile extends StatelessWidget {
                 UserHomePage.surface.withOpacity(0.9),
               ],
             ),
-
-            /// Depth
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.35),
@@ -457,24 +514,19 @@ class _QuickTile extends StatelessWidget {
                 offset: const Offset(0, 6),
               ),
             ],
-
-            /// Optional highlight
             border: highlight
                 ? Border.all(color: UserHomePage.accent.withOpacity(0.6))
                 : Border.all(color: Colors.white.withOpacity(0.06)),
           ),
           child: Stack(
             children: [
-              /// BADGE
               if (badge != null)
                 Positioned(
                   top: 0,
                   right: 6,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                        horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: UserHomePage.accent.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
@@ -489,17 +541,10 @@ class _QuickTile extends StatelessWidget {
                     ),
                   ),
                 ),
-
-              /// CONTENT
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    icon,
-                    size: 28,
-                    color:UserHomePage.accent
-                        
-                  ),
+                  Icon(icon, size: 28, color: UserHomePage.accent),
                   const Spacer(),
                   Text(
                     title,
@@ -529,35 +574,8 @@ class _QuickTile extends StatelessWidget {
       ),
     );
   }
+}
 
-  /// 🧠 Central action handler (future-ready)
-  void _handleQuickAction(BuildContext context, QuickAction action) {
-    switch (action) {
-      case QuickAction.groups:
-        // Navigator.push(...)
-        break;
-      case QuickAction.bookings:
-        break;
-      case QuickAction.friends:
-        break;
-      case QuickAction.rankings:
-        break;
-      case QuickAction.scoreboard:
-        break;
-      case QuickAction.aiTrainer:
-        // Show coming soon / beta dialog
-        break;
-    }
-  }
-}
-enum QuickAction {
-  groups,
-  bookings,
-  friends,
-  rankings,
-  scoreboard,
-  aiTrainer,
-}
 
 
 

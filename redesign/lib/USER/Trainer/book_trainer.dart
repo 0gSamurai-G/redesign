@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:redesign/trainer_payment.dart';
+import 'package:redesign/USER/Trainer/trainer_payment.dart';
 
 const kBg = Color(0xFF000000);
 const kCard = Color(0xFF1A1A1A);

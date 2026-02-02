@@ -429,8 +429,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:redesign/home.dart';
-import 'package:redesign/navigation.dart';
+import 'package:redesign/USER/Home/home.dart';
+import 'package:redesign/user_navigation.dart';
 import 'package:redesign/register.dart';
 
 void main() {
@@ -499,7 +499,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // TODO: Navigate to Home Screen
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const AppNavShell()),
+      MaterialPageRoute(builder: (_) => const UserAppNavShell()),
     );
   }
 

@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/book_trainer.dart';
+import 'package:redesign/USER/Trainer/book_trainer.dart';
 import 'package:shimmer/shimmer.dart';
 
 const Color kBg = Colors.black;

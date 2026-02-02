@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:redesign/login.dart';
-import 'package:redesign/navigation.dart';
+import 'package:redesign/user_navigation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -71,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = false);
 
     // TODO: Navigate to Home / Login
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){return AppNavShell();}));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){return UserAppNavShell();}));
   }
 
   @override

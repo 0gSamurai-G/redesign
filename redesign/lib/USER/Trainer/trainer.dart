@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/trainer_info.dart';
-import 'package:redesign/trainer_register.dart';
+import 'package:redesign/USER/Trainer/trainer_info.dart';
+import 'package:redesign/USER/Trainer/trainer_register.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AppColors {

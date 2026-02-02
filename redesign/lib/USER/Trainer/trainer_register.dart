@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:redesign/USER/Trainer/trainer_platform_package.dart';
 
 
 const Color kBg = Color(0xFF000000);
@@ -197,7 +198,9 @@ AgreementsSection(),
  /// CTA
  const SizedBox(height: 25),
             ElevatedButton(
-              onPressed: _isValid ? () {} : null,
+              onPressed: _isValid ? () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>TrainerProAccessScreen()));
+              } : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: kGreen,
                 foregroundColor: Colors.black,

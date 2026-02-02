@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:redesign/payment_success.dart';
+import 'package:redesign/USER/Book/payment_success.dart';
 
 const kBgColor = Colors.black;
 const kCardColor = Color(0xFF1A1A1A);
