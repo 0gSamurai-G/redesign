@@ -432,6 +432,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:redesign/USER/Home/home.dart';
 import 'package:redesign/user_navigation.dart';
 import 'package:redesign/register.dart';
+const kSpotifyGreen = Color(0xFF1DB954);
+const kBg = Color(0xFF000000);
+const kSurface = Color(0xFF0E0E0E);
+const kCard = Color(0xFF1A1A1A);
+const kMuted = Color(0xFFA7A7A7);
 
 void main() {
   runApp(const MyApp());
@@ -523,13 +528,14 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           gradient: LinearGradient(
             begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1DB954),
-              Color(0x801DB954),
-              Color(0x001DB954),
-            ],
-            stops: [0.0, 0.4, 1.0],
+end: Alignment.bottomCenter,
+colors: const [
+  Color(0xFF1DB954), // Spotify green
+  Color(0xFF15883E), // darker green (natural step-down)
+  Color(0xFF0B3D20), // deep green-black blend
+],
+stops: const [0.0, 0.45, 1.0],
+
           ),
         ),
       ),
@@ -540,7 +546,7 @@ class _LoginScreenState extends State<LoginScreen> {
         left: 30,
         right: -50,
         child: Opacity(
-          opacity: 0.6,
+          opacity: 0.8,
           child: Transform.rotate(
             angle: -0.5,
             child: Text(
@@ -570,189 +576,223 @@ class _LoginScreenState extends State<LoginScreen> {
 
             /// LOGIN CARD
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.08),
+  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+  child: Container(
+    padding: const EdgeInsets.all(22),
+    decoration: BoxDecoration(
+      color: kSurface,
+      borderRadius: BorderRadius.circular(22),
+      border: Border.all(
+        color: Colors.white.withOpacity(0.06),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.6),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    ),
+    child: Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          /// 🎧 TITLE
+          const Text(
+            'Welcome back',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Ready to get back on the field?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13.5,
+              color: kMuted,
+              height: 1.4,
+            ),
+          ),
+
+          const SizedBox(height: 26),
+
+          /// 📧 EMAIL
+          _InputField(
+            controller: _emailController,
+            icon: Icons.email_outlined,
+            hint: 'user@playz.com',
+            fillColor: kCard,
+            validator: (value) =>
+                value == null || value.isEmpty ? 'Email is required' : null,
+          ),
+
+          const SizedBox(height: 14),
+
+          /// 🔒 PASSWORD
+          _InputField(
+            controller: _passwordController,
+            icon: Icons.lock_outline,
+            hint: '••••••••',
+            obscure: true,
+            fillColor: kCard,
+            validator: (value) =>
+                value == null || value.length < 6
+                    ? 'Minimum 6 characters'
+                    : null,
+          ),
+
+          const SizedBox(height: 14),
+
+          /// ☑ REMEMBER + FORGOT
+          Row(
+            children: [
+              Transform.scale(
+                scale: 0.9,
+                child: Checkbox(
+                  value: _rememberMe,
+                  activeColor: kSpotifyGreen,
+                  checkColor: Colors.black,
+                  side: BorderSide(
+                    color: Colors.white.withOpacity(0.25),
                   ),
+                  onChanged: (v) =>
+                      setState(() => _rememberMe = v ?? false),
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Welcome Back!',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Ready to get back on the field?',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.65),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      _InputField(
-                        controller: _emailController,
-                        icon: Icons.email_outlined,
-                        hint: 'user@playz.com',
-                        fillColor: inputColor,
-                        validator: (value) =>
-                            value == null || value.isEmpty
-                                ? 'Email is required'
-                                : null,
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      _InputField(
-                        controller: _passwordController,
-                        icon: Icons.lock_outline,
-                        hint: '••••••••',
-                        obscure: true,
-                        fillColor: inputColor,
-                        validator: (value) =>
-                            value == null || value.length < 6
-                                ? 'Minimum 6 characters'
-                                : null,
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _rememberMe,
-                            activeColor: spotifyGreen,
-                            onChanged: (v) =>
-                                setState(() => _rememberMe = v ?? false),
-                          ),
-                          Text(
-                            'Remember me',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white.withOpacity(0.8),
-                            ),
-                          ),
-                          const Spacer(),
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Forgot Password?',
-                              style: TextStyle(
-                                color: spotifyGreen,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _handleLogin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: spotifyGreen,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              : const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Sign In',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.arrow_forward,
-                                        color: Colors.black),
-                                  ],
-                                ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                                color: Colors.white.withOpacity(0.15)),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              'or continue with',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white.withOpacity(0.5),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                                color: Colors.white.withOpacity(0.15)),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      Row(
-                        children: const [
-                          Expanded(
-                            child: _SocialButton(
-                              icon: Icons.g_mobiledata,
-                              label: 'Google',
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: _SocialButton(
-                              icon: Icons.apple,
-                              label: 'Apple',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+              ),
+              const Text(
+                'Remember me',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: Colors.white70,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                ),
+                child: const Text(
+                  'Forgot password?',
+                  style: TextStyle(
+                    color: kSpotifyGreen,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+
+          /// 🟢 PRIMARY CTA
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _handleLogin,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kSpotifyGreen,
+                disabledBackgroundColor:
+                    kSpotifyGreen.withOpacity(0.5),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: _isLoading
+                    ? const SizedBox(
+                        key: ValueKey('loader'),
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: Colors.black,
+                        ),
+                      )
+                    : const Row(
+                        key: ValueKey('text'),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward_rounded,
+                              color: Colors.black, size: 18),
+                        ],
+                      ),
+              ),
             ),
+          ),
+
+          const SizedBox(height: 28),
+
+          /// ─── DIVIDER
+          Row(
+            children: [
+              Expanded(
+                child:
+                    Divider(color: Colors.white.withOpacity(0.12)),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  'or continue with',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+              ),
+              Expanded(
+                child:
+                    Divider(color: Colors.white.withOpacity(0.12)),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+
+          /// 🌐 SOCIAL BUTTONS
+          Row(
+            children: const [
+              Expanded(
+                child: _SocialButton(
+                  icon: Icons.g_mobiledata,
+                  label: 'Google',
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: _SocialButton(
+                  icon: Icons.apple,
+                  label: 'Apple',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  ),
+),
+
 
             /// REGISTER
             Padding(
