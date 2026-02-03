@@ -4,7 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 
 import 'package:redesign/USER/Book/book.dart';
+import 'package:redesign/USER/Home/Bookings/bookings.dart';
+import 'package:redesign/USER/Home/Friends/friends.dart';
 import 'package:redesign/USER/Home/Groups/groups.dart';
+import 'package:redesign/USER/Home/Ranking/ranking.dart';
 import 'package:redesign/togglemode.dart';
 import 'package:redesign/trainer_navigation.dart';
 import 'package:shimmer/shimmer.dart';
@@ -429,20 +432,20 @@ final List<_QuickTile> _tiles = [
     'Bookings',
     'Reserve slots',
     badge: '2 Active',
-    // destination: BookingsScreen(),
+    destination: MyBookingsScreen(),
   ),
   _QuickTile(
     Icons.people_outline,
     'Friends',
     'Build squad',
-    // destination: FriendsScreen(),
+    destination: FriendsHubScreen(),
   ),
   _QuickTile(
     Icons.emoji_events,
     'Rankings',
     'Track stats',
     badge: 'New',
-    // destination: RankingsScreen(),
+    destination: RankingsScreen(),
   ),
   _QuickTile(
     Icons.scoreboard_outlined,
