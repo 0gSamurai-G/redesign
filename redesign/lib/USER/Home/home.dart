@@ -8,6 +8,7 @@ import 'package:redesign/USER/Home/Bookings/bookings.dart';
 import 'package:redesign/USER/Home/Friends/friends.dart';
 import 'package:redesign/USER/Home/Groups/groups.dart';
 import 'package:redesign/USER/Home/Ranking/ranking.dart';
+import 'package:redesign/USER/Home/Scoreboard/scoreboards.dart';
 import 'package:redesign/togglemode.dart';
 import 'package:redesign/trainer_navigation.dart';
 import 'package:shimmer/shimmer.dart';
@@ -451,7 +452,7 @@ final List<_QuickTile> _tiles = [
     Icons.scoreboard_outlined,
     'Scoreboard',
     'Live scores',
-    // destination: ScoreboardScreen(),
+    destination: ScoreboardHubScreen(),
   ),
   _QuickTile(
     Icons.smart_toy_outlined,
