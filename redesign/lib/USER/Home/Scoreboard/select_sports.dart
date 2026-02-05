@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:redesign/USER/Home/Scoreboard/Cricket/cricket_scoreboard.dart';
+import 'package:redesign/USER/Home/Scoreboard/Cricket/cricket_setup_friendly.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,9 +21,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        scaffoldBackgroundColor: kBg,
-      ),
+      theme: ThemeData.dark(
+        useMaterial3: true,
+      ).copyWith(scaffoldBackgroundColor: kBg),
       home: const SelectSportScreen(),
     );
   }
@@ -60,7 +60,9 @@ class _SelectSportScreenState extends State<SelectSportScreen> {
         _SportItem(
           'Cricket',
           Icons.sports_cricket,
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_)=>CricketMatchSetupScreen()))
+          onTap: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => FriendlySetupScreen())),
         ),
         _SportItem(
           'Football',
@@ -126,11 +128,7 @@ class _SelectSportScreenState extends State<SelectSportScreen> {
           Icons.self_improvement,
           onTap: () => _openSetup('Yoga'),
         ),
-        _SportItem(
-          'Swimming',
-          Icons.pool,
-          onTap: () => _openSetup('Swimming'),
-        ),
+        _SportItem('Swimming', Icons.pool, onTap: () => _openSetup('Swimming')),
         _SportItem(
           'Cycling',
           Icons.directions_bike,
@@ -149,9 +147,7 @@ class _SelectSportScreenState extends State<SelectSportScreen> {
     setState(() => selectedSport = sport);
 
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => SportMatchSetupScreen(sport: sport),
-      ),
+      MaterialPageRoute(builder: (_) => SportMatchSetupScreen(sport: sport)),
     );
   }
 
@@ -164,8 +160,7 @@ class _SelectSportScreenState extends State<SelectSportScreen> {
           slivers: [
             const _AppBar(),
             _SearchBar(
-              onChanged: (v) =>
-                  setState(() => searchQuery = v.toLowerCase()),
+              onChanged: (v) => setState(() => searchQuery = v.toLowerCase()),
             ),
             ...categories.entries.map(
               (entry) => _CategorySection(
@@ -205,12 +200,7 @@ class _AppBar extends StatelessWidget {
         'Select Sport',
         style: TextStyle(fontWeight: FontWeight.w700),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.tune),
-          onPressed: () {},
-        ),
-      ],
+      actions: [IconButton(icon: const Icon(Icons.tune), onPressed: () {})],
     );
   }
 }
@@ -272,11 +262,9 @@ class _CategorySection extends StatelessWidget {
         .where((s) => s.name.toLowerCase().contains(searchQuery))
         .toList();
 
-if (filtered.isEmpty) {
-  return const SliverToBoxAdapter(
-    child: SizedBox.shrink(),
-  );
-}
+    if (filtered.isEmpty) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
 
     return SliverList(
       delegate: SliverChildListDelegate([
@@ -314,15 +302,14 @@ if (filtered.isEmpty) {
                 final columns = width > 900
                     ? 5
                     : width > 600
-                        ? 4
-                        : 3;
+                    ? 4
+                    : 3;
 
                 return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filtered.length,
-                  gridDelegate:
-                      SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: columns,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
@@ -351,10 +338,7 @@ class _SportTile extends StatelessWidget {
   final _SportItem sport;
   final bool selected;
 
-  const _SportTile({
-    required this.sport,
-    required this.selected,
-  });
+  const _SportTile({required this.sport, required this.selected});
 
   @override
   Widget build(BuildContext context) {
@@ -376,11 +360,7 @@ class _SportTile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                sport.icon,
-                color: selected ? kGreen : kMuted,
-                size: 28,
-              ),
+              Icon(sport.icon, color: selected ? kGreen : kMuted, size: 28),
               const SizedBox(height: 8),
               Text(
                 sport.name,
