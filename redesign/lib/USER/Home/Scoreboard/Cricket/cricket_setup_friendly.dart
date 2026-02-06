@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:redesign/USER/Home/Scoreboard/Cricket/cricket_scoreboard.dart';
 
 /* ───────────────── THEME ───────────────── */
 
@@ -411,7 +412,7 @@ class _FriendlySetupScreenState extends State<FriendlySetupScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: _cta(),
+      bottomNavigationBar: _cta(context),
     );
   }
 
@@ -2587,9 +2588,10 @@ class _FriendlySetupScreenState extends State<FriendlySetupScreen> {
 
   /* ───────── CTA ───────── */
 
-  Widget _cta() {
+  Widget _cta(BuildContext context) {
     final isTournament = mode == MatchMode.tournament;
     final isValid = isTournament ? tournamentValid : valid;
+
     final label = isTournament
         ? 'Create Tournament →'
         : 'Create Friendly Scoreboard →';
@@ -2597,7 +2599,22 @@ class _FriendlySetupScreenState extends State<FriendlySetupScreen> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: isValid ? () {} : null,
+        onPressed: isValid
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CricketScoreboardScreen(
+                      // mode: mode,
+                      // // optional but recommended
+                      // tournamentBlueprint:
+                      //     isTournament ? tournamentBlueprint : null,
+                      // friendlyConfig:
+                      //     !isTournament ? friendlyConfig : null,
+                    ),
+                  ),
+                );
+              }
+            : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: kGreen,
           foregroundColor: Colors.black,
