@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:redesign/USER/Home/Scoreboard/Cricket/cricket_setup_friendly.dart';
 import 'package:redesign/USER/Home/Scoreboard/Football/football_setup.dart';
+import 'package:redesign/USER/Home/Scoreboard/Badminton/badminton_setup.dart';
 
 void main() {
   runApp(const MyApp());
@@ -102,7 +103,9 @@ class _SelectSportScreenState extends State<SelectSportScreen> {
         _SportItem(
           'Badminton',
           Icons.sports,
-          onTap: () => _openSetup('Badminton'),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const BadmintonSetupScreen()),
+          ),
         ),
         _SportItem(
           'Table Tennis',
