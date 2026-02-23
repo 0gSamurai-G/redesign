@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
-
+import 'play_game_card.dart';
 
 class AppColors {
   static const bg = Color(0xFF000000);
@@ -11,7 +11,6 @@ class AppColors {
   static const muted = Color(0xFFB3B3B3);
   static const accent = Color(0xFF1DB954);
 }
-
 
 class GameDiaryScreen extends StatelessWidget {
   const GameDiaryScreen({super.key});
@@ -25,26 +24,25 @@ class GameDiaryScreen extends StatelessWidget {
         top: true,
         bottom: false,
         child: ListView(
-          children:  [
+          children: [
             _TopBar(),
             _Tabs(),
-             SizedBox(height: 12),
+            SizedBox(height: 12),
             _SportFilters(),
-             SizedBox(height: 22),
+            SizedBox(height: 22),
             _DateSelector(),
-             SizedBox(height: 10),
+            SizedBox(height: 10),
             _ActionRow(),
             SizedBox(height: 12),
             _GameList(),
             // SizedBox(height: 24),
-            const _EndOfResults()
+            const _EndOfResults(),
           ],
         ),
       ),
     );
   }
 }
-
 
 class _TopBar extends StatelessWidget {
   const _TopBar();
@@ -72,9 +70,6 @@ class _TopBar extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class _Tabs extends StatelessWidget {
   const _Tabs();
@@ -105,9 +100,6 @@ class _Tabs extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class _SportFilters extends StatelessWidget {
   const _SportFilters();
@@ -162,16 +154,15 @@ class _SportFilters extends StatelessWidget {
   }
 }
 
-
-
-
 class _DateSelector extends StatelessWidget {
   const _DateSelector();
 
   @override
   Widget build(BuildContext context) {
-    final dates =
-        List.generate(10, (i) => DateTime.now().add(Duration(days: i)));
+    final dates = List.generate(
+      10,
+      (i) => DateTime.now().add(Duration(days: i)),
+    );
 
     return SizedBox(
       height: 76,
@@ -241,10 +232,6 @@ class _DateSelector extends StatelessWidget {
   }
 }
 
-
-
-
-
 class _ActionRow extends StatelessWidget {
   const _ActionRow();
 
@@ -266,10 +253,7 @@ class _ActionRow extends StatelessWidget {
             children: [
               const Icon(Icons.swap_vert, color: Colors.white, size: 16),
               const SizedBox(width: 4),
-              Text(
-                'Sort',
-                style: GoogleFonts.inter(color: Colors.white),
-              ),
+              Text('Sort', style: GoogleFonts.inter(color: Colors.white)),
             ],
           ),
         ],
@@ -278,29 +262,31 @@ class _ActionRow extends StatelessWidget {
   }
 }
 
-
-
 class _GameData {
   final String hostName;
   final String time;
   final String price;
-  final String onboard;
+  final int currentPlayers;
+  final int maxPlayers;
   final String address;
+  final String distance;
   final String avatarUrl;
   final String sport;
   final String type;
-  final String tier;
+  final bool isFull;
 
   const _GameData({
     required this.hostName,
     required this.time,
     required this.price,
-    required this.onboard,
+    required this.currentPlayers,
+    required this.maxPlayers,
     required this.address,
+    required this.distance,
     required this.avatarUrl,
     required this.sport,
     required this.type,
-    required this.tier,
+    this.isFull = false,
   });
 }
 
@@ -312,48 +298,40 @@ class _GameList extends StatelessWidget {
       hostName: 'Deepankar Shrikant Rokade Patil',
       time: 'Thu 4 Dec, 06:30',
       price: '₹100',
-      onboard: '2/22',
-      address:
-          'Dnyankamal Society, Sr No 20/1, Abhinav Nagar, Pune (0.8 km)',
+      currentPlayers: 2,
+      maxPlayers: 22,
+      address: 'Dnyankamal Society, Sr No 20/1, Abhinav Nagar, Pune',
+      distance: '0.8 km',
       avatarUrl: 'https://i.pravatar.cc/100?img=1',
       sport: 'Cricket',
       type: 'Casual',
-      tier: 'ELITE',
-    ),_GameData(
-      hostName: 'Deepankar Shrikant Rokade Patil',
-      time: 'Thu 4 Dec, 06:30',
-      price: '₹100',
-      onboard: '2/22',
-      address:
-          'Dnyankamal Society, Sr No 20/1, Abhinav Nagar, Pune (0.8 km)',
-      avatarUrl: 'https://i.pravatar.cc/100?img=1',
-      sport: 'Cricket',
-      type: 'Casual',
-      tier: 'ELITE',
+      isFull: false,
     ),
     _GameData(
       hostName: 'Rahul Mahadev Kulkarni',
       time: 'Fri 5 Dec, 07:00',
       price: '₹150',
-      onboard: '5/18',
-      address:
-          'Baner Sports Complex, Near High Street, Pune (1.4 km)',
+      currentPlayers: 18,
+      maxPlayers: 18,
+      address: 'Baner Sports Complex, Near High Street, Pune',
+      distance: '1.4 km',
       avatarUrl: 'https://i.pravatar.cc/100?img=2',
       sport: 'Football',
       type: 'Competitive',
-      tier: 'PRO',
+      isFull: true,
     ),
     _GameData(
       hostName: 'Amit Prakash Deshmukh',
       time: 'Sat 6 Dec, 08:30',
       price: '₹80',
-      onboard: '8/16',
-      address:
-          'Wakad Indoor Arena, Hinjewadi Road, Pune (2.1 km)',
+      currentPlayers: 8,
+      maxPlayers: 16,
+      address: 'Wakad Indoor Arena, Hinjewadi Road, Pune',
+      distance: '2.1 km',
       avatarUrl: 'https://i.pravatar.cc/100?img=3',
       sport: 'Badminton',
       type: 'Casual',
-      tier: 'OPEN',
+      isFull: false,
     ),
   ];
 
@@ -373,140 +351,245 @@ class _GameCard extends StatelessWidget {
   final _GameData data;
   const _GameCard({required this.data});
 
+  Color _typeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'casual':
+        return const Color(0xFF1E3A8A); // blue
+      case 'competitive':
+        return const Color(0xFF4C1D95); // purple
+      case 'tournament':
+        return const Color(0xFF7C2D12); // amber/brown
+      default:
+        return const Color(0xFF2A2A2A);
+    }
+  }
+
+  String _shortName(String name) {
+    final parts = name.split(' ');
+    if (parts.length < 2) return name;
+    return '${parts.first} ${parts.last[0]}.';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// TOP
-          Row(
-            children: [
-              _Tag(data.type),
-              // const SizedBox(width: 6),
-              _Tag("•"),
-              _Tag(data.sport),
-              const Spacer(),
-              Text(
-                data.price,
-                style: GoogleFonts.inter(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+    final progress = data.currentPlayers / data.maxPlayers;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MatchDetailScreen()),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF141414), Color(0xFF0E0E0E)],
           ),
-
-          const SizedBox(height: 10),
-
-          /// HOST
-          Row(
-            children: [
-              ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: data.avatarUrl,
-                  width: 38,
-                  height: 38,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => const _AvatarShimmer(),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// SECTION 1: TAGS & PRICE
+            Row(
+              children: [
+                _Tag(data.type.toUpperCase(), color: _typeColor(data.type)),
+                const SizedBox(width: 8),
+                _Tag(data.sport.toUpperCase(), color: const Color(0xFF2A2A2A)),
+                const Spacer(),
+                Text(
+                  data.price,
+                  style: GoogleFonts.inter(
+                    color: AppColors.accent,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
+              ],
+            ),
+            const SizedBox(height: 16),
 
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            /// SECTION 2: HOST INFO & PLAYER COUNT
+            Row(
+              children: [
+                // Avatar with Online Status
+                Stack(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: Text(
-                        data.hostName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: data.avatarUrl,
+                        width: 52,
+                        height: 52,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    Text(
-                      data.time,
-                      style: GoogleFonts.inter(
-                        color: AppColors.muted,
-                        fontSize: 12,
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: AppColors.accent,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.surface,
+                            width: 2,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-
-              Text(
-                data.onboard,
-                style: GoogleFonts.inter(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-          const Divider(color: Colors.white12),
-
-          /// LOCATION
-          Row(
-            children: [
-              const Icon(
-                Icons.location_on,
-                color: AppColors.muted,
-                size: 14,
-              ),
-              const SizedBox(width: 4),
-
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: Text(
-                    data.address,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: AppColors.muted,
-                      fontSize: 12,
-                    ),
+                const SizedBox(width: 12),
+                // Name and Time
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _shortName(data.hostName),
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time,
+                            color: Colors.white54,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            data.time,
+                            style: GoogleFonts.inter(
+                              color: Colors.white54,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                // Player Ratio
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${data.currentPlayers}/${data.maxPlayers}',
+                      style: GoogleFonts.inter(
+                        color: data.isFull ? Colors.white54 : AppColors.accent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const Text(
+                      'PLAYERS',
+                      style: TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
 
-              const SizedBox(width: 8),
-              _Tag(data.tier, color: Colors.blue),
-            ],
-          ),
-        ],
+            /// SECTION 3: PROGRESS BAR
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: progress,
+                backgroundColor: Colors.white10,
+                color: progress >= 0.7
+                    ? const Color(0xFFF59E0B)
+                    : AppColors.accent,
+                minHeight: 4,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Divider(color: Colors.white.withOpacity(0.06), height: 1),
+            const SizedBox(height: 16),
+
+            /// SECTION 4: LOCATION & JOIN BUTTON
+            Row(
+              children: [
+                const Icon(Icons.location_on, color: Colors.white24, size: 14),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data.address,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        data.distance,
+                        style: GoogleFonts.inter(
+                          color: Colors.white38,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Join Button
+                ElevatedButton(
+                  onPressed: data.isFull ? null : () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: Colors.black,
+                    disabledBackgroundColor: Colors.white10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 10,
+                    ),
+                  ),
+                  child: Text(
+                    data.isFull ? 'Full' : 'Join',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-
-
-
-
 class _Tag extends StatelessWidget {
   final String text;
   final Color color;
-  const _Tag(this.text, {this.color = AppColors.surface});
+  const _Tag(this.text, {required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(8),
@@ -514,34 +597,15 @@ class _Tag extends StatelessWidget {
       child: Text(
         text,
         style: GoogleFonts.inter(
-          fontSize: 11,
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
+          fontSize: 10,
+          color: Colors.white.withOpacity(0.9),
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.5,
         ),
       ),
     );
   }
 }
-
-class _AvatarShimmer extends StatelessWidget {
-  const _AvatarShimmer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade800,
-      highlightColor: Colors.grey.shade700,
-      child: Container(
-        width: 38,
-        height: 38,
-        decoration: const BoxDecoration(shape: BoxShape.circle),
-      ),
-    );
-  }
-}
-
-
-
 
 class _EndOfResults extends StatelessWidget {
   const _EndOfResults();
@@ -557,8 +621,8 @@ class _EndOfResults extends StatelessWidget {
     final imageSize = width < 360
         ? 90.0
         : width < 600
-            ? 120.0
-            : 140.0;
+        ? 120.0
+        : 140.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 36, 20, 48),
@@ -634,19 +698,14 @@ class _EndOfResults extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.accent,
               side: const BorderSide(color: AppColors.accent),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(22),
               ),
             ),
             child: Text(
               'Explore Other Sports',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
             ),
           ),
         ],

@@ -9,23 +9,25 @@ enum AppMode { player, trainer }
 class TrainerModePillToggle extends StatelessWidget {
   final AppMode mode;
   final ValueChanged<AppMode> onChanged;
+  final bool compact;
 
   const TrainerModePillToggle({
     super.key,
     required this.mode,
     required this.onChanged,
+    this.compact = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double height = 44;
+        final double height = 30;
         final double pillWidth = constraints.maxWidth;
         final double segmentWidth = pillWidth / 2;
 
         return Container(
-          margin: const EdgeInsets.only(top: 12),
+          margin: compact ? EdgeInsets.zero : const EdgeInsets.only(top: 12),
           height: height,
           decoration: BoxDecoration(
             color: kCard,
@@ -44,8 +46,7 @@ class TrainerModePillToggle extends StatelessWidget {
                   height: height,
                   decoration: BoxDecoration(
                     color: kSpotifyGreen,
-                    borderRadius:
-                        BorderRadius.circular(height / 2),
+                    borderRadius: BorderRadius.circular(height / 2),
                     boxShadow: [
                       BoxShadow(
                         color: kSpotifyGreen.withOpacity(0.50),
@@ -63,14 +64,12 @@ class TrainerModePillToggle extends StatelessWidget {
                   _PillTab(
                     width: segmentWidth,
                     label: 'Player',
-                    icon: Icons.sports_esports_outlined,
                     active: mode == AppMode.player,
                     onTap: () => onChanged(AppMode.player),
                   ),
                   _PillTab(
                     width: segmentWidth,
                     label: 'Trainer',
-                    icon: Icons.fitness_center_outlined,
                     active: mode == AppMode.trainer,
                     onTap: () => onChanged(AppMode.trainer),
                   ),
@@ -87,14 +86,12 @@ class TrainerModePillToggle extends StatelessWidget {
 class _PillTab extends StatelessWidget {
   final double width;
   final String label;
-  final IconData icon;
   final bool active;
   final VoidCallback onTap;
 
   const _PillTab({
     required this.width,
     required this.label,
-    required this.icon,
     required this.active,
     required this.onTap,
   });
@@ -111,19 +108,12 @@ class _PillTab extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 16,
-                color: active ? Colors.black : kMuted,
-              ),
-              const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color:
-                      active ? Colors.black : kMuted,
+                  color: active ? Colors.black : kMuted,
                 ),
               ),
             ],

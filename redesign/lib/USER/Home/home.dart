@@ -67,24 +67,23 @@ class _UserHomePageState extends State<UserHomePage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(0, 0, 00, 80),
           children: [
-             _TopAppBar(),
+            _TopAppBar(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TrainerModePillToggle(
+              child: _HomeHeader(
                 mode: _mode,
                 onChanged: (m) {
                   setState(() => _mode = m);
                   if (_mode == AppMode.trainer) {
-                        // switch to player shell
-                        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=>TrainerAppNavShell()), (route)=>false);
-                      }
-              
-                  // Optional:
-                  // Navigate or switch shell here
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => TrainerAppNavShell()),
+                      (route) => false,
+                    );
+                  }
                 },
               ),
             ),
-           
+
             SizedBox(height: 20),
             _HeroCTA(),
             SizedBox(height: 28),
@@ -100,6 +99,87 @@ class _UserHomePageState extends State<UserHomePage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/* ============================================================
+   HOME HEADER (GREETING + TOGGLE)
+   ============================================================ */
+class _HomeHeader extends StatelessWidget {
+  final AppMode mode;
+  final ValueChanged<AppMode> onChanged;
+
+  const _HomeHeader({required this.mode, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = MediaQuery.of(context).size.width;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// LEFT SIDE (Texts)
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  RichText(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Hey Deepankar! 👋\n",
+                          style: TextStyle(
+                            fontSize: width < 360 ? 16 : 20,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.1,
+                          ),
+                        ),
+                        TextSpan(
+                          text: "Ready for some competition?",
+                          style: TextStyle(
+                            fontSize: width < 360 ? 8 : 13,
+                            fontWeight: FontWeight.w500,
+                            color: UserHomePage.muted,
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(width: 20),
+
+            /// RIGHT SIDE (Toggle)
+            Flexible(
+              child: Column(
+                children: [
+                  SizedBox(height: 15),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 150,
+                      minWidth: 110,
+                    ),
+                    child: TrainerModePillToggle(
+                      mode: mode,
+                      onChanged: onChanged,
+                      compact: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -178,20 +258,17 @@ class _HeroCTAState extends State<_HeroCTA> {
 
   static const List<Map<String, String>> _slides = [
     {
-      'image':
-          'https://images.unsplash.com/photo-1546519638-68e109498ffc',
+      'image': 'https://images.unsplash.com/photo-1546519638-68e109498ffc',
       'badge': 'TRENDING NOW',
       'title': 'Game On with\nPlayZ',
     },
     {
-      'image':
-          'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
+      'image': 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
       'badge': 'NEAR YOU',
       'title': 'Book Grounds\nInstantly',
     },
     {
-      'image':
-          'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+      'image': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
       'badge': 'COMMUNITY',
       'title': 'Find Your\nSquad',
     },
@@ -251,8 +328,7 @@ class _HeroCTAState extends State<_HeroCTA> {
                         imageUrl: slide['image']!,
                         cacheKey: slide['image'],
                         fit: BoxFit.cover,
-                        placeholder: (_, __) =>
-                            const _HeroShimmer(),
+                        placeholder: (_, __) => const _HeroShimmer(),
                         errorWidget: (_, __, ___) => const Center(
                           child: Icon(
                             Icons.broken_image,
@@ -285,24 +361,19 @@ class _HeroCTAState extends State<_HeroCTA> {
                             /// BADGE
                             Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal:
-                                    (w * 0.035).clamp(10.0, 16.0),
-                                vertical:
-                                    (w * 0.014).clamp(4.0, 8.0),
+                                horizontal: (w * 0.035).clamp(10.0, 16.0),
+                                vertical: (w * 0.014).clamp(4.0, 8.0),
                               ),
                               decoration: BoxDecoration(
-                                color:
-                                    UserHomePage.muted.withOpacity(0.5),
-                                borderRadius:
-                                    BorderRadius.circular(20),
+                                color: UserHomePage.muted.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
                                 slide['badge']!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize:
-                                      (w * 0.028).clamp(10.0, 13.0),
+                                  fontSize: (w * 0.028).clamp(10.0, 13.0),
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 1,
                                   color: Colors.white,
@@ -318,8 +389,7 @@ class _HeroCTAState extends State<_HeroCTA> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize:
-                                    (w * 0.065).clamp(18.0, 26.0),
+                                fontSize: (w * 0.065).clamp(18.0, 26.0),
                                 fontWeight: FontWeight.w700,
                                 height: 1.15,
                                 color: Colors.white,
@@ -330,21 +400,17 @@ class _HeroCTAState extends State<_HeroCTA> {
 
                             /// CTA
                             SizedBox(
-                              height:
-                                  (w * 0.11).clamp(40.0, 46.0),
+                              height: (w * 0.11).clamp(40.0, 46.0),
                               child: ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color(0xFF1DB954),
+                                  backgroundColor: const Color(0xFF1DB954),
                                   foregroundColor: Colors.black,
                                   padding: EdgeInsets.symmetric(
-                                    horizontal:
-                                        (w * 0.06).clamp(16.0, 24.0),
+                                    horizontal: (w * 0.06).clamp(16.0, 24.0),
                                   ),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(18),
+                                    borderRadius: BorderRadius.circular(18),
                                   ),
                                 ),
                                 child: const FittedBox(
@@ -380,9 +446,7 @@ class _HeroShimmer extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade800,
       highlightColor: Colors.grey.shade700,
-      child: Container(
-        color: Colors.grey.shade800,
-      ),
+      child: Container(color: Colors.grey.shade800),
     );
   }
 }
@@ -397,8 +461,8 @@ class _QuickAccessTiles extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final crossAxisCount = width >= 600 ? 3 : 2;
+        // 2 columns for a dashboard feel
+        const crossAxisCount = 2;
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -406,11 +470,12 @@ class _QuickAccessTiles extends StatelessWidget {
             padding: EdgeInsets.zero,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-              childAspectRatio: width < 360 ? 1.15 : 1.3,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              // Wide ratio for horizontal layout
+              childAspectRatio: 2.1,
             ),
             itemCount: _tiles.length,
             itemBuilder: (_, i) => _tiles[i],
@@ -432,7 +497,6 @@ final List<_QuickTile> _tiles = [
     Icons.calendar_month,
     'Bookings',
     'Reserve slots',
-    badge: '2 Active',
     destination: MyBookingsScreen(),
   ),
   _QuickTile(
@@ -445,7 +509,6 @@ final List<_QuickTile> _tiles = [
     Icons.emoji_events,
     'Rankings',
     'Track stats',
-    badge: 'New',
     destination: RankingsScreen(),
   ),
   _QuickTile(
@@ -458,12 +521,10 @@ final List<_QuickTile> _tiles = [
     Icons.smart_toy_outlined,
     'AI Trainer',
     'Train smarter',
-    badge: 'Beta',
     highlight: true,
     // destination: AiTrainerScreen(),
   ),
 ];
-
 
 class _QuickTile extends StatelessWidget {
   final IconData icon;
@@ -471,8 +532,6 @@ class _QuickTile extends StatelessWidget {
   final String subtitle;
   final String? badge;
   final bool highlight;
-
-  /// ✅ SAFE navigation target
   final Widget? destination;
 
   const _QuickTile(
@@ -489,85 +548,103 @@ class _QuickTile extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         onTap: destination == null
             ? null
             : () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => destination!,
-                  ),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => destination!));
               },
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                UserHomePage.surface,
-                UserHomePage.surface.withOpacity(0.9),
-              ],
+            color: UserHomePage.surface, // #181818
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: highlight
+                  ? UserHomePage.accent.withOpacity(0.5)
+                  : Colors.white.withOpacity(0.05),
+              width: 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 10,
-                offset: const Offset(0, 6),
-              ),
-            ],
-            border: highlight
-                ? Border.all(color: UserHomePage.accent.withOpacity(0.6))
-                : Border.all(color: Colors.white.withOpacity(0.06)),
           ),
           child: Stack(
             children: [
+              // Badge (BETA/NEW/Active)
               if (badge != null)
                 Positioned(
                   top: 0,
-                  right: 6,
+                  right: 0,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: UserHomePage.accent.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+                      color: badge == 'Beta' || badge == 'New'
+                          ? UserHomePage.accent
+                          : Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      badge!,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: UserHomePage.accent,
+                      badge!.toUpperCase(),
+                      style: GoogleFonts.inter(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w900,
+                        color: badge == 'Beta' || badge == 'New'
+                            ? Colors.black
+                            : Colors.white70,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
                 ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+
+              Row(
                 children: [
-                  Icon(icon, size: 28, color: UserHomePage.accent),
-                  const Spacer(),
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  // Icon Container
+                  Container(
+                    height: 44,
+                    width: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 22,
+                      color: highlight ? UserHomePage.accent : Colors.white70,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: UserHomePage.muted,
-                      fontSize: 12,
+                  const SizedBox(width: 12),
+                  // Text Info
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: UserHomePage.muted,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -579,9 +656,6 @@ class _QuickTile extends StatelessWidget {
     );
   }
 }
-
-
-
 
 /* ============================================================
    POPULAR VENUES
@@ -640,10 +714,7 @@ class _VenueTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: UserHomePage.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.08),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
       ),
       child: Row(
         children: [
@@ -658,14 +729,10 @@ class _VenueTile extends StatelessWidget {
               width: 70,
               height: 70,
               fit: BoxFit.cover,
-              placeholder: (_, __) => const _ImageShimmer(
-                width: 70,
-                height: 70,
-              ),
-              errorWidget: (_, __, ___) => const Icon(
-                Icons.broken_image,
-                color: Colors.white54,
-              ),
+              placeholder: (_, __) =>
+                  const _ImageShimmer(width: 70, height: 70),
+              errorWidget: (_, __, ___) =>
+                  const Icon(Icons.broken_image, color: Colors.white54),
             ),
           ),
 
@@ -711,13 +778,9 @@ class _VenueTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.star,
-                      size: 14, color: Colors.amber),
+                  const Icon(Icons.star, size: 14, color: Colors.amber),
                   const SizedBox(width: 4),
-                  Text(
-                    rating,
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                  Text(rating, style: const TextStyle(color: Colors.white)),
                 ],
               ),
               const SizedBox(height: 6),
@@ -725,10 +788,7 @@ class _VenueTile extends StatelessWidget {
                 status,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: UserHomePage.muted,
-                  fontSize: 11,
-                ),
+                style: const TextStyle(color: UserHomePage.muted, fontSize: 11),
               ),
             ],
           ),
@@ -768,11 +828,9 @@ class _ExploreBySport extends StatelessWidget {
               height: cardHeight,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding:
-                    const EdgeInsets.only(left: 20, right: 14),
+                padding: const EdgeInsets.only(left: 20, right: 14),
                 itemCount: sports.length,
-                separatorBuilder: (_, __) =>
-                    const SizedBox(width: 14),
+                separatorBuilder: (_, __) => const SizedBox(width: 14),
                 itemBuilder: (context, index) {
                   return SizedBox(
                     width: cardWidth,
@@ -788,15 +846,12 @@ class _ExploreBySport extends StatelessWidget {
                             cacheKey:
                                 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
                             fit: BoxFit.cover,
-                            placeholder: (_, __) =>
-                                const _ImageShimmer(),
+                            placeholder: (_, __) => const _ImageShimmer(),
                             errorWidget: (_, __, ___) =>
                                 const Icon(Icons.broken_image),
                           ),
 
-                          Container(
-                            color: Colors.black.withOpacity(0.25),
-                          ),
+                          Container(color: Colors.black.withOpacity(0.25)),
 
                           Padding(
                             padding: EdgeInsets.all(padding),
@@ -868,22 +923,19 @@ class _FeaturedEventsState extends State<_FeaturedEvents> {
 
   static const _events = [
     {
-      'image':
-          'https://images.unsplash.com/photo-1547347298-4074fc3086f0',
+      'image': 'https://images.unsplash.com/photo-1547347298-4074fc3086f0',
       'title': 'Prime Energy Cup 2024',
       'subtitle': 'Starts Aug 12 • Entry ₹500',
       'tag': 'SPONSORED',
     },
     {
-      'image':
-          'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
+      'image': 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
       'title': 'Weekend Football Bash',
       'subtitle': 'Open slots available',
       'tag': 'HOT',
     },
     {
-      'image':
-          'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+      'image': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
       'title': 'Community Badminton',
       'subtitle': 'Free entry • All levels',
       'tag': 'COMMUNITY',
@@ -946,8 +998,7 @@ class _FeaturedEventsState extends State<_FeaturedEvents> {
                   return Padding(
                     padding: EdgeInsets.only(
                       left: index == 0 ? 20 : 0,
-                      right:
-                          index == _events.length - 1 ? 20 : 16,
+                      right: index == _events.length - 1 ? 20 : 16,
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
@@ -987,21 +1038,17 @@ class _FeaturedEventsState extends State<_FeaturedEvents> {
                           Padding(
                             padding: EdgeInsets.all(padding),
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 /// TAG
                                 Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal:
-                                        (w * 0.03).clamp(8.0, 12.0),
-                                    vertical:
-                                        (w * 0.012).clamp(4.0, 6.0),
+                                    horizontal: (w * 0.03).clamp(8.0, 12.0),
+                                    vertical: (w * 0.012).clamp(4.0, 6.0),
                                   ),
                                   decoration: BoxDecoration(
                                     color: UserHomePage.accent,
-                                    borderRadius:
-                                        BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     event['tag']!,
@@ -1065,12 +1112,11 @@ class _ShimmerPlaceholder extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade800,
       highlightColor: Colors.grey.shade700,
-      child: Container(
-        color: Colors.grey.shade800,
-      ),
+      child: Container(color: Colors.grey.shade800),
     );
   }
 }
+
 /* ============================================================
    SECTION HEADER
    ============================================================ */
@@ -1082,20 +1128,23 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(title,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700)),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const Spacer(),
-        const Text('See All',
-            style: TextStyle(
-                color: UserHomePage.accent, fontSize: 13)),
+        const Text(
+          'See All',
+          style: TextStyle(color: UserHomePage.accent, fontSize: 13),
+        ),
       ],
     );
   }
 }
-
 
 /* ============================================================
    OFFICIAL APP INFO / FOOTER
@@ -1122,27 +1171,18 @@ class _OfficialAppInfo extends StatelessWidget {
           SizedBox(height: 6),
           Text(
             'Play • Book • Compete',
-            style: TextStyle(
-              color: UserHomePage.muted,
-              fontSize: 13,
-            ),
+            style: TextStyle(color: UserHomePage.muted, fontSize: 13),
           ),
           SizedBox(height: 10),
           Text(
             'Built for local sports, teams, and communities.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: UserHomePage.muted,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: UserHomePage.muted, fontSize: 12),
           ),
           SizedBox(height: 12),
           Text(
             '© 2026 PlayZ Technologies. All rights reserved.',
-            style: TextStyle(
-              color: UserHomePage.muted,
-              fontSize: 11,
-            ),
+            style: TextStyle(color: UserHomePage.muted, fontSize: 11),
           ),
         ],
       ),
