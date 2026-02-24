@@ -3,38 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 
-import 'package:redesign/USER/Book/book.dart';
-import 'package:redesign/USER/Home/Bookings/bookings.dart';
-import 'package:redesign/USER/Home/Friends/friends.dart';
-import 'package:redesign/USER/Home/Groups/groups.dart';
-import 'package:redesign/USER/Home/Ranking/ranking.dart';
-import 'package:redesign/USER/Home/Scoreboard/scoreboards.dart';
+import 'package:redesign/view/USER/Book/book.dart';
+import 'package:redesign/view/USER/Home/Bookings/bookings.dart';
+import 'package:redesign/view/USER/Home/Friends/friends.dart';
+import 'package:redesign/view/USER/Home/Groups/groups.dart';
+import 'package:redesign/view/USER/Home/Ranking/ranking.dart';
+import 'package:redesign/view/USER/Home/Scoreboard/scoreboards.dart';
 import 'package:redesign/togglemode.dart';
 import 'package:redesign/trainer_navigation.dart';
 import 'package:shimmer/shimmer.dart';
 // enum AppMode { player, trainer }
-
-void main() {
-  runApp(const PlayZApp());
-}
-
-class PlayZApp extends StatelessWidget {
-  const PlayZApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'PlayZ',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        fontFamily: 'Inter',
-      ),
-      home: const UserHomePage(),
-    );
-  }
-}
 
 /* ============================================================
    USER HOME PAGE

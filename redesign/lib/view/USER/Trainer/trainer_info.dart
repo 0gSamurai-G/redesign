@@ -1,9 +1,8 @@
-
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/USER/Trainer/book_trainer.dart';
+import 'package:redesign/view/USER/Trainer/book_trainer.dart';
 import 'package:shimmer/shimmer.dart';
 
 const Color kBg = Colors.black;
@@ -12,6 +11,7 @@ const Color kSurface = Color(0xFF121212);
 const Color kGreen = Color(0xFF1DB954);
 const Color kMuted = Color(0xFFA7A7A7);
 const Color kYellow = Color(0xFFFFC107);
+
 class AcademyDetailScreen extends StatefulWidget {
   const AcademyDetailScreen({super.key});
 
@@ -26,14 +26,11 @@ class _AcademyDetailScreenState extends State<AcademyDetailScreen> {
       backgroundColor: kBg,
       extendBody: true,
       body: CustomScrollView(
-        
         slivers: [
           _HeroSection(),
           SliverPadding(
-            
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
             sliver: SliverList(
-              
               delegate: SliverChildListDelegate([
                 _AcademyInfo(),
                 const SizedBox(height: 16),
@@ -51,7 +48,7 @@ class _AcademyDetailScreenState extends State<AcademyDetailScreen> {
                 _FacilityInfo(),
                 const SizedBox(height: 24),
                 _Amenities(),
-                
+
                 const SizedBox(height: 24),
                 _Reviews(),
                 const SizedBox(height: 24),
@@ -60,14 +57,13 @@ class _AcademyDetailScreenState extends State<AcademyDetailScreen> {
                 _Certifications(),
               ]),
             ),
-          )
+          ),
         ],
       ),
       bottomNavigationBar: _BottomBar(),
     );
   }
 }
-
 
 class _HeroSection extends StatefulWidget {
   @override
@@ -101,9 +97,7 @@ class _HeroSectionState extends State<_HeroSection> {
       automaticallyImplyLeading: false,
       stretch: true,
       flexibleSpace: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(24),
-        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -141,10 +135,7 @@ class _HeroSectionState extends State<_HeroSection> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black54,
-                      Colors.black87,
-                    ],
+                    colors: [Colors.black54, Colors.black87],
                   ),
                 ),
               ),
@@ -176,8 +167,10 @@ class _HeroSectionState extends State<_HeroSection> {
               bottom: 34,
               left: 16,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: kGreen,
                   borderRadius: BorderRadius.circular(20),
@@ -228,30 +221,26 @@ class _HeroSectionState extends State<_HeroSection> {
   /// -------------------------------
   /// ICON BUTTON
   /// -------------------------------
-Widget _iconBtn(IconData icon, {VoidCallback? onTap}) {
-  return Material(
-    color: Colors.black.withOpacity(0.55),
-    shape: const CircleBorder(),
-    child: InkWell(
-      customBorder: const CircleBorder(),
-      onTap: onTap,
-      child: SizedBox(
-        width: 40,
-        height: 40,
-        child: Icon(
-          icon, // ✅ USE PARAMETER
-          color: Colors.white,
-          size: 20,
+  Widget _iconBtn(IconData icon, {VoidCallback? onTap}) {
+    return Material(
+      color: Colors.black.withOpacity(0.55),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(
+            icon, // ✅ USE PARAMETER
+            color: Colors.white,
+            size: 20,
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
-
-}
-
-
-
 
 class _AcademyInfo extends StatelessWidget {
   @override
@@ -290,103 +279,76 @@ class _AcademyInfo extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    /// LOCATION
-    Row(
-      children: const [
-        Icon(
-          Icons.location_on_outlined,
-          size: 16,
-          color: kMuted,
-        ),
-        SizedBox(width: 6),
-        Text(
-          'Kothrud, Pune • 2.3 km away',
-          style: TextStyle(
-            color: kMuted,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    ),
-
-    const SizedBox(height: 6),
-
-    /// OPEN STATUS (RichText)
-    Row(
-      children: [
-        const Icon(
-          Icons.access_time,
-          size: 16,
-          color: kMuted,
-        ),
-        const SizedBox(width: 6),
-        RichText(
-          text: const TextSpan(
-            style: TextStyle(
-              fontSize: 14,
-              color: kMuted,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// LOCATION
+            Row(
+              children: const [
+                Icon(Icons.location_on_outlined, size: 16, color: kMuted),
+                SizedBox(width: 6),
+                Text(
+                  'Kothrud, Pune • 2.3 km away',
+                  style: TextStyle(color: kMuted, fontSize: 14),
+                ),
+              ],
             ),
-            children: [
-              TextSpan(
-                text: 'Open Now',
-                style: TextStyle(
-                  color: kGreen,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextSpan(
-                text: ' • Closes at 10:00 PM',
-                style: TextStyle(
-                  color: kMuted,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
 
-    const SizedBox(height: 6),
+            const SizedBox(height: 6),
 
-    /// CERTIFICATION
-    Row(
-      children: const [
-        Icon(
-          Icons.verified_outlined,
-          size: 16,
-          color: kGreen,
+            /// OPEN STATUS (RichText)
+            Row(
+              children: [
+                const Icon(Icons.access_time, size: 16, color: kMuted),
+                const SizedBox(width: 6),
+                RichText(
+                  text: const TextSpan(
+                    style: TextStyle(fontSize: 14, color: kMuted),
+                    children: [
+                      TextSpan(
+                        text: 'Open Now',
+                        style: TextStyle(
+                          color: kGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' • Closes at 10:00 PM',
+                        style: TextStyle(
+                          color: kMuted,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 6),
+
+            /// CERTIFICATION
+            Row(
+              children: const [
+                Icon(Icons.verified_outlined, size: 16, color: kGreen),
+                SizedBox(width: 6),
+                Text(
+                  'Govt. Certified Sports Facility',
+                  style: TextStyle(color: kMuted, fontSize: 14),
+                ),
+              ],
+            ),
+          ],
         ),
-        SizedBox(width: 6),
-        Text(
-          'Govt. Certified Sports Facility',
-          style: TextStyle(
-            color: kMuted,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    ),
-  ],
-),
         const SizedBox(height: 12),
         const Text(
           'A premier cricket training center equipped with turf wickets, bowling machines, and expert coaching staff. We focus on technique, fitness, and match temperament for aspiring cricketers.',
-          style: TextStyle(
-            color: kMuted,
-            height: 1.45,
-          ),
+          style: TextStyle(color: kMuted, height: 1.45),
         ),
       ],
     );
   }
 }
-
-
-
 
 class _ActivityRow extends StatelessWidget {
   @override
@@ -418,10 +380,7 @@ class _Activity extends StatelessWidget {
         Container(
           width: 56,
           height: 56,
-          decoration: BoxDecoration(
-            color: kCard,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: kCard, shape: BoxShape.circle),
           child: Icon(icon, color: Colors.white),
         ),
         const SizedBox(height: 6),
@@ -430,7 +389,6 @@ class _Activity extends StatelessWidget {
     );
   }
 }
-
 
 class _StudentTypeSelector extends StatefulWidget {
   @override
@@ -464,15 +422,14 @@ class _StudentTypeSelectorState extends State<_StudentTypeSelector> {
               onTap: () => setState(() => selected = type),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: active ? kGreen : Colors.black,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: active ? kGreen : kGreen,
-                    width: 1,
-                  ),
+                  border: Border.all(color: active ? kGreen : kGreen, width: 1),
                 ),
                 child: Text(
                   type,
@@ -491,9 +448,6 @@ class _StudentTypeSelectorState extends State<_StudentTypeSelector> {
   }
 }
 
-
-
-
 class _Tags extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -501,17 +455,18 @@ class _Tags extends StatelessWidget {
     return Wrap(
       spacing: 8,
       children: tags
-          .map((t) => Chip(
-                label: Text(t),
-                backgroundColor: Colors.black,
-                side: BorderSide(color: kGreen),
-                labelStyle: const TextStyle(color: kGreen),
-              ))
+          .map(
+            (t) => Chip(
+              label: Text(t),
+              backgroundColor: Colors.black,
+              side: BorderSide(color: kGreen),
+              labelStyle: const TextStyle(color: kGreen),
+            ),
+          )
           .toList(),
     );
   }
 }
-
 
 class _Announcement extends StatelessWidget {
   @override
@@ -522,20 +477,21 @@ class _Announcement extends StatelessWidget {
         color: kYellow.withOpacity(0.15),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Row(children: const [
-        Icon(Icons.campaign, color: kYellow),
-        SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            'Summer Camp Registration Open!\nBatch starts 10th Feb • Limited slots',
-            style: TextStyle(color: kYellow),
+      child: Row(
+        children: const [
+          Icon(Icons.campaign, color: kYellow),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Summer Camp Registration Open!\nBatch starts 10th Feb • Limited slots',
+              style: TextStyle(color: kYellow),
+            ),
           ),
-        )
-      ]),
+        ],
+      ),
     );
   }
 }
-
 
 class _Packages extends StatefulWidget {
   @override
@@ -550,11 +506,7 @@ class _PackagesState extends State<_Packages> {
       title: 'Trial Session',
       price: 'FREE',
       subtitle: '1 Day Trial • Coach Interaction',
-      features: [
-        'Ground walkthrough',
-        'Coach interaction',
-        'Skill assessment',
-      ],
+      features: ['Ground walkthrough', 'Coach interaction', 'Skill assessment'],
     ),
     _PackageModel(
       title: 'Monthly Transformation',
@@ -571,11 +523,7 @@ class _PackagesState extends State<_Packages> {
       title: '3 Month Plan',
       price: '₹5,500',
       subtitle: 'Quarterly Training Program',
-      features: [
-        'Structured coaching',
-        'Fitness drills',
-        'Match practice',
-      ],
+      features: ['Structured coaching', 'Fitness drills', 'Match practice'],
     ),
     _PackageModel(
       title: '6 Month Plan',
@@ -630,10 +578,7 @@ class _PackagesState extends State<_Packages> {
               onTap: () {
                 setState(() => selectedIndex = index);
               },
-              child: _PackageCard(
-                model: pkg,
-                active: active,
-              ),
+              child: _PackageCard(model: pkg, active: active),
             ),
           );
         }),
@@ -649,10 +594,7 @@ class _PackageCard extends StatelessWidget {
   final _PackageModel model;
   final bool active;
 
-  const _PackageCard({
-    required this.model,
-    required this.active,
-  });
+  const _PackageCard({required this.model, required this.active});
 
   @override
   Widget build(BuildContext context) {
@@ -667,12 +609,7 @@ class _PackageCard extends StatelessWidget {
           width: 1.4,
         ),
         boxShadow: active
-            ? [
-                BoxShadow(
-                  color: kGreen.withOpacity(0.25),
-                  blurRadius: 14,
-                ),
-              ]
+            ? [BoxShadow(color: kGreen.withOpacity(0.25), blurRadius: 14)]
             : [],
       ),
       child: Column(
@@ -681,8 +618,7 @@ class _PackageCard extends StatelessWidget {
           if (model.badge != null)
             Container(
               margin: const EdgeInsets.only(bottom: 8),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: kGreen,
                 borderRadius: BorderRadius.circular(20),
@@ -722,10 +658,7 @@ class _PackageCard extends StatelessWidget {
 
           if (model.subtitle != null) ...[
             const SizedBox(height: 4),
-            Text(
-              model.subtitle!,
-              style: const TextStyle(color: kMuted),
-            ),
+            Text(model.subtitle!, style: const TextStyle(color: kMuted)),
           ],
 
           /// FEATURES (ONLY WHEN ACTIVE)
@@ -738,14 +671,9 @@ class _PackageCard extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 8),
                       child: Row(
                         children: [
-                          const Icon(Icons.check,
-                              color: kGreen, size: 16),
+                          const Icon(Icons.check, color: kGreen, size: 16),
                           const SizedBox(width: 8),
-                          Text(
-                            f,
-                            style:
-                                const TextStyle(color: kMuted),
-                          ),
+                          Text(f, style: const TextStyle(color: kMuted)),
                         ],
                       ),
                     ),
@@ -782,8 +710,6 @@ class _PackageModel {
   });
 }
 
-
-
 class _BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -791,53 +717,53 @@ class _BottomBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: Container(
-          padding:
-              const EdgeInsets.fromLTRB(16, 12, 16, 20),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
           decoration: const BoxDecoration(
             color: Color.fromRGBO(0, 0, 0, 0.7),
-            border: Border(
-              top: BorderSide(color: Color(0xFF1A1A1A)),
-            ),
+            border: Border(top: BorderSide(color: Color(0xFF1A1A1A))),
           ),
-          child: Row(children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: kGreen),
-                  foregroundColor: kGreen,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: kGreen),
+                    foregroundColor: kGreen,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text('Chat with Academy'),
                 ),
-                child: const Text('Chat with Academy'),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_)=> ChoosePackageScreen()));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: kGreen,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => ChoosePackageScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kGreen,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text('Book Trial'),
                 ),
-                child: const Text('Book Trial'),
               ),
-            ),
-          ]),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
 
 Widget _FacilityInfo() {
   return Column(
@@ -867,7 +793,11 @@ Widget _FacilityInfo() {
         itemBuilder: (_, index) {
           final items = const [
             _FacilityData('Surface', 'Astro Turf + Grass', Icons.grass),
-            _FacilityData('Equipment', 'Available for Rent', Icons.sports_cricket),
+            _FacilityData(
+              'Equipment',
+              'Available for Rent',
+              Icons.sports_cricket,
+            ),
             _FacilityData('Batch Size', 'Max 15 Students', Icons.group),
             _FacilityData('Parking', 'Free Valet', Icons.local_parking),
           ];
@@ -904,11 +834,7 @@ class _FacilityTile extends StatelessWidget {
 
           Text(
             data.title,
-            style: const TextStyle(
-              color: kMuted,
-              fontSize: 11,
-              height: 1.1,
-            ),
+            style: const TextStyle(color: kMuted, fontSize: 11, height: 1.1),
           ),
 
           const SizedBox(height: 2),
@@ -941,14 +867,8 @@ class _FacilityData {
   const _FacilityData(this.title, this.value, this.icon);
 }
 
-
 Widget _Amenities() {
-  final items = [
-    'CCTV Monitored',
-    'First Aid Kit',
-    'RO Water',
-    'Change Rooms',
-  ];
+  final items = ['CCTV Monitored', 'First Aid Kit', 'RO Water', 'Change Rooms'];
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -956,9 +876,10 @@ Widget _Amenities() {
       const Text(
         'Safety & Amenities',
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold),
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       const SizedBox(height: 12),
       Wrap(
@@ -968,15 +889,16 @@ Widget _Amenities() {
             .map(
               (e) => Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: kCard,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
                   e,
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 13),
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
                 ),
               ),
             )
@@ -986,7 +908,6 @@ Widget _Amenities() {
   );
 }
 
-
 Widget _Location() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -994,9 +915,10 @@ Widget _Location() {
       const Text(
         'Location',
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold),
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       const SizedBox(height: 12),
       Container(
@@ -1027,18 +949,20 @@ Widget _Location() {
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)),
+                  borderRadius: BorderRadius.circular(30),
+                ),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 12),
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),
     ],
   );
 }
-
 
 Widget _Reviews() {
   return Column(
@@ -1049,13 +973,13 @@ Widget _Reviews() {
           Text(
             'Reviews (128)',
             style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           Spacer(),
-          Text('View All',
-              style: TextStyle(color: kGreen)),
+          Text('View All', style: TextStyle(color: kGreen)),
         ],
       ),
       const SizedBox(height: 12),
@@ -1103,14 +1027,16 @@ class _ReviewTile extends StatelessWidget {
               CircleAvatar(
                 radius: 14,
                 backgroundColor: Colors.grey.shade700,
-                child: const Icon(Icons.person,
-                    size: 16, color: Colors.white),
+                child: const Icon(Icons.person, size: 16, color: Colors.white),
               ),
               const SizedBox(width: 8),
-              Text(name,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const Spacer(),
               Row(
                 children: List.generate(
@@ -1118,30 +1044,22 @@ class _ReviewTile extends StatelessWidget {
                   (i) => Icon(
                     Icons.star,
                     size: 14,
-                    color:
-                        i < rating ? kYellow : Colors.grey,
+                    color: i < rating ? kYellow : Colors.grey,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(text,
-              style:
-                  const TextStyle(color: kMuted, height: 1.4)),
+          Text(text, style: const TextStyle(color: kMuted, height: 1.4)),
         ],
       ),
     );
   }
 }
 
-
 Widget _Gallery() {
-  final items = [
-    'Training Ground',
-    'Client Success',
-    'Equipment',
-  ];
+  final items = ['Training Ground', 'Client Success', 'Equipment'];
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1149,9 +1067,10 @@ Widget _Gallery() {
       const Text(
         'Transformations & Gallery',
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold),
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       const SizedBox(height: 12),
       SizedBox(
@@ -1159,8 +1078,7 @@ Widget _Gallery() {
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemCount: items.length,
-          separatorBuilder: (_, __) =>
-              const SizedBox(width: 12),
+          separatorBuilder: (_, __) => const SizedBox(width: 12),
           itemBuilder: (_, i) {
             return Container(
               width: 180,
@@ -1169,7 +1087,8 @@ Widget _Gallery() {
                 borderRadius: BorderRadius.circular(14),
                 image: const DecorationImage(
                   image: NetworkImage(
-                      'https://images.unsplash.com/photo-1517836357463-d25dfeac3438'),
+                    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -1178,8 +1097,9 @@ Widget _Gallery() {
               child: Text(
                 items[i],
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             );
           },
@@ -1189,7 +1109,6 @@ Widget _Gallery() {
   );
 }
 
-
 Widget _Certifications() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1197,9 +1116,10 @@ Widget _Certifications() {
       const Text(
         'Certifications',
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold),
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       const SizedBox(height: 12),
       Wrap(
@@ -1220,16 +1140,18 @@ class _CertBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: kCard,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(label,
-          style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:redesign/USER/Home/Scoreboard/Cricket/cricket_scoreboard.dart';
+import 'package:redesign/view/USER/Home/Scoreboard/Cricket/cricket_scoreboard.dart';
 
 /* ───────────────── THEME ───────────────── */
 

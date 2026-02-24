@@ -1,7 +1,5 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:redesign/USER/Home/Bookings/qr_in_bookings.dart';
+import 'package:redesign/view/USER/Home/Bookings/qr_in_bookings.dart';
 
 const kBg = Color(0xFF000000);
 const kSurface = Color(0xFF0E0E0E);
@@ -58,7 +56,6 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
   }
 }
 
-
 class _BookingsHeader extends StatelessWidget {
   const _BookingsHeader();
 
@@ -72,14 +69,19 @@ class _BookingsHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('My Bookings',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800)),
+                Text(
+                  'My Bookings',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 SizedBox(height: 4),
-                Text('Upcoming sessions & history',
-                    style: TextStyle(color: kMuted, fontSize: 13)),
+                Text(
+                  'Upcoming sessions & history',
+                  style: TextStyle(color: kMuted, fontSize: 13),
+                ),
               ],
             ),
           ),
@@ -89,15 +91,15 @@ class _BookingsHeader extends StatelessWidget {
           ),
           const CircleAvatar(
             radius: 18,
-            backgroundImage:
-                NetworkImage('https://randomuser.me/api/portraits/men/32.jpg'),
+            backgroundImage: NetworkImage(
+              'https://randomuser.me/api/portraits/men/32.jpg',
+            ),
           ),
         ],
       ),
     );
   }
 }
-
 
 class _SearchAndFilters extends StatelessWidget {
   const _SearchAndFilters();
@@ -156,22 +158,19 @@ class _FilterChip extends StatelessWidget {
         label: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (icon != null)
-              Icon(icon, size: 14, color: kGreen),
+            if (icon != null) Icon(icon, size: 14, color: kGreen),
             if (icon != null) const SizedBox(width: 6),
-            Text(label,
-                style:
-                    const TextStyle(color: Colors.white, fontSize: 12)),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ],
         ),
-        shape: StadiumBorder(
-          side: BorderSide(color: kGreen.withOpacity(0.6)),
-        ),
+        shape: StadiumBorder(side: BorderSide(color: kGreen.withOpacity(0.6))),
       ),
     );
   }
 }
-
 
 class _BookingsTabs extends StatelessWidget {
   final TabController controller;
@@ -180,9 +179,9 @@ class _BookingsTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TabBar(
-      isScrollable: true,                 // 🔑 allows left alignment
-  tabAlignment: TabAlignment.start,   // 🔑 Flutter 3.10+
-  padding: const EdgeInsets.only(left: 16), // 👈 shifts tabs left
+      isScrollable: true, // 🔑 allows left alignment
+      tabAlignment: TabAlignment.start, // 🔑 Flutter 3.10+
+      padding: const EdgeInsets.only(left: 16), // 👈 shifts tabs left
       controller: controller,
       indicatorColor: kGreen,
       labelColor: kGreen,
@@ -196,7 +195,6 @@ class _BookingsTabs extends StatelessWidget {
     );
   }
 }
-
 
 class _WeatherAlert extends StatelessWidget {
   const _WeatherAlert();
@@ -228,7 +226,6 @@ class _WeatherAlert extends StatelessWidget {
   }
 }
 
-
 class _UpcomingBookings extends StatelessWidget {
   const _UpcomingBookings();
 
@@ -236,14 +233,10 @@ class _UpcomingBookings extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: EdgeInsets.only(bottom: 32),
-      children: const [
-        _WeatherAlert(),
-        _BookingCardUpcoming(),
-      ],
+      children: const [_WeatherAlert(), _BookingCardUpcoming()],
     );
   }
 }
-
 
 class _BookingCardUpcoming extends StatelessWidget {
   const _BookingCardUpcoming();
@@ -259,11 +252,9 @@ class _BookingCardUpcoming extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const BookingQrScreen(),
-              ),
-            );
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const BookingQrScreen()));
           },
 
           child: Container(
@@ -305,10 +296,7 @@ class _BookingCardUpcoming extends StatelessWidget {
                           SizedBox(height: 4),
                           Text(
                             'Court 4 · 5-a-side',
-                            style: TextStyle(
-                              color: kMuted,
-                              fontSize: 12,
-                            ),
+                            style: TextStyle(color: kMuted, fontSize: 12),
                           ),
                         ],
                       ),
@@ -364,8 +352,6 @@ class _BookingCardUpcoming extends StatelessWidget {
   }
 }
 
-
-
 class _PastBookings extends StatelessWidget {
   const _PastBookings();
 
@@ -373,9 +359,7 @@ class _PastBookings extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-      children: const [
-        _CompletedBookingCard(),
-      ],
+      children: const [_CompletedBookingCard()],
     );
   }
 }
@@ -428,18 +412,12 @@ class _CompletedBookingCard extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       'Badminton · 60 mins',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     SizedBox(height: 6),
                     Text(
                       'Dec 2, 7:00 PM  •  ₹450 Paid',
-                      style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white54, fontSize: 12),
                     ),
                   ],
                 ),
@@ -459,11 +437,7 @@ class _CompletedBookingCard extends StatelessWidget {
           /// ACTIONS
           Row(
             children: [
-              _ActionChip(
-                Icons.download_outlined,
-                'Invoice',
-                onTap: () {},
-              ),
+              _ActionChip(Icons.download_outlined, 'Invoice', onTap: () {}),
               const Spacer(),
               _ActionChip(
                 Icons.refresh_rounded,
@@ -479,7 +453,6 @@ class _CompletedBookingCard extends StatelessWidget {
   }
 }
 
-
 class _CancelledBookings extends StatelessWidget {
   const _CancelledBookings();
 
@@ -487,12 +460,11 @@ class _CancelledBookings extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-      children: const [
-        _CancelledBookingCard(),
-      ],
+      children: const [_CancelledBookingCard()],
     );
   }
 }
+
 class _CancelledBookingCard extends StatelessWidget {
   const _CancelledBookingCard();
 
@@ -541,18 +513,12 @@ class _CancelledBookingCard extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       '7-a-side · 60 mins',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     SizedBox(height: 6),
                     Text(
                       'Nov 28, 6:00 PM  •  Refunded',
-                      style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white54, fontSize: 12),
                     ),
                   ],
                 ),
@@ -568,11 +534,7 @@ class _CancelledBookingCard extends StatelessWidget {
           /// BOTTOM ROW
           Row(
             children: [
-              const Icon(
-                Icons.cancel_outlined,
-                size: 16,
-                color: kRed,
-              ),
+              const Icon(Icons.cancel_outlined, size: 16, color: kRed),
               const SizedBox(width: 6),
               const Expanded(
                 child: Text(
@@ -584,11 +546,7 @@ class _CancelledBookingCard extends StatelessWidget {
                   ),
                 ),
               ),
-              _ActionChip(
-                Icons.info_outline,
-                'Details',
-                onTap: () {},
-              ),
+              _ActionChip(Icons.info_outline, 'Details', onTap: () {}),
             ],
           ),
         ],
@@ -596,8 +554,6 @@ class _CancelledBookingCard extends StatelessWidget {
     );
   }
 }
-
-
 
 class _EmptyState extends StatelessWidget {
   final IconData icon;
@@ -620,28 +576,19 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-
 class _StatusBadge extends StatelessWidget {
   final String label;
   final Color color;
   final Color? textColor;
 
-  const _StatusBadge(
-    this.label,
-    this.color, {
-    super.key,
-    this.textColor,
-  });
+  const _StatusBadge(this.label, this.color, {super.key, this.textColor});
 
   @override
   Widget build(BuildContext context) {
     final resolvedTextColor = textColor ?? color;
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withOpacity(0.12), // soft fill
         borderRadius: BorderRadius.circular(999),
@@ -665,7 +612,6 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-
 class _ActionChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -682,11 +628,13 @@ class _ActionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor =
-        outlined ? Colors.white.withOpacity(0.35) : Colors.transparent;
+    final borderColor = outlined
+        ? Colors.white.withOpacity(0.35)
+        : Colors.transparent;
 
-    final backgroundColor =
-        outlined ? Colors.transparent : Colors.white.withOpacity(0.08);
+    final backgroundColor = outlined
+        ? Colors.transparent
+        : Colors.white.withOpacity(0.08);
 
     final contentColor = Colors.white;
 
@@ -696,26 +644,16 @@ class _ActionChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: borderColor,
-              width: 1,
-            ),
+            border: Border.all(color: borderColor, width: 1),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 16,
-                color: contentColor,
-              ),
+              Icon(icon, size: 16, color: contentColor),
               const SizedBox(width: 6),
               Text(
                 label,

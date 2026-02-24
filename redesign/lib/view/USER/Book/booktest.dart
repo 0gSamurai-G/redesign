@@ -620,12 +620,11 @@
 // //   });
 // // }
 
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:redesign/USER/Home/home.dart';
-import 'package:redesign/USER/Book/turfdetails.dart';
+import 'package:redesign/view/USER/Home/home.dart';
+import 'package:redesign/view/USER/Book/turfdetails.dart';
 import 'package:shimmer/shimmer.dart';
 
 /* ============================================================
@@ -649,7 +648,7 @@ class BookTurfScreen extends StatelessWidget {
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.only(bottom: 80),
-          children:  [
+          children: [
             _TopBar(),
             SizedBox(height: 14),
             _SearchBar(),
@@ -666,7 +665,7 @@ class BookTurfScreen extends StatelessWidget {
             SizedBox(height: 14),
             _AvailableTurfsList(),
             SizedBox(height: 0),
-            const _EndOfResults()
+            const _EndOfResults(),
           ],
         ),
       ),
@@ -700,8 +699,7 @@ class _TopBar extends StatelessWidget {
               ),
             ),
           ),
-          const Icon(Icons.keyboard_arrow_down,
-              color: BookTurfScreen.muted),
+          const Icon(Icons.keyboard_arrow_down, color: BookTurfScreen.muted),
           const SizedBox(width: 8),
           const Icon(Icons.notifications_none, color: Colors.white),
         ],
@@ -758,6 +756,7 @@ class _SportFilters extends StatefulWidget {
   @override
   State<_SportFilters> createState() => _SportFiltersState();
 }
+
 class _SportFiltersState extends State<_SportFilters> {
   int _selectedIndex = 0;
 
@@ -799,7 +798,8 @@ class _SportFiltersState extends State<_SportFilters> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? BookTurfScreen.accent // green background
+                    ? BookTurfScreen
+                          .accent // green background
                     : BookTurfScreen.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -811,7 +811,8 @@ class _SportFiltersState extends State<_SportFilters> {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: isSelected
-                      ? Colors.black // 🔥 black text on green
+                      ? Colors
+                            .black // 🔥 black text on green
                       : Colors.white,
                 ),
               ),
@@ -822,7 +823,6 @@ class _SportFiltersState extends State<_SportFilters> {
     );
   }
 }
-
 
 /* ============================================================
    SECTION HEADER
@@ -851,10 +851,7 @@ class _SectionHeader extends StatelessWidget {
           ),
           Text(
             'See all',
-            style: GoogleFonts.inter(
-              color: BookTurfScreen.muted,
-              fontSize: 13,
-            ),
+            style: GoogleFonts.inter(color: BookTurfScreen.muted, fontSize: 13),
           ),
         ],
       ),
@@ -922,8 +919,9 @@ class _TrendingTile extends StatelessWidget {
           children: [
             /// ✅ IMAGE WITH CACHE + SHIMMER
             ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
               child: CachedNetworkImage(
                 imageUrl: data.image,
                 cacheKey: data.image,
@@ -1041,18 +1039,16 @@ class _FilterRowState extends State<_FilterRow> {
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? BookTurfScreen.accent // green
+                    ? BookTurfScreen
+                          .accent // green
                     : BookTurfScreen.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: isSelected
-                      ? BookTurfScreen.accent
-                      : Colors.white24,
+                  color: isSelected ? BookTurfScreen.accent : Colors.white24,
                 ),
               ),
               child: Text(
@@ -1063,7 +1059,8 @@ class _FilterRowState extends State<_FilterRow> {
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: isSelected
-                      ? Colors.black // 🔥 black text on green
+                      ? Colors
+                            .black // 🔥 black text on green
                       : Colors.white,
                 ),
               ),
@@ -1075,11 +1072,9 @@ class _FilterRowState extends State<_FilterRow> {
   }
 }
 
-
 /* ============================================================
    AVAILABLE TURFS
    ============================================================ */
-
 
 class _AvailableTurfsList extends StatelessWidget {
   const _AvailableTurfsList();
@@ -1165,24 +1160,21 @@ class _TurfCardState extends State<_TurfCard>
         children: [
           /// IMAGE PAGE VIEW (CACHED + SHIMMER)
           ClipRRect(
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(18)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             child: Stack(
               children: [
                 SizedBox(
                   height: imageHeight,
                   child: PageView.builder(
                     itemCount: data.images.length,
-                    onPageChanged: (i) =>
-                        setState(() => _pageIndex = i),
+                    onPageChanged: (i) => setState(() => _pageIndex = i),
                     itemBuilder: (_, i) => CachedNetworkImage(
                       imageUrl: data.images[i],
                       cacheKey: data.images[i],
                       fit: BoxFit.cover,
                       width: double.infinity,
-                      placeholder: (_, __) => _ImageShimmer(
-                        height: imageHeight,
-                      ),
+                      placeholder: (_, __) =>
+                          _ImageShimmer(height: imageHeight),
                       errorWidget: (_, __, ___) => const Center(
                         child: Icon(
                           Icons.broken_image,
@@ -1205,8 +1197,7 @@ class _TurfCardState extends State<_TurfCard>
                       children: List.generate(
                         data.images.length,
                         (i) => Container(
-                          margin:
-                              const EdgeInsets.symmetric(horizontal: 3),
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
                           width: 6,
                           height: 6,
                           decoration: BoxDecoration(
@@ -1227,132 +1218,131 @@ class _TurfCardState extends State<_TurfCard>
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    /// 🔥 NAVIGABLE CONTENT ONLY
-    InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            // builder: (_) => const UserHomePage(),
-            builder: (_) => const TurfDetailScreen(),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              data.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
-                color: BookTurfScreen.accent,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              data.location,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
-                color: BookTurfScreen.muted,
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(text: '⭐ '),
-                      TextSpan(
-                        text: '4.6',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                /// 🔥 NAVIGABLE CONTENT ONLY
+                InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        // builder: (_) => const UserHomePage(),
+                        builder: (_) => const TurfDetailScreen(),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    '(128 reviews) • 2.4 km away',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: BookTurfScreen.muted,
-                      fontSize: 12,
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: BookTurfScreen.accent,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          data.location,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: BookTurfScreen.muted,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Row(
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(text: '⭐ '),
+                                  TextSpan(
+                                    text: '4.6',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                '(128 reviews) • 2.4 km away',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  color: BookTurfScreen.muted,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
 
-    /// 🔥 PRICE + BOOK (NOT NAVIGABLE)
-    Row(
-      children: [
-        Expanded(
-          child: RichText(
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            text: TextSpan(
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: BookTurfScreen.muted,
-              ),
-              children: [
-                const TextSpan(text: 'Starts from '),
-                TextSpan(
-                  text: '₹${data.price}',
-                  style: const TextStyle(
-                    color: BookTurfScreen.accent,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
-                  ),
+                /// 🔥 PRICE + BOOK (NOT NAVIGABLE)
+                Row(
+                  children: [
+                    Expanded(
+                      child: RichText(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: BookTurfScreen.muted,
+                          ),
+                          children: [
+                            const TextSpan(text: 'Starts from '),
+                            TextSpan(
+                              text: '₹${data.price}',
+                              style: const TextStyle(
+                                color: BookTurfScreen.accent,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const TextSpan(text: '/hr'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        // 👉 booking flow only
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: BookTurfScreen.accent,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text('Book'),
+                    ),
+                  ],
                 ),
-                const TextSpan(text: '/hr'),
               ],
             ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        ElevatedButton(
-          onPressed: () {
-            // 👉 booking flow only
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: BookTurfScreen.accent,
-            foregroundColor: Colors.black,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 10,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          child: const Text('Book'),
-        ),
-      ],
-    ),
-  ],
-)
-
           ),
         ],
       ),
@@ -1422,8 +1412,6 @@ class _TrendingData {
   _TrendingData(this.name, this.rating, this.distance, this.image);
 }
 
-
-
 class _EndOfResults extends StatelessWidget {
   const _EndOfResults();
 
@@ -1438,8 +1426,8 @@ class _EndOfResults extends StatelessWidget {
     final imageSize = width < 360
         ? 90.0
         : width < 600
-            ? 120.0
-            : 140.0;
+        ? 120.0
+        : 140.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 36, 20, 48),
@@ -1515,19 +1503,14 @@ class _EndOfResults extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: BookTurfScreen.accent,
               side: const BorderSide(color: BookTurfScreen.accent),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(22),
               ),
             ),
             child: Text(
               'Explore Other Sports',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
             ),
           ),
         ],

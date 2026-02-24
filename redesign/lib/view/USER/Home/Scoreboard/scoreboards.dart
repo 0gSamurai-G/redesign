@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:redesign/USER/Home/Scoreboard/select_sports.dart';
+import 'package:redesign/view/USER/Home/Scoreboard/select_sports.dart';
 
 const kBg = Color(0xFF000000);
 const kSurface = Color(0xFF0E0E0E);
@@ -11,7 +11,6 @@ const kRed = Color(0xFFE53935);
 const kGold = Color(0xFFFFC107);
 const kPurple = Color(0xFF7C4DFF);
 const kMuted = Color(0xFFA7A7A7);
-
 
 class ScoreboardHubScreen extends StatefulWidget {
   const ScoreboardHubScreen({super.key});
@@ -37,14 +36,10 @@ class _ScoreboardHubScreenState extends State<ScoreboardHubScreen> {
             const _ScoreboardAppBar(),
 
             /// QUICK ACTIONS
-            SliverToBoxAdapter(
-              child: QuickActions(),
-            ),
+            SliverToBoxAdapter(child: QuickActions()),
 
             /// CREATE SCOREBOARD
-            SliverToBoxAdapter(
-              child: _CreateScoreboardHero(),
-            ),
+            SliverToBoxAdapter(child: _CreateScoreboardHero()),
 
             /// LIVE SCOREBOARDS
             const _SectionHeader(
@@ -56,21 +51,15 @@ class _ScoreboardHubScreenState extends State<ScoreboardHubScreen> {
             SliverToBoxAdapter(
               child: hasLiveMatches
                   ? const LiveScoreboardCard()
-                  : _EmptyLiveState(
-                      onCreate: _onCreateMatch,
-                    ),
+                  : _EmptyLiveState(onCreate: _onCreateMatch),
             ),
 
             /// LIVE TOURNAMENT WATCH
-            SliverToBoxAdapter(
-              child: LiveTournamentWatch(),
-            ),
+            SliverToBoxAdapter(child: LiveTournamentWatch()),
 
             /// CLAN BATTLES
             const _SectionHeader(title: 'Clan Battles'),
-            SliverToBoxAdapter(
-              child: _ClanBattleCard(),
-            ),
+            SliverToBoxAdapter(child: _ClanBattleCard()),
 
             /// TOURNAMENTS
             const _SectionHeader(title: 'Tournaments'),
@@ -87,13 +76,9 @@ class _ScoreboardHubScreenState extends State<ScoreboardHubScreen> {
 
             /// HISTORY
             const _SectionHeader(title: 'History'),
-            SliverToBoxAdapter(
-              child: _HistoryList(),
-            ),
+            SliverToBoxAdapter(child: _HistoryList()),
 
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 32),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
         ),
       ),
@@ -114,7 +99,6 @@ class _ScoreboardHubScreenState extends State<ScoreboardHubScreen> {
     // Hook API / WebSocket refresh here
   }
 }
-
 
 class _EmptyLiveState extends StatelessWidget {
   final VoidCallback onCreate;
@@ -197,7 +181,6 @@ class _ScoreboardAppBar extends StatelessWidget {
   }
 }
 
-
 class QuickActions extends StatefulWidget {
   const QuickActions({super.key});
 
@@ -248,8 +231,6 @@ class _QuickActionsState extends State<QuickActions> {
   }
 }
 
-
-
 class _CreateScoreboardHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -260,10 +241,7 @@ class _CreateScoreboardHero extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
           gradient: LinearGradient(
-            colors: [
-              kGreen.withOpacity(0.18),
-              kSurface,
-            ],
+            colors: [kGreen.withOpacity(0.18), kSurface],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -294,7 +272,9 @@ class _CreateScoreboardHero extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SelectSportScreen()));
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => SelectSportScreen()));
               },
               child: const Text('Create Now →'),
             ),
@@ -304,7 +284,6 @@ class _CreateScoreboardHero extends StatelessWidget {
     );
   }
 }
-
 
 class LiveScoreboardCard extends StatelessWidget {
   const LiveScoreboardCard({super.key});
@@ -434,8 +413,7 @@ class LiveScoreboardCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(Icons.chevron_right,
-                    color: kMuted, size: 20),
+                Icon(Icons.chevron_right, color: kMuted, size: 20),
               ],
             ),
           ],
@@ -460,8 +438,9 @@ class _TeamBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final alignment =
-        alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+    final alignment = alignStart
+        ? CrossAxisAlignment.start
+        : CrossAxisAlignment.end;
 
     return Column(
       crossAxisAlignment: alignment,
@@ -472,10 +451,13 @@ class _TeamBlock extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(code,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800)),
+              Text(
+                code,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 2),
               Text(
                 percent,
@@ -556,7 +538,6 @@ class _LiveBadge extends StatelessWidget {
   }
 }
 
-
 class LiveTournamentWatch extends StatefulWidget {
   const LiveTournamentWatch({super.key});
 
@@ -599,8 +580,7 @@ class _LiveTournamentWatchState extends State<LiveTournamentWatch> {
                       if (progress == null) return child;
                       return Container(color: kSurface);
                     },
-                    errorBuilder: (_, __, ___) =>
-                        Container(color: kSurface),
+                    errorBuilder: (_, __, ___) => Container(color: kSurface),
                   ),
 
                   /// DARK GRADIENT OVERLAY
@@ -640,8 +620,7 @@ class _LiveTournamentWatchState extends State<LiveTournamentWatch> {
                         const SizedBox(height: 6),
                         const Row(
                           children: [
-                            Icon(Icons.remove_red_eye,
-                                size: 14, color: kMuted),
+                            Icon(Icons.remove_red_eye, size: 14, color: kMuted),
                             SizedBox(width: 6),
                             Text(
                               '1.2k watching',
@@ -679,7 +658,6 @@ class _LiveTournamentWatchState extends State<LiveTournamentWatch> {
   }
 }
 
-
 class _WatchLivePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -709,8 +687,6 @@ class _WatchLivePill extends StatelessWidget {
   }
 }
 
-
-
 class _HistoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -736,7 +712,6 @@ class _HistoryList extends StatelessWidget {
     );
   }
 }
-
 
 // class _LiveBadge extends StatelessWidget {
 //   const _LiveBadge();
@@ -772,7 +747,6 @@ class _CircleIcon extends StatelessWidget {
     );
   }
 }
-
 
 class _SectionHeader extends StatelessWidget {
   final String title;
@@ -831,7 +805,6 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-
 class QuickActionCard extends StatefulWidget {
   final IconData icon;
   final String title;
@@ -874,11 +847,7 @@ class _QuickActionCardState extends State<QuickActionCard> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(
-                  widget.icon,
-                  color: widget.live ? kRed : kGreen,
-                  size: 22,
-                ),
+                Icon(widget.icon, color: widget.live ? kRed : kGreen, size: 22),
                 const SizedBox(width: 12),
 
                 /// TEXT
@@ -900,10 +869,7 @@ class _QuickActionCardState extends State<QuickActionCard> {
                         widget.subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: kMuted,
-                          fontSize: 12,
-                        ),
+                        style: const TextStyle(color: kMuted, fontSize: 12),
                       ),
                     ],
                   ),
@@ -950,8 +916,6 @@ class _QuickActionCardState extends State<QuickActionCard> {
 //   }
 // }
 
-
-
 class _TeamScore extends StatelessWidget {
   final String short;
   final String name;
@@ -975,10 +939,12 @@ class _TeamScore extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Text(name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: kMuted, fontSize: 12)),
+        Text(
+          name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: kMuted, fontSize: 12),
+        ),
         const SizedBox(height: 4),
         Text(
           score,
@@ -992,7 +958,6 @@ class _TeamScore extends StatelessWidget {
     );
   }
 }
-
 
 class _HistoryTile extends StatelessWidget {
   final String title;
@@ -1021,18 +986,23 @@ class _HistoryTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle,
-                    style:
-                        const TextStyle(color: kMuted, fontSize: 12)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: kMuted, fontSize: 12),
+                ),
                 const SizedBox(height: 4),
-                Text(highlight,
-                    style:
-                        const TextStyle(color: kMuted, fontSize: 12)),
+                Text(
+                  highlight,
+                  style: const TextStyle(color: kMuted, fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -1050,7 +1020,6 @@ class _HistoryTile extends StatelessWidget {
   }
 }
 
-
 class _ClanBattleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1066,21 +1035,25 @@ class _ClanBattleCard extends StatelessWidget {
           children: [
             const Row(
               children: [
-                Text('REGIONAL RIVALRY',
-                    style: TextStyle(color: kMuted, fontSize: 12)),
+                Text(
+                  'REGIONAL RIVALRY',
+                  style: TextStyle(color: kMuted, fontSize: 12),
+                ),
                 Spacer(),
-                Text('Q4 Live',
-                    style: TextStyle(color: kRed, fontSize: 12)),
+                Text('Q4 Live', style: TextStyle(color: kRed, fontSize: 12)),
               ],
             ),
             const SizedBox(height: 14),
             Row(
               children: const [
                 Expanded(child: _ClanScore('TI', 'Titans', 88)),
-                Text('VS',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700)),
+                Text(
+                  'VS',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 Expanded(child: _ClanScore('SP', 'Spartans', 82)),
               ],
             ),
@@ -1110,14 +1083,16 @@ class _ClanScore extends StatelessWidget {
         CircleAvatar(
           radius: 22,
           backgroundColor: Colors.white.withOpacity(0.08),
-          child: Text(tag,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w700)),
+          child: Text(
+            tag,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
         const SizedBox(height: 6),
-        Text(name,
-            style:
-                const TextStyle(color: kMuted, fontSize: 12)),
+        Text(name, style: const TextStyle(color: kMuted, fontSize: 12)),
         const SizedBox(height: 4),
         Text(
           '$score',
@@ -1131,7 +1106,6 @@ class _ClanScore extends StatelessWidget {
     );
   }
 }
-
 
 class _TournamentCard extends StatelessWidget {
   final String name;
@@ -1160,9 +1134,7 @@ class _TournamentCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: kSurface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Colors.amber.withOpacity(0.15),
-          ),
+          border: Border.all(color: Colors.amber.withOpacity(0.15)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1196,8 +1168,10 @@ class _TournamentCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -1220,10 +1194,7 @@ class _TournamentCard extends StatelessWidget {
             /// META
             Text(
               '$sport · $teams Teams',
-              style: const TextStyle(
-                color: kMuted,
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: kMuted, fontSize: 12),
             ),
 
             const SizedBox(height: 10),
@@ -1231,8 +1202,11 @@ class _TournamentCard extends StatelessWidget {
             /// PRIZE
             Row(
               children: [
-                const Icon(Icons.monetization_on,
-                    size: 16, color: Colors.amber),
+                const Icon(
+                  Icons.monetization_on,
+                  size: 16,
+                  color: Colors.amber,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Prize Pool: $prize',
@@ -1253,10 +1227,7 @@ class _TournamentCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Current Stage\n$stage',
-                    style: const TextStyle(
-                      color: kMuted,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: kMuted, fontSize: 12),
                   ),
                 ),
                 _ActionChip(
@@ -1299,27 +1270,18 @@ class _ActionChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: outlined ? Colors.transparent : accent,
             borderRadius: BorderRadius.circular(999),
             border: outlined
-                ? Border.all(
-                    color: accent.withOpacity(0.6),
-                  )
+                ? Border.all(color: accent.withOpacity(0.6))
                 : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 16,
-                color: outlined ? accent : Colors.black,
-              ),
+              Icon(icon, size: 16, color: outlined ? accent : Colors.black),
               const SizedBox(width: 6),
               Text(
                 label,

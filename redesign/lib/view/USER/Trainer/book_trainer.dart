@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:redesign/USER/Trainer/trainer_payment.dart';
+import 'package:redesign/view/USER/Trainer/trainer_payment.dart';
 
 const kBg = Color(0xFF000000);
 const kCard = Color(0xFF1A1A1A);
@@ -77,7 +77,6 @@ class _ChoosePackageScreenState extends State<ChoosePackageScreen> {
       backgroundColor: kBg,
       body: Column(
         children: [
-          
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
@@ -124,9 +123,7 @@ class _AppBar extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           padding: EdgeInsets.fromLTRB(16, topInset + 12, 16, 16),
-          decoration: const BoxDecoration(
-            color: Colors.black54,
-          ),
+          decoration: const BoxDecoration(color: Colors.black54),
           child: Row(
             children: [
               IconButton(
@@ -149,10 +146,7 @@ class _AppBar extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       'Select a plan that fits your goals',
-                      style: TextStyle(
-                        color: kMuted,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: kMuted, fontSize: 13),
                     ),
                   ],
                 ),
@@ -164,7 +158,6 @@ class _AppBar extends StatelessWidget {
     );
   }
 }
-
 
 /* ───────────────── ACADEMY CARD ───────────────── */
 
@@ -192,13 +185,18 @@ class _AcademyCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('PowerPlay Cricket Academy',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600)),
+                Text(
+                  'PowerPlay Cricket Academy',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 SizedBox(height: 4),
-                Text('⭐ 4.9 (128 Reviews)',
-                    style: TextStyle(color: kMuted, fontSize: 12)),
+                Text(
+                  '⭐ 4.9 (128 Reviews)',
+                  style: TextStyle(color: kMuted, fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -238,87 +236,106 @@ class _PackageCard extends StatelessWidget {
               width: 1.6,
             ),
             boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: kGreen.withOpacity(0.35),
-                      blurRadius: 16,
-                    )
-                  ]
+                ? [BoxShadow(color: kGreen.withOpacity(0.35), blurRadius: 16)]
                 : [],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(children: [
-                if (data.badge != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: data.badgeColor ?? kGreen,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(data.badge!,
+              Row(
+                children: [
+                  if (data.badge != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: data.badgeColor ?? kGreen,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        data.badge!,
                         style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold)),
+                          color: Colors.black,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  const Spacer(),
+                  Icon(
+                    selected
+                        ? Icons.check_circle
+                        : Icons.radio_button_unchecked,
+                    color: selected ? kGreen : kMuted,
                   ),
-                const Spacer(),
-                Icon(
-                  selected
-                      ? Icons.check_circle
-                      : Icons.radio_button_unchecked,
-                  color: selected ? kGreen : kMuted,
-                )
-              ]),
+                ],
+              ),
               const SizedBox(height: 10),
-              Text(data.title,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                data.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 6),
-              Text(data.desc,
-                  style:
-                      const TextStyle(color: kMuted, height: 1.4)),
+              Text(
+                data.desc,
+                style: const TextStyle(color: kMuted, height: 1.4),
+              ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: data.chips
-                    .map((e) => Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: kSurface,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(e,
-                              style: const TextStyle(
-                                  color: kMuted, fontSize: 12)),
-                        ))
+                    .map(
+                      (e) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: kSurface,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          e,
+                          style: const TextStyle(color: kMuted, fontSize: 12),
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
               const SizedBox(height: 12),
               const Divider(color: Colors.white10),
               Row(
                 children: [
-                  Text('₹${data.price}',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    '₹${data.price}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const Spacer(),
-                  Text('+${data.coins} Z Coins',
-                      style: const TextStyle(
-                          color: kYellow, fontWeight: FontWeight.bold)),
+                  Text(
+                    '+${data.coins} Z Coins',
+                    style: const TextStyle(
+                      color: kYellow,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 4),
-              Text(data.billing,
-                  style:
-                      const TextStyle(color: kMuted, fontSize: 12)),
+              Text(
+                data.billing,
+                style: const TextStyle(color: kMuted, fontSize: 12),
+              ),
             ],
           ),
         ),
@@ -333,10 +350,7 @@ class _BottomCTA extends StatelessWidget {
   final List<_PackageModel> packages;
   final ValueNotifier<int> selectedIndex;
 
-  const _BottomCTA({
-    required this.packages,
-    required this.selectedIndex,
-  });
+  const _BottomCTA({required this.packages, required this.selectedIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -350,26 +364,34 @@ class _BottomCTA extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Selected: ${p.title}',
-                  style: const TextStyle(color: kMuted)),
+              Text(
+                'Selected: ${p.title}',
+                style: const TextStyle(color: kMuted),
+              ),
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=>PaymentSuccessScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => PaymentSuccessScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kGreen,
                     foregroundColor: Colors.black,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
-                  child: Text('Continue — ₹${p.price}',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'Continue — ₹${p.price}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],

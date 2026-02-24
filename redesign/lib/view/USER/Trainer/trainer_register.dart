@@ -1,8 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:redesign/USER/Trainer/trainer_platform_package.dart';
-
+import 'package:redesign/view/USER/Trainer/trainer_platform_package.dart';
 
 const Color kBg = Color(0xFF000000);
 const Color kSurface = Color(0xFF0E0E0E);
@@ -21,38 +20,34 @@ class _TrainerJoinScreenState extends State<TrainerJoinScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _gender;
 
+  bool isRentedGround = true;
 
-bool isRentedGround = true;
+  final List<String> facilityPhotos = [];
 
-final List<String> facilityPhotos = [];
-
-final TextEditingController addressController = TextEditingController();
-final TextEditingController areaController = TextEditingController();
-final TextEditingController cityController = TextEditingController();
-
-
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController areaController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
 
   final Map<String, List<String>> packagePerks = {
-  'Trial': [],
-  '1 Month': [],
-  '3 Months': [],
-  '6 Months': [],
-  '1 Year': [],
-};
+    'Trial': [],
+    '1 Month': [],
+    '3 Months': [],
+    '6 Months': [],
+    '1 Year': [],
+  };
 
-final Set<String> suggestedPerks = {
-  'Kit Provided',
-  'Video Analysis',
-  'Fitness Tracking',
-  'Match Practice',
-  'Diet Plan',
-  'Performance Report',
-};
+  final Set<String> suggestedPerks = {
+    'Kit Provided',
+    'Video Analysis',
+    'Fitness Tracking',
+    'Match Practice',
+    'Diet Plan',
+    'Performance Report',
+  };
 
-String selectedPackage = 'Trial';
+  String selectedPackage = 'Trial';
 
-final TextEditingController perkController = TextEditingController();
-
+  final TextEditingController perkController = TextEditingController();
 
   bool _isValid = true;
 
@@ -83,12 +78,7 @@ final TextEditingController perkController = TextEditingController();
                     const _ProfilePhoto(),
                     const SizedBox(height: 24),
 
-
-
-                    _InputField(
-                      label: 'Full Name *',
-                      initial: 'Rahul Sharma',
-                    ),
+                    _InputField(label: 'Full Name *', initial: 'Rahul Sharma'),
                     const SizedBox(height: 16),
                     _VerifiedInputField(
                       label: 'Mobile Number *',
@@ -110,125 +100,116 @@ final TextEditingController perkController = TextEditingController();
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-  child: _DropdownField(
-  label: 'Gender',
-  value: _gender,
-  items: const ['Male', 'Female', 'Other'],
-  onChanged: (v) => setState(() => _gender = v),
-)
-),
-
+                          child: _DropdownField(
+                            label: 'Gender',
+                            value: _gender,
+                            items: const ['Male', 'Female', 'Other'],
+                            onChanged: (v) => setState(() => _gender = v),
+                          ),
+                        ),
                       ],
                     ),
 
+                    const SizedBox(height: 32),
+                    const _StepHeader(step: 2, title: 'Professional Details'),
+                    const SizedBox(height: 20),
+
+                    /// PRIMARY SPORT
+                    _DropdownField(
+                      label: 'Primary Sport',
+                      value: 'Cricket',
+                      items: const ['Cricket', 'Football', 'Fitness', 'Yoga'],
+                      onChanged: (String? value) {},
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// SPECIALIZATION
+                    _InputField(
+                      label: 'Specialization',
+                      hint: 'e.g. Batting Coach, Pace Bowling',
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// CURRENT ACADEMY (OPTIONAL)
+                    _InputField(
+                      label: 'Current Academy / Club (Optional)',
+                      hint: 'e.g. PowerPlay Academy',
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// EXPERIENCE
+                    _InputField(
+                      label: 'Years of Experience',
+                      hint: 'e.g. 5',
+                      keyboardType: TextInputType.number,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// SHORT BIO
+                    _BioField(),
+
+                    const SizedBox(height: 20),
+                    _CertificationsSection(), // ✅ Section 3
 
                     const SizedBox(height: 32),
-const _StepHeader(step: 2, title: 'Professional Details'),
-const SizedBox(height: 20),
+                    _CoachingPreferencesSection(),
+                    const SizedBox(height: 32),
+                    _AvailabilitySection(),
+                    const SizedBox(height: 32),
+                    _PricingPackagesSection(),
+                    const SizedBox(height: 32),
+                    LocationInfraSection(),
+                    const SizedBox(height: 32),
+                    IdentityVerificationSection(),
+                    const SizedBox(height: 32),
+                    PayoutDetailsSection(),
+                    const SizedBox(height: 32),
+                    AgreementsSection(),
 
-/// PRIMARY SPORT
-_DropdownField(
-  label: 'Primary Sport',
-  value: 'Cricket',
-  items: const ['Cricket', 'Football', 'Fitness', 'Yoga'], onChanged: (String? value) {  },
-),
+                    const SizedBox(height: 120),
 
-const SizedBox(height: 16),
-
-/// SPECIALIZATION
-_InputField(
-  label: 'Specialization',
-  hint: 'e.g. Batting Coach, Pace Bowling',
-),
-
-const SizedBox(height: 16),
-
-/// CURRENT ACADEMY (OPTIONAL)
-_InputField(
-  label: 'Current Academy / Club (Optional)',
-  hint: 'e.g. PowerPlay Academy',
-),
-
-const SizedBox(height: 16),
-
-/// EXPERIENCE
-_InputField(
-  label: 'Years of Experience',
-  hint: 'e.g. 5',
-  keyboardType: TextInputType.number,
-),
-
-const SizedBox(height: 16),
-
-/// SHORT BIO
-_BioField(),
-
-const SizedBox(height: 20),
-_CertificationsSection(), // ✅ Section 3
-
-
-const SizedBox(height: 32),
-    _CoachingPreferencesSection(),
-const SizedBox(height: 32),
-    _AvailabilitySection(),
-const SizedBox(height: 32),
-   _PricingPackagesSection(), 
-const SizedBox(height: 32),
-LocationInfraSection(), 
-const SizedBox(height: 32),
-IdentityVerificationSection(),
-const SizedBox(height: 32),
-PayoutDetailsSection(),
-const SizedBox(height: 32),
-AgreementsSection(),
-
-
-
-
-
-
-
-
-
-
-
-
-    const SizedBox(height: 120),
-
- /// CTA
- const SizedBox(height: 25),
-            ElevatedButton(
-              onPressed: _isValid ? () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>TrainerProAccessScreen()));
-              } : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kGreen,
-                foregroundColor: Colors.black,
-                minimumSize: const Size.fromHeight(54),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
-                ),
-              ),
-              child: const Text(
-                'Continue',
-                style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-              ),
-            ),
-
+                    /// CTA
+                    const SizedBox(height: 25),
+                    ElevatedButton(
+                      onPressed: _isValid
+                          ? () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => TrainerProAccessScreen(),
+                                ),
+                              );
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kGreen,
+                        foregroundColor: Colors.black,
+                        minimumSize: const Size.fromHeight(54),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                      ),
+                      child: const Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-
-           
           ],
         ),
       ),
     );
   }
 }
-
 
 class _JoinAppBar extends StatelessWidget {
   const _JoinAppBar();
@@ -265,7 +246,6 @@ class _JoinAppBar extends StatelessWidget {
   }
 }
 
-
 class _CertifiedBanner extends StatelessWidget {
   const _CertifiedBanner();
 
@@ -275,12 +255,7 @@ class _CertifiedBanner extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [
-            kGreen.withOpacity(0.25),
-            kSurface,
-          ],
-        ),
+        gradient: LinearGradient(colors: [kGreen.withOpacity(0.25), kSurface]),
         border: Border.all(color: kGreen.withOpacity(0.4)),
       ),
       child: Row(
@@ -302,8 +277,9 @@ class _CertifiedBanner extends StatelessWidget {
                 Text(
                   'Certified Trainer Program',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 SizedBox(height: 6),
                 Text(
@@ -318,7 +294,6 @@ class _CertifiedBanner extends StatelessWidget {
     );
   }
 }
-
 
 class _StepHeader extends StatelessWidget {
   final int step;
@@ -335,22 +310,24 @@ class _StepHeader extends StatelessWidget {
           child: Text(
             step.toString(),
             style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         const SizedBox(width: 10),
         Text(
           title,
           style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold),
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
   }
 }
-
 
 class _ProfilePhoto extends StatelessWidget {
   const _ProfilePhoto();
@@ -374,16 +351,18 @@ class _ProfilePhoto extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               padding: const EdgeInsets.all(6),
-              child: const Icon(Icons.camera_alt,
-                  size: 16, color: Colors.black),
+              child: const Icon(
+                Icons.camera_alt,
+                size: 16,
+                color: Colors.black,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 }
-
 
 class _InputField extends StatelessWidget {
   final String label;
@@ -431,8 +410,10 @@ class _InputField extends StatelessWidget {
         hintStyle: TextStyle(color: kMuted.withOpacity(0.6)),
         filled: true,
         fillColor: kCard,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
@@ -449,8 +430,6 @@ class _InputField extends StatelessWidget {
     );
   }
 }
-
-
 
 class _VerifiedInputField extends StatelessWidget {
   final String label;
@@ -487,7 +466,6 @@ class _VerifiedInputField extends StatelessWidget {
   }
 }
 
-
 // class _DropdownField extends StatelessWidget {
 //   final String label;
 //   final String value;
@@ -518,7 +496,6 @@ class _VerifiedInputField extends StatelessWidget {
 //     );
 //   }
 // }
-
 
 class _DropdownField extends StatelessWidget {
   final String label;
@@ -554,8 +531,10 @@ class _DropdownField extends StatelessWidget {
         labelText: label,
         filled: true,
         fillColor: kCard,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
@@ -573,8 +552,7 @@ class _DropdownField extends StatelessWidget {
             e,
             style: TextStyle(
               color: isSelected ? kGreen : Colors.white,
-              fontWeight:
-                  isSelected ? FontWeight.w600 : FontWeight.w400,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
           ),
         );
@@ -582,10 +560,6 @@ class _DropdownField extends StatelessWidget {
     );
   }
 }
-
-
-
-
 
 class _BioField extends StatefulWidget {
   @override
@@ -635,7 +609,6 @@ class _BioFieldState extends State<_BioField> {
   }
 }
 
-
 class _CertificationsSection extends StatelessWidget {
   const _CertificationsSection();
 
@@ -668,17 +641,11 @@ class _CertificationsSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: kCard,
             borderRadius: BorderRadius.circular(14),
-            border: const Border(
-              left: BorderSide(color: kGreen, width: 3),
-            ),
+            border: const Border(left: BorderSide(color: kGreen, width: 3)),
           ),
           child: const Text(
             'Adding valid certifications increases your profile trust score by 40%.',
-            style: TextStyle(
-              color: kMuted,
-              fontSize: 13,
-              height: 1.4,
-            ),
+            style: TextStyle(color: kMuted, fontSize: 13, height: 1.4),
           ),
         ),
 
@@ -707,7 +674,6 @@ class _CertificationsSection extends StatelessWidget {
   }
 }
 
-
 class _StepIndicator extends StatelessWidget {
   final int number;
   const _StepIndicator({required this.number});
@@ -718,10 +684,7 @@ class _StepIndicator extends StatelessWidget {
       width: 26,
       height: 26,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: kGreen,
-        shape: BoxShape.circle,
-      ),
+      decoration: const BoxDecoration(color: kGreen, shape: BoxShape.circle),
       child: Text(
         '$number',
         style: const TextStyle(
@@ -733,7 +696,6 @@ class _StepIndicator extends StatelessWidget {
     );
   }
 }
-
 
 class _UploadCertificateCard extends StatelessWidget {
   @override
@@ -749,9 +711,7 @@ class _UploadCertificateCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: kCard,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.08),
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -760,18 +720,12 @@ class _UploadCertificateCard extends StatelessWidget {
             SizedBox(height: 10),
             Text(
               'Upload Certificate',
-              style: TextStyle(
-                color: kGreen,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: kGreen, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 4),
             Text(
               'PDF or JPG (Max 5MB)',
-              style: TextStyle(
-                color: kMuted,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: kMuted, fontSize: 12),
             ),
           ],
         ),
@@ -779,7 +733,6 @@ class _UploadCertificateCard extends StatelessWidget {
     );
   }
 }
-
 
 class _UploadedCertificateTile extends StatelessWidget {
   final String fileName;
@@ -832,10 +785,7 @@ class _UploadedCertificateTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   fileSize,
-                  style: const TextStyle(
-                    color: kMuted,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: kMuted, fontSize: 12),
                 ),
               ],
             ),
@@ -858,7 +808,6 @@ class _UploadedCertificateTile extends StatelessWidget {
   }
 }
 
-
 class _CoachingPreferencesSection extends StatefulWidget {
   const _CoachingPreferencesSection();
 
@@ -872,15 +821,9 @@ class _CoachingPreferencesSectionState
   final Set<String> _selectedLevels = {'Kids', 'Adults'};
   bool _willingToTravel = true;
   bool _onlineCoaching = false;
-    bool _isComfortable = false;
+  bool _isComfortable = false;
 
-  final levels = [
-    'Kids',
-    'Adults',
-    'Women Only',
-    'Pro Athletes',
-    'Beginners',
-  ];
+  final levels = ['Kids', 'Adults', 'Women Only', 'Pro Athletes', 'Beginners'];
 
   @override
   Widget build(BuildContext context) {
@@ -965,7 +908,6 @@ class _CoachingPreferencesSectionState
   }
 }
 
-
 class _SelectableChip extends StatelessWidget {
   final String label;
   final bool selected;
@@ -1005,7 +947,6 @@ class _SelectableChip extends StatelessWidget {
     );
   }
 }
-
 
 class _PreferenceToggle extends StatelessWidget {
   final String label;
@@ -1052,7 +993,6 @@ class _PreferenceToggle extends StatelessWidget {
   }
 }
 
-
 class _AvailabilitySection extends StatefulWidget {
   const _AvailabilitySection();
 
@@ -1062,10 +1002,7 @@ class _AvailabilitySection extends StatefulWidget {
 
 class _AvailabilitySectionState extends State<_AvailabilitySection> {
   final Set<String> _selectedDays = {'M', 'T', 'W', 'T', 'F'};
-  final Set<String> _selectedSlots = {
-    'Morning (6–10 AM)',
-    'Evening (5–9 PM)',
-  };
+  final Set<String> _selectedSlots = {'Morning (6–10 AM)', 'Evening (5–9 PM)'};
 
   final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   final slots = [
@@ -1166,7 +1103,6 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
   }
 }
 
-
 class _DayCircle extends StatelessWidget {
   final String label;
   final bool selected;
@@ -1203,7 +1139,6 @@ class _DayCircle extends StatelessWidget {
     );
   }
 }
-
 
 class _TimeSlotChip extends StatelessWidget {
   final String label;
@@ -1244,7 +1179,6 @@ class _TimeSlotChip extends StatelessWidget {
     );
   }
 }
-
 
 class _PricingPackagesSection extends StatefulWidget {
   const _PricingPackagesSection();
@@ -1301,8 +1235,8 @@ class _PricingPackagesSectionState extends State<_PricingPackagesSection> {
         ),
 
         const SizedBox(height: 16),
-_PerksSection(),
-const SizedBox(height: 16),
+        _PerksSection(),
+        const SizedBox(height: 16),
         ...enabled.keys.map((key) {
           return _PackagePricingCard(
             title: key,
@@ -1310,10 +1244,8 @@ const SizedBox(height: 16),
             priceController: priceControllers[key]!,
             perks: perks[key]!,
             onToggle: (v) => setState(() => enabled[key] = v),
-            onAddPerk: (perk) =>
-                setState(() => perks[key]!.add(perk)),
-            onRemovePerk: (perk) =>
-                setState(() => perks[key]!.remove(perk)),
+            onAddPerk: (perk) => setState(() => perks[key]!.add(perk)),
+            onRemovePerk: (perk) => setState(() => perks[key]!.remove(perk)),
           );
         }).toList(),
 
@@ -1321,16 +1253,12 @@ const SizedBox(height: 16),
 
         const Text(
           'Note: Final pricing is subject to platform review.',
-          style: TextStyle(
-            color: kMuted,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: kMuted, fontSize: 12),
         ),
       ],
     );
   }
 }
-
 
 class _PackagePricingCard extends StatelessWidget {
   final String title;
@@ -1381,11 +1309,7 @@ class _PackagePricingCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Switch(
-                value: enabled,
-                activeColor: kGreen,
-                onChanged: onToggle,
-              ),
+              Switch(value: enabled, activeColor: kGreen, onChanged: onToggle),
             ],
           ),
 
@@ -1419,10 +1343,7 @@ class _PackagePricingCard extends StatelessWidget {
               runSpacing: 8,
               children: perks
                   .map(
-                    (p) => _PerkChip(
-                      text: p,
-                      onRemove: () => onRemovePerk(p),
-                    ),
+                    (p) => _PerkChip(text: p, onRemove: () => onRemovePerk(p)),
                   )
                   .toList(),
             ),
@@ -1436,7 +1357,6 @@ class _PackagePricingCard extends StatelessWidget {
     );
   }
 }
-
 
 class _AddPerkField extends StatefulWidget {
   final ValueChanged<String> onAdd;
@@ -1484,7 +1404,6 @@ class _AddPerkFieldState extends State<_AddPerkField> {
   }
 }
 
-
 // class _PerkChip extends StatelessWidget {
 //   final String text;
 //   final VoidCallback onRemove;
@@ -1529,28 +1448,27 @@ class _AddPerkFieldState extends State<_AddPerkField> {
 //   }
 // }
 
-
 Widget _PerksSection() {
   final Map<String, List<String>> packagePerks = {
-  'Trial': [],
-  '1 Month': [],
-  '3 Months': [],
-  '6 Months': [],
-  '1 Year': [],
-};
+    'Trial': [],
+    '1 Month': [],
+    '3 Months': [],
+    '6 Months': [],
+    '1 Year': [],
+  };
 
-final Set<String> suggestedPerks = {
-  'Kit Provided',
-  'Video Analysis',
-  'Fitness Tracking',
-  'Match Practice',
-  'Diet Plan',
-  'Performance Report',
-};
+  final Set<String> suggestedPerks = {
+    'Kit Provided',
+    'Video Analysis',
+    'Fitness Tracking',
+    'Match Practice',
+    'Diet Plan',
+    'Performance Report',
+  };
 
-String selectedPackage = 'Trial';
+  String selectedPackage = 'Trial';
 
-final TextEditingController perkController = TextEditingController();
+  final TextEditingController perkController = TextEditingController();
 
   final perks = packagePerks[selectedPackage]!;
 
@@ -1599,8 +1517,10 @@ final TextEditingController perkController = TextEditingController();
                 hintStyle: TextStyle(color: kMuted.withOpacity(0.6)),
                 filled: true,
                 fillColor: kCard,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1626,7 +1546,7 @@ final TextEditingController perkController = TextEditingController();
 
               perkController.clear();
             },
-          )
+          ),
         ],
       ),
 
@@ -1664,15 +1584,11 @@ final TextEditingController perkController = TextEditingController();
   );
 }
 
-
 class _PerkChip extends StatelessWidget {
   final String text;
   final VoidCallback onRemove;
 
-  const _PerkChip({
-    required this.text,
-    required this.onRemove,
-  });
+  const _PerkChip({required this.text, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -1688,26 +1604,18 @@ class _PerkChip extends StatelessWidget {
         children: [
           Text(
             text,
-            style: const TextStyle(
-              color: kGreen,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(color: kGreen, fontWeight: FontWeight.w600),
           ),
           const SizedBox(width: 6),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(
-              Icons.close,
-              size: 14,
-              color: kGreen,
-            ),
-          )
+            child: const Icon(Icons.close, size: 14, color: kGreen),
+          ),
         ],
       ),
     );
   }
 }
-
 
 class _SuggestionChip extends StatelessWidget {
   final String text;
@@ -1730,9 +1638,7 @@ class _SuggestionChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: active ? kGreen.withOpacity(0.2) : kCard,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: active ? kGreen : Colors.grey.shade800,
-          ),
+          border: Border.all(color: active ? kGreen : Colors.grey.shade800),
         ),
         child: Text(
           text,
@@ -1746,15 +1652,13 @@ class _SuggestionChip extends StatelessWidget {
   }
 }
 
-
-
-
 class LocationInfraSection extends StatefulWidget {
   const LocationInfraSection({super.key});
 
   @override
   State<LocationInfraSection> createState() => _LocationInfraSectionState();
 }
+
 class _LocationInfraSectionState extends State<LocationInfraSection> {
   bool isRentedGround = true;
 
@@ -1771,6 +1675,7 @@ class _LocationInfraSectionState extends State<LocationInfraSection> {
     cityController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1882,9 +1787,7 @@ class _LocationInfraSectionState extends State<LocationInfraSection> {
                 );
               }
 
-              return _PhotoPreviewTile(
-                imageUrl: facilityPhotos[index - 1],
-              );
+              return _PhotoPreviewTile(imageUrl: facilityPhotos[index - 1]);
             },
           ),
         ),
@@ -1892,7 +1795,6 @@ class _LocationInfraSectionState extends State<LocationInfraSection> {
     );
   }
 }
-
 
 // class _StepIndicator extends StatelessWidget {
 //   final int number;
@@ -1918,7 +1820,6 @@ class _LocationInfraSectionState extends State<LocationInfraSection> {
 //     );
 //   }
 // }
-
 
 class _GroundChip extends StatelessWidget {
   final String label;
@@ -1958,7 +1859,6 @@ class _GroundChip extends StatelessWidget {
   }
 }
 
-
 class _AddPhotoTile extends StatelessWidget {
   final VoidCallback onTap;
   const _AddPhotoTile({required this.onTap});
@@ -1974,16 +1874,11 @@ class _AddPhotoTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.grey.shade800),
         ),
-        child: const Icon(
-          Icons.add_rounded,
-          color: kMuted,
-          size: 28,
-        ),
+        child: const Icon(Icons.add_rounded, color: kMuted, size: 28),
       ),
     );
   }
 }
-
 
 class _PhotoPreviewTile extends StatelessWidget {
   final String imageUrl;
@@ -1993,16 +1888,10 @@ class _PhotoPreviewTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.network(
-        imageUrl,
-        width: 96,
-        height: 96,
-        fit: BoxFit.cover,
-      ),
+      child: Image.network(imageUrl, width: 96, height: 96, fit: BoxFit.cover),
     );
   }
 }
-
 
 class IdentityVerificationSection extends StatefulWidget {
   const IdentityVerificationSection({super.key});
@@ -2139,10 +2028,7 @@ class _IdentityVerificationSectionState
             Expanded(
               child: Text(
                 'Your ID is securely stored and only used for verification.',
-                style: TextStyle(
-                  color: kMuted,
-                  fontSize: 11.5,
-                ),
+                style: TextStyle(color: kMuted, fontSize: 11.5),
               ),
             ),
           ],
@@ -2151,7 +2037,6 @@ class _IdentityVerificationSectionState
     );
   }
 }
-
 
 class _UploadCard extends StatelessWidget {
   final String label;
@@ -2179,9 +2064,7 @@ class _UploadCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: kMuted.withOpacity(0.15),
-            ),
+            border: Border.all(color: kMuted.withOpacity(0.15)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -2204,15 +2087,11 @@ class _UploadCard extends StatelessWidget {
   }
 }
 
-
 class _SelfieCard extends StatelessWidget {
   final String? image;
   final VoidCallback onTap;
 
-  const _SelfieCard({
-    required this.image,
-    required this.onTap,
-  });
+  const _SelfieCard({required this.image, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -2233,10 +2112,7 @@ class _SelfieCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: kGreen.withOpacity(0.15),
                 ),
-                child: const Icon(
-                  Icons.camera_alt_outlined,
-                  color: kGreen,
-                ),
+                child: const Icon(Icons.camera_alt_outlined, color: kGreen),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -2253,18 +2129,12 @@ class _SelfieCard extends StatelessWidget {
                     SizedBox(height: 2),
                     Text(
                       'Hold your ID card near your face',
-                      style: TextStyle(
-                        color: kMuted,
-                        fontSize: 12.5,
-                      ),
+                      style: TextStyle(color: kMuted, fontSize: 12.5),
                     ),
                   ],
                 ),
               ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: Colors.white54,
-              ),
+              const Icon(Icons.chevron_right_rounded, color: Colors.white54),
             ],
           ),
         ),
@@ -2272,7 +2142,6 @@ class _SelfieCard extends StatelessWidget {
     );
   }
 }
-
 
 class PayoutDetailsSection extends StatefulWidget {
   const PayoutDetailsSection({super.key});
@@ -2282,10 +2151,8 @@ class PayoutDetailsSection extends StatefulWidget {
 }
 
 class _PayoutDetailsSectionState extends State<PayoutDetailsSection> {
-  final TextEditingController accountNameController =
-      TextEditingController();
-  final TextEditingController accountNumberController =
-      TextEditingController();
+  final TextEditingController accountNameController = TextEditingController();
+  final TextEditingController accountNumberController = TextEditingController();
   final TextEditingController ifscController = TextEditingController();
 
   @override
@@ -2321,10 +2188,7 @@ class _PayoutDetailsSectionState extends State<PayoutDetailsSection> {
 
         const Text(
           'Used to transfer your earnings securely',
-          style: TextStyle(
-            color: kMuted,
-            fontSize: 12.5,
-          ),
+          style: TextStyle(color: kMuted, fontSize: 12.5),
         ),
 
         const SizedBox(height: 16),
@@ -2364,19 +2228,12 @@ class _PayoutDetailsSectionState extends State<PayoutDetailsSection> {
         /// ───────── SECURITY NOTE ─────────
         Row(
           children: const [
-            Icon(
-              Icons.lock_outline,
-              size: 14,
-              color: kMuted,
-            ),
+            Icon(Icons.lock_outline, size: 14, color: kMuted),
             SizedBox(width: 6),
             Expanded(
               child: Text(
                 'Your bank details are encrypted and only used for payouts.',
-                style: TextStyle(
-                  color: kMuted,
-                  fontSize: 11.5,
-                ),
+                style: TextStyle(color: kMuted, fontSize: 11.5),
               ),
             ),
           ],
@@ -2385,7 +2242,6 @@ class _PayoutDetailsSectionState extends State<PayoutDetailsSection> {
     );
   }
 }
-
 
 class AgreementsSection extends StatefulWidget {
   const AgreementsSection({super.key});
@@ -2465,11 +2321,7 @@ class _AgreementsSectionState extends State<AgreementsSection> {
           onChanged: (v) => setState(() => agreeMarketing = v),
           child: const Text(
             'I consent to the use of my profile photos for marketing purposes.',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 13.5,
-              height: 1.5,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 13.5, height: 1.5),
           ),
         ),
 
@@ -2480,11 +2332,7 @@ class _AgreementsSectionState extends State<AgreementsSection> {
           onChanged: (v) => setState(() => agreeResponse = v),
           child: const Text(
             'I agree to respond to user inquiries within 24 hours.',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 13.5,
-              height: 1.5,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 13.5, height: 1.5),
           ),
         ),
 
@@ -2493,19 +2341,12 @@ class _AgreementsSectionState extends State<AgreementsSection> {
         /// ───────── NOTE ─────────
         Row(
           children: const [
-            Icon(
-              Icons.info_outline,
-              size: 14,
-              color: kMuted,
-            ),
+            Icon(Icons.info_outline, size: 14, color: kMuted),
             SizedBox(width: 6),
             Expanded(
               child: Text(
                 'These agreements are mandatory to activate your trainer profile.',
-                style: TextStyle(
-                  color: kMuted,
-                  fontSize: 11.5,
-                ),
+                style: TextStyle(color: kMuted, fontSize: 11.5),
               ),
             ),
           ],
@@ -2517,16 +2358,12 @@ class _AgreementsSectionState extends State<AgreementsSection> {
         if (!canProceed)
           const Text(
             'Please accept all agreements to continue.',
-            style: TextStyle(
-              color: Colors.redAccent,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.redAccent, fontSize: 12),
           ),
       ],
     );
   }
 }
-
 
 class _AgreementTile extends StatelessWidget {
   final bool value;
@@ -2565,5 +2402,3 @@ class _AgreementTile extends StatelessWidget {
     );
   }
 }
-
-

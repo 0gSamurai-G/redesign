@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/USER/Book/bookingdetails.dart';
+import 'package:redesign/view/USER/Book/bookingdetails.dart';
 import 'package:shimmer/shimmer.dart';
 
 class TurfDetailScreen extends StatefulWidget {
@@ -98,7 +98,8 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
                   Positioned(
                     bottom: 10,
                     left: 10,
-                    child: _greenBadge('CROSSFIT & GYM')),
+                    child: _greenBadge('CROSSFIT & GYM'),
+                  ),
                 ],
               ),
             ),
@@ -107,25 +108,23 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(0, 0, 00, 80),
               sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    _venueInfo(),
-                    const SizedBox(height: 0),
-                    _ratingRow(),
-                    const SizedBox(height: 24),
-                    _aboutSection(),
-                    const SizedBox(height: 24),
-                    _amenitiesGrid(),
-                    const SizedBox(height: 24),
-                    _cancellationBanner(),
-                    const SizedBox(height: 24),
-                    _friendsSection(),
-                    const SizedBox(height: 24),
-                    _reviewsSection(),
-                    const SizedBox(height: 24),
-                    _recommendedSection(),
-                  ],
-                ),
+                delegate: SliverChildListDelegate([
+                  _venueInfo(),
+                  const SizedBox(height: 0),
+                  _ratingRow(),
+                  const SizedBox(height: 24),
+                  _aboutSection(),
+                  const SizedBox(height: 24),
+                  _amenitiesGrid(),
+                  const SizedBox(height: 24),
+                  _cancellationBanner(),
+                  const SizedBox(height: 24),
+                  _friendsSection(),
+                  const SizedBox(height: 24),
+                  _reviewsSection(),
+                  const SizedBox(height: 24),
+                  _recommendedSection(),
+                ]),
               ),
             ),
           ],
@@ -133,15 +132,19 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
 
         /// STICKY BOOK NOW BAR
         bottomNavigationBar: ClipRRect(
-          
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
                 color: Color.fromRGBO(0, 0, 0, 0.9),
-                border: Border(top: BorderSide(color: Color.fromARGB(100, 163, 163, 163))),
+                border: Border(
+                  top: BorderSide(color: Color.fromARGB(100, 163, 163, 163)),
+                ),
               ),
               child: Row(
                 children: [
@@ -158,14 +161,20 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1DB954),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 14,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ConfirmSlotScreen()));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ConfirmSlotScreen(),
+                        ),
+                      );
                     },
                     child: const Text(
                       'Book Now',
@@ -211,25 +220,24 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
                 ),
               ),
               TextButton(
-  onPressed: () {}, // future: show timings, status info, etc.
-  style: TextButton.styleFrom(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    backgroundColor: const Color(0xFF1DB954).withOpacity(0.15),
-    foregroundColor: const Color(0xFF1DB954),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20),
-    ),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  ),
-  child: const Text(
-    'Open Now',
-    style: TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.w600,
-    ),
-  ),
-),
-
+                onPressed: () {}, // future: show timings, status info, etc.
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  backgroundColor: const Color(0xFF1DB954).withOpacity(0.15),
+                  foregroundColor: const Color(0xFF1DB954),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  'Open Now',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
             ],
           ),
         ],
@@ -253,11 +261,15 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          const Text('5.0',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          const Text(
+            '5.0',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(width: 6),
-          const Text('(128 Reviews)',
-              style: TextStyle(color: Color(0xFFA7A7A7))),
+          const Text(
+            '(128 Reviews)',
+            style: TextStyle(color: Color(0xFFA7A7A7)),
+          ),
         ],
       ),
     );
@@ -272,9 +284,10 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
           const Text(
             'About Venue',
             style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -345,11 +358,14 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Amenities',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
+          const Text(
+            'Amenities',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 12,
@@ -367,9 +383,10 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
                   children: [
                     Icon(items[index], color: Colors.white),
                     const SizedBox(height: 6),
-                    Text(labels[index],
-                        style:
-                            const TextStyle(color: Color(0xFFA7A7A7))),
+                    Text(
+                      labels[index],
+                      style: const TextStyle(color: Color(0xFFA7A7A7)),
+                    ),
                   ],
                 ),
               ),
@@ -411,11 +428,20 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: const [
-          CircleAvatar(radius: 18, backgroundImage: NetworkImage('https://i.pravatar.cc/100')),
+          CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage('https://i.pravatar.cc/100'),
+          ),
           SizedBox(width: 8),
-          CircleAvatar(radius: 18, backgroundImage: NetworkImage('https://i.pravatar.cc/101')),
+          CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage('https://i.pravatar.cc/101'),
+          ),
           SizedBox(width: 8),
-          CircleAvatar(radius: 18, backgroundImage: NetworkImage('https://i.pravatar.cc/102')),
+          CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage('https://i.pravatar.cc/102'),
+          ),
           SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -436,18 +462,26 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
         children: [
           Row(
             children: const [
-              Text('Reviews',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                'Reviews',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Spacer(),
-              Text('View All (128)',
-                  style: TextStyle(color: Color(0xFF1DB954))),
+              Text(
+                'View All (128)',
+                style: TextStyle(color: Color(0xFF1DB954)),
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          _reviewCard('Michael S.', 'Great facilities and well maintained equipment.'),
+          _reviewCard(
+            'Michael S.',
+            'Great facilities and well maintained equipment.',
+          ),
           const SizedBox(height: 12),
           _reviewCard('Priya K.', 'Spacious and clean. Friendly trainers.'),
         ],
@@ -461,11 +495,14 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: const Text('You Might Also Like',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
+          child: const Text(
+            'You Might Also Like',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -490,11 +527,14 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text('Gold\'s Gym',
-                        style: TextStyle(color: Colors.white)),
-                    const Text('2.3 km • ₹1200/hr',
-                        style:
-                            TextStyle(color: Color(0xFFA7A7A7))),
+                    const Text(
+                      'Gold\'s Gym',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    const Text(
+                      '2.3 km • ₹1200/hr',
+                      style: TextStyle(color: Color(0xFFA7A7A7)),
+                    ),
                   ],
                 ),
               );
@@ -515,28 +555,33 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
       child: Row(
         children: [
           const CircleAvatar(
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150')),
+            backgroundImage: NetworkImage('https://i.pravatar.cc/150'),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 Row(
                   children: List.generate(
                     5,
-                    (index) => const Icon(Icons.star,
-                        size: 14, color: Colors.amber),
+                    (index) =>
+                        const Icon(Icons.star, size: 14, color: Colors.amber),
                   ),
                 ),
-                Text(comment,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style:
-                        const TextStyle(color: Color(0xFFA7A7A7))),
+                Text(
+                  comment,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xFFA7A7A7)),
+                ),
               ],
             ),
           ),
@@ -552,9 +597,13 @@ class _TurfDetailScreenState extends State<TurfDetailScreen> {
         color: const Color(0xFF1DB954),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text,
-          style: const TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 

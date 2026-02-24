@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/USER/Trainer/trainer_info.dart';
-import 'package:redesign/USER/Trainer/trainer_register.dart';
+import 'package:redesign/view/USER/Trainer/trainer_info.dart';
+import 'package:redesign/view/USER/Trainer/trainer_register.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AppColors {
@@ -12,7 +12,6 @@ class AppColors {
   static const muted = Color(0xFFB3B3B3);
   static const accent = Color(0xFF1DB954);
 }
-
 
 enum EntityType { trainer, academy }
 
@@ -36,15 +35,11 @@ class DiscoveryItem {
   });
 }
 
-
-
-
 class TrainerDiscoveryScreen extends StatefulWidget {
   const TrainerDiscoveryScreen({super.key});
 
   @override
-  State<TrainerDiscoveryScreen> createState() =>
-      _TrainerDiscoveryScreenState();
+  State<TrainerDiscoveryScreen> createState() => _TrainerDiscoveryScreenState();
 }
 
 class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
@@ -85,8 +80,6 @@ class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
     );
   }
 }
-
-
 
 class _Header extends StatelessWidget {
   const _Header();
@@ -131,20 +124,19 @@ class _Header extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-_TrainerJoinCard(
-  onTap: () {
-    // Navigate to Trainer Login / Onboarding
-    Navigator.of(context).push(MaterialPageRoute(builder: (_)=>TrainerJoinScreen()));
-  },
-),
-
+          _TrainerJoinCard(
+            onTap: () {
+              // Navigate to Trainer Login / Onboarding
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => TrainerJoinScreen()));
+            },
+          ),
         ],
       ),
     );
   }
 }
-
-
 
 class _FilterChips extends StatefulWidget {
   const _FilterChips();
@@ -192,8 +184,6 @@ class _FilterChipsState extends State<_FilterChips> {
   }
 }
 
-
-
 class _DiscoveryGrid extends StatelessWidget {
   final items = const [
     DiscoveryItem(
@@ -201,9 +191,7 @@ class _DiscoveryGrid extends StatelessWidget {
       subtitle: 'FitCore Gym, Pune',
       rating: 4.8,
       type: EntityType.trainer,
-      images: [
-        'https://images.unsplash.com/photo-1599058917212-d750089bc07c',
-      ],
+      images: ['https://images.unsplash.com/photo-1599058917212-d750089bc07c'],
       tags: ['Adults', 'Strength'],
       sports: [Icons.fitness_center],
     ),
@@ -212,9 +200,7 @@ class _DiscoveryGrid extends StatelessWidget {
       subtitle: 'Kothrud, Pune',
       rating: 4.9,
       type: EntityType.academy,
-      images: [
-        'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
-      ],
+      images: ['https://images.unsplash.com/photo-1521412644187-c49fa049e84d'],
       tags: ['Kids', 'Camp'],
       sports: [Icons.sports_cricket, Icons.groups],
     ),
@@ -223,9 +209,7 @@ class _DiscoveryGrid extends StatelessWidget {
       subtitle: 'Viman Nagar',
       rating: 5.0,
       type: EntityType.trainer,
-      images: [
-        'https://images.unsplash.com/photo-1599058917212-d750089bc07c',
-      ],
+      images: ['https://images.unsplash.com/photo-1599058917212-d750089bc07c'],
       tags: ['Women', 'Yoga'],
       sports: [Icons.self_improvement],
     ),
@@ -234,19 +218,16 @@ class _DiscoveryGrid extends StatelessWidget {
       subtitle: 'Baner, Pune',
       rating: 4.5,
       type: EntityType.academy,
-      images: [
-        'https://images.unsplash.com/photo-1546519638-68e109498ffc',
-      ],
+      images: ['https://images.unsplash.com/photo-1546519638-68e109498ffc'],
       tags: ['Pro', 'Coaching'],
       sports: [Icons.sports_tennis],
-    ),DiscoveryItem(
+    ),
+    DiscoveryItem(
       name: 'Anjali Deshmukh',
       subtitle: 'Viman Nagar',
       rating: 5.0,
       type: EntityType.trainer,
-      images: [
-        'https://images.unsplash.com/photo-1599058917212-d750089bc07c',
-      ],
+      images: ['https://images.unsplash.com/photo-1599058917212-d750089bc07c'],
       tags: ['Women', 'Yoga'],
       sports: [Icons.self_improvement],
     ),
@@ -255,9 +236,7 @@ class _DiscoveryGrid extends StatelessWidget {
       subtitle: 'Baner, Pune',
       rating: 4.5,
       type: EntityType.academy,
-      images: [
-        'https://images.unsplash.com/photo-1546519638-68e109498ffc',
-      ],
+      images: ['https://images.unsplash.com/photo-1546519638-68e109498ffc'],
       tags: ['Pro', 'Coaching'],
       sports: [Icons.sports_tennis],
     ),
@@ -286,8 +265,6 @@ class _DiscoveryGrid extends StatelessWidget {
   }
 }
 
-
-
 class _DiscoveryCard extends StatefulWidget {
   final DiscoveryItem item;
   const _DiscoveryCard({required this.item});
@@ -305,7 +282,13 @@ class _DiscoveryCardState extends State<_DiscoveryCard> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (_){return AcademyDetailScreen();}));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) {
+              return AcademyDetailScreen();
+            },
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -317,7 +300,9 @@ class _DiscoveryCardState extends State<_DiscoveryCard> {
           children: [
             /// IMAGE
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
               child: Stack(
                 children: [
                   AspectRatio(
@@ -338,18 +323,16 @@ class _DiscoveryCardState extends State<_DiscoveryCard> {
                       ),
                     ),
                   ),
-      
+
                   /// TYPE BADGE
                   Positioned(
                     top: 8,
                     left: 8,
                     child: _Pill(
-                      item.type == EntityType.trainer
-                          ? 'TRAINER'
-                          : 'ACADEMY',
+                      item.type == EntityType.trainer ? 'TRAINER' : 'ACADEMY',
                     ),
                   ),
-      
+
                   /// SPORTS ICONS
                   Positioned(
                     top: 8,
@@ -371,7 +354,7 @@ class _DiscoveryCardState extends State<_DiscoveryCard> {
                 ],
               ),
             ),
-      
+
             /// INFO
             Padding(
               padding: const EdgeInsets.all(10),
@@ -419,7 +402,6 @@ class _DiscoveryCardState extends State<_DiscoveryCard> {
     );
   }
 }
-
 
 class _Pill extends StatelessWidget {
   final String text;
@@ -490,17 +472,11 @@ class _TagChip extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: GoogleFonts.inter(
-          fontSize: 11,
-          color: Colors.white,
-        ),
+        style: GoogleFonts.inter(fontSize: 11, color: Colors.white),
       ),
     );
   }
 }
-
-
-
 
 class _TrainerEndOfResults extends StatelessWidget {
   const _TrainerEndOfResults();
@@ -516,8 +492,8 @@ class _TrainerEndOfResults extends StatelessWidget {
     final imageSize = width < 360
         ? 90.0
         : width < 600
-            ? 120.0
-            : 140.0;
+        ? 120.0
+        : 140.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 36, 20, 56),
@@ -593,19 +569,14 @@ class _TrainerEndOfResults extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.accent,
               side: const BorderSide(color: AppColors.accent),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(22),
               ),
             ),
             child: Text(
               'Try Another Sport',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -613,7 +584,6 @@ class _TrainerEndOfResults extends StatelessWidget {
     );
   }
 }
-
 
 class TrainersToggle extends StatelessWidget {
   final bool isMyTrainers;
@@ -681,7 +651,6 @@ class TrainersToggle extends StatelessWidget {
   }
 }
 
-
 class MyTrainersSection extends StatelessWidget {
   const MyTrainersSection({super.key});
 
@@ -707,10 +676,7 @@ class MyTrainersSection extends StatelessWidget {
               const Spacer(),
               Text(
                 'Active & recent coaches',
-                style: GoogleFonts.inter(
-                  color: AppColors.muted,
-                  fontSize: 13,
-                ),
+                style: GoogleFonts.inter(color: AppColors.muted, fontSize: 13),
               ),
             ],
           ),
@@ -719,33 +685,20 @@ class MyTrainersSection extends StatelessWidget {
 
           /// FILTER CHIPS
           Wrap(
-  spacing: 8,
-  runSpacing: 8,
-  children: [
-    _FilterButton(
-      label: 'Active packages',
-      icon: Icons.local_fire_department,
-      active: true,
-      onTap: () {},
-    ),
-    _FilterButton(
-      label: 'Cricket',
-      active: false,
-      onTap: () {},
-    ),
-    _FilterButton(
-      label: 'Football',
-      active: false,
-      onTap: () {},
-    ),
-    _FilterButton(
-      label: 'Online',
-      active: false,
-      onTap: () {},
-    ),
-  ],
-),
-
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _FilterButton(
+                label: 'Active packages',
+                icon: Icons.local_fire_department,
+                active: true,
+                onTap: () {},
+              ),
+              _FilterButton(label: 'Cricket', active: false, onTap: () {}),
+              _FilterButton(label: 'Football', active: false, onTap: () {}),
+              _FilterButton(label: 'Online', active: false, onTap: () {}),
+            ],
+          ),
 
           const SizedBox(height: 14),
 
@@ -756,7 +709,6 @@ class MyTrainersSection extends StatelessWidget {
     );
   }
 }
-
 
 class _MyTrainerCard extends StatelessWidget {
   const _MyTrainerCard();
@@ -770,10 +722,7 @@ class _MyTrainerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.accent),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.accent.withOpacity(0.15),
-            blurRadius: 12,
-          ),
+          BoxShadow(color: AppColors.accent.withOpacity(0.15), blurRadius: 12),
         ],
       ),
       child: Column(
@@ -787,10 +736,7 @@ class _MyTrainerCard extends StatelessWidget {
                 backgroundColor: AppColors.surface,
                 child: Text(
                   'Trainer',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    color: Colors.white,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 10, color: Colors.white),
                 ),
               ),
               const SizedBox(width: 12),
@@ -822,11 +768,9 @@ class _MyTrainerCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: const [
-                        Icon(Icons.star,
-                            size: 14, color: AppColors.accent),
+                        Icon(Icons.star, size: 14, color: AppColors.accent),
                         SizedBox(width: 4),
-                        Text('4.8',
-                            style: TextStyle(color: Colors.white)),
+                        Text('4.8', style: TextStyle(color: Colors.white)),
                       ],
                     ),
                   ],
@@ -857,17 +801,13 @@ class _MyTrainerCard extends StatelessWidget {
               LinearProgressIndicator(
                 value: 4 / 8,
                 backgroundColor: AppColors.surface,
-                valueColor:
-                    const AlwaysStoppedAnimation(AppColors.accent),
+                valueColor: const AlwaysStoppedAnimation(AppColors.accent),
                 minHeight: 4,
               ),
               const SizedBox(height: 4),
               Text(
                 '4 / 8 sessions completed',
-                style: GoogleFonts.inter(
-                  color: AppColors.muted,
-                  fontSize: 11,
-                ),
+                style: GoogleFonts.inter(color: AppColors.muted, fontSize: 11),
               ),
             ],
           ),
@@ -932,10 +872,6 @@ class _MyTrainerCard extends StatelessWidget {
   }
 }
 
-
-
-
-
 class _Tag extends StatelessWidget {
   final String label;
   const _Tag(this.label);
@@ -959,7 +895,6 @@ class _Tag extends StatelessWidget {
     );
   }
 }
-
 
 class _FilterButton extends StatelessWidget {
   final String label;
@@ -1008,7 +943,7 @@ class _FilterButton extends StatelessWidget {
                         color: AppColors.accent.withOpacity(0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
-                      )
+                      ),
                     ]
                   : [],
             ),
@@ -1019,8 +954,7 @@ class _FilterButton extends StatelessWidget {
                   Icon(
                     icon,
                     size: 14,
-                    color:
-                        active ? AppColors.accent : Colors.white,
+                    color: active ? AppColors.accent : Colors.white,
                   ),
                   const SizedBox(width: 6),
                 ],
@@ -1029,9 +963,7 @@ class _FilterButton extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: active
-                        ? AppColors.accent
-                        : Colors.white,
+                    color: active ? AppColors.accent : Colors.white,
                   ),
                 ),
               ],
@@ -1043,13 +975,10 @@ class _FilterButton extends StatelessWidget {
   }
 }
 
-
 class _TrainerJoinCard extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _TrainerJoinCard({
-    required this.onTap,
-  });
+  const _TrainerJoinCard({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -1068,10 +997,7 @@ class _TrainerJoinCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppColors.accent.withOpacity(0.18),
-                AppColors.bg,
-              ],
+              colors: [AppColors.accent.withOpacity(0.18), AppColors.bg],
             ),
             border: Border.all(
               color: AppColors.accent.withOpacity(0.5),
@@ -1136,15 +1062,14 @@ class _TrainerJoinCard extends StatelessWidget {
 
               /// CTA BUTTON
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.accent,
                   borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: AppColors.accent,
-                    width: 1,
-                  ),
+                  border: Border.all(color: AppColors.accent, width: 1),
                 ),
                 child: Row(
                   children: [

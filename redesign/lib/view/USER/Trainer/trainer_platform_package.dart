@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:redesign/USER/Trainer/trainer_platform_fee_limited.dart';
-import 'package:redesign/USER/Trainer/trainer_platform_fee_success.dart';
+import 'package:redesign/view/USER/Trainer/trainer_platform_fee_limited.dart';
+import 'package:redesign/view/USER/Trainer/trainer_platform_fee_success.dart';
 import 'package:shimmer/shimmer.dart';
 
 const kBg = Color(0xFF000000);
@@ -18,8 +18,7 @@ class TrainerProAccessScreen extends StatefulWidget {
   const TrainerProAccessScreen({super.key});
 
   @override
-  State<TrainerProAccessScreen> createState() =>
-      _TrainerProAccessScreenState();
+  State<TrainerProAccessScreen> createState() => _TrainerProAccessScreenState();
 }
 
 class _TrainerProAccessScreenState extends State<TrainerProAccessScreen> {
@@ -84,22 +83,17 @@ class _TrainerProAccessScreenState extends State<TrainerProAccessScreen> {
           builder: (context, constraints) {
             final isTablet = constraints.maxWidth >= 700;
             final bottomInset = MediaQuery.of(context).padding.bottom;
-        
+
             return CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
                 _OfferBanner(text: _format(offerTime)),
-                
+
                 SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    16,
-                    12,
-                    16,
-                    120 + bottomInset,
-                  ),
+                  padding: EdgeInsets.fromLTRB(16, 12, 16, 120 + bottomInset),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                        BlurredHeader(),
+                      BlurredHeader(),
                       const SizedBox(height: 16),
                       const _VideoCard(),
                       const SizedBox(height: 16),
@@ -109,61 +103,57 @@ class _TrainerProAccessScreenState extends State<TrainerProAccessScreen> {
                       const SizedBox(height: 24),
                       const _MembershipHeader(),
                       const SizedBox(height: 12),
-                      
+
                       ValueListenableBuilder<int>(
                         valueListenable: selectedIndex,
                         builder: (_, value, __) {
                           if (isTablet) {
                             return GridView.builder(
                               shrinkWrap: true,
-                              physics:
-                                  const NeverScrollableScrollPhysics(),
+                              physics: const NeverScrollableScrollPhysics(),
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 1.9,
-                              ),
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 1.9,
+                                  ),
                               itemCount: plans.length,
                               itemBuilder: (_, i) => _PlanCard(
                                 plan: plans[i],
                                 selected: value == i,
-                                onTap: () =>
-                                    selectedIndex.value = i,
+                                onTap: () => selectedIndex.value = i,
                               ),
                             );
                           }
-        
+
                           return Column(
                             children: List.generate(
                               plans.length,
                               (i) => Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.only(bottom: 12),
                                 child: _PlanCard(
                                   plan: plans[i],
                                   selected: value == i,
-                                  onTap: () =>
-                                      selectedIndex.value = i,
+                                  onTap: () => selectedIndex.value = i,
                                 ),
                               ),
                             ),
                           );
                         },
                       ),
-        
+
                       _FreeVsProComparison(),
                       const SizedBox(height: 20),
                       _WhyGoProSection(),
-        
-        const SizedBox(height: 20),
+
+                      const SizedBox(height: 20),
                       const _TrainerSuccessStories(),
-        const SizedBox(height: 24),
-        const _MoneyBackGuarantee(),
-        const SizedBox(height: 32),
-        const _FaqSection(),
-        const SizedBox(height: 36),
+                      const SizedBox(height: 24),
+                      const _MoneyBackGuarantee(),
+                      const SizedBox(height: 32),
+                      const _FaqSection(),
+                      const SizedBox(height: 36),
                     ]),
                   ),
                 ),
@@ -202,8 +192,7 @@ class _OfferBanner extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.timer,
-                  color: Colors.white, size: 16),
+              const Icon(Icons.timer, color: Colors.white, size: 16),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -238,15 +227,8 @@ class BlurredHeader extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
         child: Container(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            topInset + 12,
-            16,
-            16,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
-          ),
+          padding: EdgeInsets.fromLTRB(16, topInset + 12, 16, 16),
+          decoration: BoxDecoration(color: Colors.black.withOpacity(0.6)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -268,10 +250,7 @@ class BlurredHeader extends StatelessWidget {
                 'Invest in your coaching career',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: kMuted,
-                  fontSize: 13,
-                ),
+                style: TextStyle(color: kMuted, fontSize: 13),
               ),
             ],
           ),
@@ -280,7 +259,6 @@ class BlurredHeader extends StatelessWidget {
     );
   }
 }
-
 
 /* ───────────────── VIDEO CARD ───────────────── */
 
@@ -307,8 +285,7 @@ class _VideoCard extends StatelessWidget {
               ),
             ),
             Container(color: Colors.black45),
-            const Icon(Icons.play_circle_fill,
-                size: 64, color: Colors.white),
+            const Icon(Icons.play_circle_fill, size: 64, color: Colors.white),
             Positioned(
               left: 12,
               bottom: 12,
@@ -344,15 +321,9 @@ class _ValueCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            kGreen.withOpacity(0.25),
-            Colors.black,
-          ],
+          colors: [kGreen.withOpacity(0.25), Colors.black],
         ),
-        border: Border.all(
-          color: kGreen.withOpacity(0.25),
-          width: 1,
-        ),
+        border: Border.all(color: kGreen.withOpacity(0.25), width: 1),
         boxShadow: [
           BoxShadow(
             color: kGreen.withOpacity(0.15),
@@ -418,18 +389,9 @@ class _ValueCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
-              _ValueMetric(
-                value: '5k+',
-                label: 'TRAINERS',
-              ),
-              _ValueMetric(
-                value: '₹10Cr+',
-                label: 'PAID OUT',
-              ),
-              _ValueMetric(
-                value: '100%',
-                label: 'SECURE',
-              ),
+              _ValueMetric(value: '5k+', label: 'TRAINERS'),
+              _ValueMetric(value: '₹10Cr+', label: 'PAID OUT'),
+              _ValueMetric(value: '100%', label: 'SECURE'),
             ],
           ),
         ],
@@ -437,14 +399,12 @@ class _ValueCard extends StatelessWidget {
     );
   }
 }
+
 class _ValueMetric extends StatelessWidget {
   final String value;
   final String label;
 
-  const _ValueMetric({
-    required this.value,
-    required this.label,
-  });
+  const _ValueMetric({required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -482,13 +442,15 @@ class _Metric extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(value,
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(label,
-            style: const TextStyle(color: kMuted, fontSize: 11)),
+        Text(label, style: const TextStyle(color: kMuted, fontSize: 11)),
       ],
     );
   }
@@ -533,12 +495,7 @@ class _PlanCard extends StatelessWidget {
           width: 1.4,
         ),
         boxShadow: selected
-            ? [
-                BoxShadow(
-                  color: kGreen.withOpacity(0.28),
-                  blurRadius: 5,
-                )
-              ]
+            ? [BoxShadow(color: kGreen.withOpacity(0.28), blurRadius: 5)]
             : [],
       ),
       child: InkWell(
@@ -552,18 +509,20 @@ class _PlanCard extends StatelessWidget {
               if (plan.badge != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color:
-                        plan.badge == 'BEST VALUE' ? kGold : kGreen,
+                    color: plan.badge == 'BEST VALUE' ? kGold : kGreen,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     plan.badge!,
                     style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.black,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               const SizedBox(height: 8),
@@ -575,34 +534,39 @@ class _PlanCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700),
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(plan.price,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    plan.price,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   if (selected)
                     const Padding(
                       padding: EdgeInsets.only(left: 6),
-                      child: Icon(Icons.check_circle,
-                          color: kGreen, size: 18),
+                      child: Icon(Icons.check_circle, color: kGreen, size: 18),
                     ),
                 ],
               ),
               const SizedBox(height: 6),
-              Text(plan.monthly,
-                  style: const TextStyle(color: kMuted)),
+              Text(plan.monthly, style: const TextStyle(color: kMuted)),
               if (plan.savings != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: Text(plan.savings!,
-                      style: const TextStyle(
-                          color: kGreen,
-                          fontWeight: FontWeight.w600)),
+                  child: Text(
+                    plan.savings!,
+                    style: const TextStyle(
+                      color: kGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               const SizedBox(height: 6),
               Text(
@@ -625,10 +589,7 @@ class _BottomCTA extends StatelessWidget {
   final List<_Plan> plans;
   final ValueNotifier<int> selectedIndex;
 
-  const _BottomCTA({
-    required this.plans,
-    required this.selectedIndex,
-  });
+  const _BottomCTA({required this.plans, required this.selectedIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -696,7 +657,11 @@ class _BottomCTA extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (_)=>TrainerPaymentSuccessScreen()));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => TrainerPaymentSuccessScreen(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kGreen,
@@ -723,7 +688,11 @@ class _BottomCTA extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     // handle skip
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> TrainerLimitedAccessScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => TrainerLimitedAccessScreen(),
+                      ),
+                    );
                   },
                   child: const Text(
                     'Skip for now (Limited Access)',
@@ -742,7 +711,6 @@ class _BottomCTA extends StatelessWidget {
     );
   }
 }
-
 
 /* ───────────────── TRUST TAGS ───────────────── */
 
@@ -819,8 +787,7 @@ class _MembershipHeader extends StatelessWidget {
         const Spacer(),
         Row(
           children: const [
-            Icon(Icons.lock_outline_rounded,
-                size: 14, color: kGreen),
+            Icon(Icons.lock_outline_rounded, size: 14, color: kGreen),
             SizedBox(width: 6),
             Text(
               'SECURE PAYMENT',
@@ -838,38 +805,17 @@ class _MembershipHeader extends StatelessWidget {
   }
 }
 
-
 class _FreeVsProComparison extends StatelessWidget {
   const _FreeVsProComparison();
 
   @override
   Widget build(BuildContext context) {
     final rows = const [
-      _ComparisonRow(
-        feature: 'Verified Badge',
-        basic: false,
-        pro: true,
-      ),
-      _ComparisonRow(
-        feature: 'Unlimited Students',
-        basic: false,
-        pro: true,
-      ),
-      _ComparisonRow(
-        feature: 'Secure Payments',
-        basic: true,
-        pro: true,
-      ),
-      _ComparisonRow(
-        feature: 'Priority Support',
-        basic: false,
-        pro: true,
-      ),
-      _ComparisonRow(
-        feature: 'Marketing Boost',
-        basic: false,
-        pro: true,
-      ),
+      _ComparisonRow(feature: 'Verified Badge', basic: false, pro: true),
+      _ComparisonRow(feature: 'Unlimited Students', basic: false, pro: true),
+      _ComparisonRow(feature: 'Secure Payments', basic: true, pro: true),
+      _ComparisonRow(feature: 'Priority Support', basic: false, pro: true),
+      _ComparisonRow(feature: 'Marketing Boost', basic: false, pro: true),
     ];
 
     return Container(
@@ -954,16 +900,11 @@ class _FreeVsProComparison extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: Center(
-                      child: _CheckIcon(enabled: row.basic),
-                    ),
+                    child: Center(child: _CheckIcon(enabled: row.basic)),
                   ),
                   Expanded(
                     child: Center(
-                      child: _CheckIcon(
-                        enabled: row.pro,
-                        highlight: true,
-                      ),
+                      child: _CheckIcon(enabled: row.pro, highlight: true),
                     ),
                   ),
                 ],
@@ -994,19 +935,12 @@ class _CheckIcon extends StatelessWidget {
   final bool enabled;
   final bool highlight;
 
-  const _CheckIcon({
-    required this.enabled,
-    this.highlight = false,
-  });
+  const _CheckIcon({required this.enabled, this.highlight = false});
 
   @override
   Widget build(BuildContext context) {
     if (!enabled) {
-      return const Icon(
-        Icons.close_rounded,
-        size: 18,
-        color: kMuted,
-      );
+      return const Icon(Icons.close_rounded, size: 18, color: kMuted);
     }
 
     return Icon(
@@ -1016,7 +950,6 @@ class _CheckIcon extends StatelessWidget {
     );
   }
 }
-
 
 class _WhyGoProSection extends StatelessWidget {
   const _WhyGoProSection();
@@ -1089,11 +1022,7 @@ class _WhyGoProItem extends StatelessWidget {
             color: kGreen.withOpacity(0.15),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: kGreen,
-          ),
+          child: Icon(icon, size: 18, color: kGreen),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1124,9 +1053,6 @@ class _WhyGoProItem extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class _TrainerSuccessStories extends StatelessWidget {
   const _TrainerSuccessStories();
@@ -1183,19 +1109,16 @@ const _stories = [
     role: 'Cricket Coach • Pune',
     quote:
         'Since joining, my student base doubled in just 3 months. The dashboard makes management so easy.',
-    imageUrl:
-        'https://randomuser.me/api/portraits/men/32.jpg',
+    imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
   ),
   _Story(
     name: 'Anita Verma',
     role: 'Fitness Trainer • Delhi',
     quote:
         'I get genuine leads every week now. The verification badge builds instant trust.',
-    imageUrl:
-        'https://randomuser.me/api/portraits/women/44.jpg',
+    imageUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
   ),
 ];
-
 
 class _StoryCard extends StatelessWidget {
   final _Story story;
@@ -1241,7 +1164,9 @@ class _StoryCard extends StatelessWidget {
                           Container(
                             margin: const EdgeInsets.only(left: 6),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: kGreen.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(10),
@@ -1262,8 +1187,7 @@ class _StoryCard extends StatelessWidget {
                       story.role,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style:
-                          const TextStyle(color: kMuted, fontSize: 12),
+                      style: const TextStyle(color: kMuted, fontSize: 12),
                     ),
                   ],
                 ),
@@ -1289,7 +1213,6 @@ class _StoryCard extends StatelessWidget {
   }
 }
 
-
 class _MoneyBackGuarantee extends StatelessWidget {
   const _MoneyBackGuarantee();
 
@@ -1304,8 +1227,7 @@ class _MoneyBackGuarantee extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
-          Icon(Icons.verified_user_rounded,
-              color: kGreen, size: 22),
+          Icon(Icons.verified_user_rounded, color: kGreen, size: 22),
           SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1321,10 +1243,7 @@ class _MoneyBackGuarantee extends StatelessWidget {
                 SizedBox(height: 6),
                 Text(
                   'If your application is rejected or you change your mind within 7 days, get a full refund.',
-                  style: TextStyle(
-                    color: kMuted,
-                    height: 1.4,
-                  ),
+                  style: TextStyle(color: kMuted, height: 1.4),
                 ),
               ],
             ),
@@ -1334,7 +1253,6 @@ class _MoneyBackGuarantee extends StatelessWidget {
     );
   }
 }
-
 
 class _FaqSection extends StatelessWidget {
   const _FaqSection();
@@ -1361,13 +1279,11 @@ class _FaqSection extends StatelessWidget {
         ),
         _FaqTile(
           question: 'Can I upgrade my plan later?',
-          answer:
-              'Yes, you can upgrade anytime and only pay the difference.',
+          answer: 'Yes, you can upgrade anytime and only pay the difference.',
         ),
         _FaqTile(
           question: 'Is my data secure?',
-          answer:
-              'We use bank-grade security and encrypted storage.',
+          answer: 'We use bank-grade security and encrypted storage.',
         ),
         _FaqTile(
           question: 'Do you provide students?',
@@ -1383,10 +1299,7 @@ class _FaqTile extends StatelessWidget {
   final String question;
   final String answer;
 
-  const _FaqTile({
-    required this.question,
-    required this.answer,
-  });
+  const _FaqTile({required this.question, required this.answer});
 
   @override
   Widget build(BuildContext context) {
@@ -1405,19 +1318,13 @@ class _FaqTile extends StatelessWidget {
       ),
       children: [
         Padding(
-          padding:
-              const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Text(
             answer,
-            style: const TextStyle(
-              color: kMuted,
-              height: 1.4,
-            ),
+            style: const TextStyle(color: kMuted, height: 1.4),
           ),
         ),
       ],
     );
   }
 }
-
-

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:redesign/USER/Home/Scoreboard/Cricket/cricket_setup_friendly.dart';
-import 'package:redesign/USER/Home/Scoreboard/Football/football_setup.dart';
-import 'package:redesign/USER/Home/Scoreboard/Badminton/badminton_setup.dart';
+import 'package:redesign/view/USER/Home/Scoreboard/Cricket/cricket_setup_friendly.dart';
+import 'package:redesign/view/USER/Home/Scoreboard/Football/football_setup.dart';
+import 'package:redesign/view/USER/Home/Scoreboard/Badminton/badminton_setup.dart';
 
 void main() {
   runApp(const MyApp());
