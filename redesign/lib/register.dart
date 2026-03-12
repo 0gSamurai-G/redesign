@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:redesign/login.dart';
 import 'package:redesign/user_navigation.dart';
+import 'package:redesign/controller/User_Controller/registerController.dart';
+import 'package:redesign/model/User_Models/registerModel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,10 +54,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  final RegisterController _controller = RegisterController();
   bool _isLoading = false;
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _controller.dispose();
+    super.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -67,11 +76,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
+
+    RegisterModel user = RegisterModel(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    bool success = await _controller.registerWithEmail(user);
+
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
-    // TODO: Navigate to Home / Login
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){return UserAppNavShell();}));
+    if (success) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return UserAppNavShell();
+          },
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_controller.errorMessage ?? "Registration failed"),
+        ),
+      );
+    }
   }
 
   @override
@@ -80,6 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       backgroundColor: Color(0xFF000000),
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           /// TOP GRADIENT
@@ -91,195 +123,202 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 bottomRight: Radius.circular(48),
               ),
               gradient: const LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: [
-    Color(0xFF1DB954),
-    Color(0x801DB954),
-    Color(0x001DB954),
-  ],
-  stops: [0.0, 0.4, 1.0],
-)
-
-
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF1DB954),
+                  Color(0x801DB954),
+                  Color(0x001DB954),
+                ],
+                stops: [0.0, 0.4, 1.0],
+              ),
             ),
           ),
 
           /// ABSTRACT BACKGROUND SHAPE
           Positioned(
-  top: -10,
-  left: 30,
-  right: -50,
-  child: Opacity(
-    opacity: 0.6,
-    child: Transform.rotate(
-      angle: -0.5, // ≈ 30 degrees in radians (30° = 0.5236)
-      child: Text(
-        'Z',
-        textAlign: TextAlign.center,
-        style: GoogleFonts.luckiestGuy(
-          fontSize: size.width * 1.1, // responsive scaling
-          color: Colors.white,    // Spotify green
-          height: 1,
-          letterSpacing: -8,
-        ),
-      ),
-    ),
-  ),
-),
-
-          /// REGISTER CARD
-          Column(
-            children: [
-              const SizedBox(height: 280),
-              SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.08),
-                    ),
+            top: -10,
+            left: 30,
+            right: -50,
+            child: Opacity(
+              opacity: 0.6,
+              child: Transform.rotate(
+                angle: -0.5, // ≈ 30 degrees in radians (30° = 0.5236)
+                child: Text(
+                  'Z',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.luckiestGuy(
+                    fontSize: size.width * 1.1, // responsive scaling
+                    color: Colors.white, // Spotify green
+                    height: 1,
+                    letterSpacing: -8,
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Create Account',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Join the PlayZ sports community',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.65),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
+                ),
+              ),
+            ),
+          ),
 
-                        _InputField(
-                          controller: _nameController,
-                          icon: Icons.person_outline,
-                          hint: 'Full Name',
-                          fillColor: inputColor,
-                          validator: (v) =>
-                              v == null || v.isEmpty ? 'Required' : null,
+          /// REGISTER CARD (Scrollable entire screen to avoid keyboard overflow)
+          Align(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 280),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 24,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.08),
                         ),
-                        const SizedBox(height: 16),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            const Text(
+                              'Create Account',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Join the PlayZ sports community',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.65),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
 
-                        _InputField(
-                          controller: _emailController,
-                          icon: Icons.email_outlined,
-                          hint: 'Email Address',
-                          fillColor: inputColor,
-                          validator: (v) =>
-                              v == null || v.isEmpty ? 'Required' : null,
-                        ),
-                        const SizedBox(height: 16),
+                            _InputField(
+                              controller: _nameController,
+                              icon: Icons.person_outline,
+                              hint: 'Full Name',
+                              fillColor: inputColor,
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Required' : null,
+                            ),
+                            const SizedBox(height: 16),
 
-                        _InputField(
-                          controller: _passwordController,
-                          icon: Icons.lock_outline,
-                          hint: 'Password',
-                          obscure: true,
-                          fillColor: inputColor,
-                          validator: (v) =>
-                              v != null && v.length < 6
+                            _InputField(
+                              controller: _emailController,
+                              icon: Icons.email_outlined,
+                              hint: 'Email Address',
+                              fillColor: inputColor,
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Required' : null,
+                            ),
+                            const SizedBox(height: 16),
+
+                            _InputField(
+                              controller: _passwordController,
+                              icon: Icons.lock_outline,
+                              hint: 'Password',
+                              obscure: true,
+                              fillColor: inputColor,
+                              validator: (v) => v != null && v.length < 6
                                   ? 'Min 6 characters'
                                   : null,
-                        ),
-                        const SizedBox(height: 16),
+                            ),
+                            const SizedBox(height: 16),
 
-                        _InputField(
-                          controller: _confirmPasswordController,
-                          icon: Icons.lock_outline,
-                          hint: 'Confirm Password',
-                          obscure: true,
-                          fillColor: inputColor,
-                          validator: (v) =>
-                              v != _passwordController.text
+                            _InputField(
+                              controller: _confirmPasswordController,
+                              icon: Icons.lock_outline,
+                              hint: 'Confirm Password',
+                              obscure: true,
+                              fillColor: inputColor,
+                              validator: (v) => v != _passwordController.text
                                   ? 'Passwords do not match'
                                   : null,
-                        ),
-                        const SizedBox(height: 24),
-
-                        /// CREATE ACCOUNT BUTTON
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleRegister,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: spotifyGreen,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 0,
                             ),
-                            child: _isLoading
-                                ? const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.black,
-                                  )
-                                : const Text(
-                                    'Create Account',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                            const SizedBox(height: 24),
+
+                            /// CREATE ACCOUNT BUTTON
+                            SizedBox(
+                              width: double.infinity,
+                              height: 54,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _handleRegister,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: spotifyGreen,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
+                                  elevation: 0,
+                                ),
+                                child: _isLoading
+                                    ? const CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.black,
+                                      )
+                                    : const Text(
+                                        'Create Account',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  /// SIGN IN LINK
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24, top: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Already have an account?',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const LoginScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Sign in',
+                            style: TextStyle(
+                              color: spotifyGreen,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
+                ],
               ),
-
-              /// SIGN IN LINK
-              Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Already have an account?',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigator.pop(context);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        );
-                      },
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          color: spotifyGreen,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),

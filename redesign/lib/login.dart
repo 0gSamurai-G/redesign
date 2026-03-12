@@ -418,6 +418,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:redesign/view/USER/Home/home.dart';
 import 'package:redesign/user_navigation.dart';
 import 'package:redesign/register.dart';
+import 'package:redesign/controller/User_Controller/registerController.dart';
 
 const kSpotifyGreen = Color(0xFF1DB954);
 const kBg = Color(0xFF000000);
@@ -471,6 +472,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final RegisterController _controller = RegisterController();
+
   bool _rememberMe = false;
   bool _isLoading = false;
 
@@ -478,6 +481,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -485,14 +489,47 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
+
+    bool success = await _controller.loginWithEmail(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
-    // TODO: Navigate to Home Screen
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const UserAppNavShell()),
-    );
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_controller.errorMessage ?? "Login failed")),
+      );
+    }
+  }
+
+  Future<void> _handleGoogleLogin() async {
+    setState(() => _isLoading = true);
+
+    bool success = await _controller.loginWithGoogle();
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_controller.errorMessage ?? "Google Sign-In failed"),
+        ),
+      );
+    }
   }
 
   @override
@@ -768,11 +805,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           /// 🌐 SOCIAL BUTTONS
                           Row(
-                            children: const [
+                            children: [
                               Expanded(
                                 child: _SocialButton(
                                   icon: Icons.g_mobiledata,
                                   label: 'Google',
+                                  onPressed: _handleGoogleLogin,
+                                  isLoading: _isLoading,
                                 ),
                               ),
                               SizedBox(width: 12),
@@ -879,13 +918,20 @@ class _InputField extends StatelessWidget {
 class _SocialButton extends StatelessWidget {
   final IconData icon;
   final String label;
+  final VoidCallback? onPressed;
+  final bool isLoading;
 
-  const _SocialButton({required this.icon, required this.label});
+  const _SocialButton({
+    required this.icon,
+    required this.label,
+    this.onPressed,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () {},
+      onPressed: isLoading ? null : onPressed ?? () {},
       icon: Icon(icon, color: const Color(0xFF1DB954)),
       label: Text(label, style: const TextStyle(color: Color(0xFF1DB954))),
       style: OutlinedButton.styleFrom(

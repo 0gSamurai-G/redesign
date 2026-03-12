@@ -7,6 +7,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:redesign/onboarding.dart';
+import 'package:redesign/user_navigation.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -43,9 +45,10 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
     );
 
-    _logoOpacity = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeIn),
-    );
+    _logoOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _logoController, curve: Curves.easeIn));
 
     /// Single ripple
     _rippleController = AnimationController(
@@ -53,8 +56,10 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(milliseconds: 1400),
     );
 
-    _rippleAnim =
-        CurvedAnimation(parent: _rippleController, curve: Curves.easeOut);
+    _rippleAnim = CurvedAnimation(
+      parent: _rippleController,
+      curve: Curves.easeOut,
+    );
 
     _logoController.forward();
     _rippleController.forward();
@@ -67,11 +72,21 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 3), _goNext);
   }
 
-  void _goNext() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-    );
+  void _goNext() async {
+    bool loggedIn = await UserPreferences.isLoggedIn();
+    if (!mounted) return;
+
+    if (loggedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+      );
+    }
   }
 
   @override
@@ -113,8 +128,7 @@ class _SplashScreenState extends State<SplashScreen>
                             width: 110 + v * 120,
                             height: 110 + v * 120,
                             decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(28 + v * 26),
+                              borderRadius: BorderRadius.circular(28 + v * 26),
                               border: Border.all(
                                 color: accent.withOpacity(0.8),
                                 width: 2,
@@ -155,10 +169,7 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 28),
                 const Text(
                   'PlayZ',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -187,17 +198,15 @@ class _GlassBubble {
   final double size;
 
   _GlassBubble({required TickerProvider vsync})
-      : size = 120 + Random().nextDouble() * 80,
-        controller = AnimationController(
-          vsync: vsync,
-          duration: Duration(seconds: 16 + Random().nextInt(8)),
-        ) {
+    : size = 120 + Random().nextDouble() * 80,
+      controller = AnimationController(
+        vsync: vsync,
+        duration: Duration(seconds: 16 + Random().nextInt(8)),
+      ) {
     animation = Tween<Offset>(
       begin: Offset(Random().nextDouble(), Random().nextDouble()),
       end: Offset(Random().nextDouble(), Random().nextDouble()),
-    ).animate(
-      CurvedAnimation(parent: controller, curve: Curves.easeInOutSine),
-    );
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOutSine));
     controller.repeat(reverse: true);
   }
 
@@ -214,9 +223,7 @@ class _GlassBubble {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: const Color(0xFF1DB954).withOpacity(0.05),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.08),
-              ),
+              border: Border.all(color: Colors.white.withOpacity(0.08)),
             ),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 90, sigmaY: 90),
