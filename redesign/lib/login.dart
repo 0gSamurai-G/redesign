@@ -1,424 +1,12 @@
-// import 'package:flutter/material.dart';
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// /* ============================================================
-//    APP ROOT
-//    ============================================================ */
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: 'PlayZ Login',
-//       theme: ThemeData(
-//         brightness: Brightness.dark,
-//         useMaterial3: true,
-//         fontFamily: 'Roboto',
-//       ),
-//       home: const LoginScreen(),
-//     );
-//   }
-// }
-
-// /* ============================================================
-//    LOGIN SCREEN (STATEFUL FOR FUTURE UPGRADES)
-//    ============================================================ */
-// class LoginScreen extends StatefulWidget {
-//   const LoginScreen({super.key});
-
-//   @override
-//   State<LoginScreen> createState() => _LoginScreenState();
-// }
-
-// class _LoginScreenState extends State<LoginScreen> {
-//   /// ---- THEME COLORS (Spotify style)
-//   static const Color spotifyGreen = Color(0xFF1DB954);
-//   static const Color charcoal = Color(0xFF121212);
-//   static const Color cardColor = Color(0xFF181818);
-//   static const Color inputColor = Color(0xFF222222);
-
-//   /// ---- FORM & INPUT CONTROLLERS
-//   /// These make it easy to:
-//   /// - Validate input
-//   /// - Send data to APIs
-//   /// - Clear fields
-//   final _formKey = GlobalKey<FormState>();
-//   final TextEditingController _emailController = TextEditingController();
-//   final TextEditingController _passwordController = TextEditingController();
-
-//   /// ---- UI STATE (future-proof)
-//   bool _rememberMe = false;
-//   bool _isLoading = false;
-
-//   @override
-//   void dispose() {
-//     /// Always dispose controllers to avoid memory leaks
-//     _emailController.dispose();
-//     _passwordController.dispose();
-//     super.dispose();
-//   }
-
-//   /// ---- LOGIN HANDLER (placeholder)
-//   /// Replace this with Firebase / API logic later
-//   Future<void> _handleLogin() async {
-//     if (!_formKey.currentState!.validate()) return;
-
-//     setState(() => _isLoading = true);
-
-//     // Simulate network delay
-//     await Future.delayed(const Duration(seconds: 2));
-
-//     setState(() => _isLoading = false);
-
-//     // TODO: Navigate to Home Screen
-//     // Navigator.pushReplacement(...)
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final size = MediaQuery.of(context).size;
-
-//     return Scaffold(
-//       backgroundColor: charcoal,
-//       body: Stack(
-//         children: [
-//           /// --------------------------------------------------
-//           /// TOP GRADIENT BACKGROUND
-//           /// --------------------------------------------------
-//           Container(
-//             height: size.height * 0.45,
-//             width: double.infinity,
-//             decoration: const BoxDecoration(
-//               borderRadius: BorderRadius.only(
-//                 bottomLeft: Radius.circular(48),
-//                 bottomRight: Radius.circular(48),
-//               ),
-//               gradient: LinearGradient(
-//                 begin: Alignment.topLeft,
-//                 end: Alignment.bottomRight,
-//                 colors: [
-//                   Color(0xFF1DB954),
-//                   Color(0xFF0F5132),
-//                 ],
-//               ),
-//             ),
-//           ),
-
-//           /// --------------------------------------------------
-//           /// ABSTRACT BACKGROUND SHAPE (OPTIONAL BRANDING)
-//           /// --------------------------------------------------
-//           Positioned(
-//             top: -40,
-//             left: -40,
-//             right: -48,
-//             child: Opacity(
-//               opacity: 0.4,
-//               child: Image.asset(
-//                 'assets/logo_shapez.png', // placeholder asset
-//                 height: size.height * 0.48,
-//                 fit: BoxFit.contain,
-//               ),
-//             ),
-//           ),
-
-//           /// --------------------------------------------------
-//           /// LOGIN CARD
-//           /// --------------------------------------------------
-//           Column(
-//             children: [
-//               const SizedBox(height: 300),
-//               SingleChildScrollView(
-//                 padding:
-//                     const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-//                 child: Container(
-//                   padding: const EdgeInsets.all(24),
-//                   decoration: BoxDecoration(
-//                     color: cardColor,
-//                     borderRadius: BorderRadius.circular(28),
-//                     border: Border.all(
-//                       color: Colors.white.withOpacity(0.08),
-//                     ),
-//                   ),
-//                   child: Form(
-//                     key: _formKey,
-//                     child: Column(
-//                       mainAxisSize: MainAxisSize.min,
-//                       children: [
-//                         const Text(
-//                           'Welcome Back!',
-//                           style: TextStyle(
-//                             fontSize: 24,
-//                             fontWeight: FontWeight.w700,
-//                             color: Colors.white,
-//                           ),
-//                         ),
-//                         const SizedBox(height: 6),
-//                         Text(
-//                           'Ready to get back on the field?',
-//                           style: TextStyle(
-//                             fontSize: 14,
-//                             color: Colors.white.withOpacity(0.65),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 24),
-
-//                         /// EMAIL
-//                         _InputField(
-//                           controller: _emailController,
-//                           icon: Icons.email_outlined,
-//                           hint: 'user@playz.com',
-//                           fillColor: inputColor,
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'Email is required';
-//                             }
-//                             return null;
-//                           },
-//                         ),
-
-//                         const SizedBox(height: 16),
-
-//                         /// PASSWORD
-//                         _InputField(
-//                           controller: _passwordController,
-//                           icon: Icons.lock_outline,
-//                           hint: '••••••••',
-//                           obscure: true,
-//                           fillColor: inputColor,
-//                           validator: (value) {
-//                             if (value == null || value.length < 6) {
-//                               return 'Minimum 6 characters';
-//                             }
-//                             return null;
-//                           },
-//                         ),
-
-//                         const SizedBox(height: 12),
-
-//                         /// REMEMBER ME + FORGOT PASSWORD
-//                         Row(
-//                           children: [
-//                             Checkbox(
-//                               value: _rememberMe,
-//                               activeColor: spotifyGreen,
-//                               onChanged: (value) {
-//                                 setState(() => _rememberMe = value ?? false);
-//                               },
-//                             ),
-//                             Text(
-//                               'Remember me',
-//                               style: TextStyle(
-//                                 fontSize: 13,
-//                                 color: Colors.white.withOpacity(0.8),
-//                               ),
-//                             ),
-//                             const Spacer(),
-//                             TextButton(
-//                               onPressed: () {
-//                                 // TODO: Forgot password flow
-//                               },
-//                               child: const Text(
-//                                 'Forgot Password?',
-//                                 style: TextStyle(
-//                                   color: spotifyGreen,
-//                                   fontSize: 13,
-//                                   fontWeight: FontWeight.w600,
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-
-//                         const SizedBox(height: 16),
-
-//                         /// SIGN IN BUTTON
-//                         SizedBox(
-//                           width: double.infinity,
-//                           height: 54,
-//                           child: ElevatedButton(
-//                             onPressed: _isLoading ? null : _handleLogin,
-//                             style: ElevatedButton.styleFrom(
-//                               backgroundColor: spotifyGreen,
-//                               shape: RoundedRectangleBorder(
-//                                 borderRadius: BorderRadius.circular(16),
-//                               ),
-//                               elevation: 0,
-//                             ),
-//                             child: _isLoading
-//                                 ? const SizedBox(
-//                                     height: 22,
-//                                     width: 22,
-//                                     child: CircularProgressIndicator(
-//                                       strokeWidth: 2,
-//                                       color: Colors.black,
-//                                     ),
-//                                   )
-//                                 : const Row(
-//                                     mainAxisAlignment: MainAxisAlignment.center,
-//                                     children: [
-//                                       Text(
-//                                         'Sign In',
-//                                         style: TextStyle(
-//                                           fontSize: 16,
-//                                           fontWeight: FontWeight.w600,
-//                                           color: Colors.black,
-//                                         ),
-//                                       ),
-//                                       SizedBox(width: 8),
-//                                       Icon(Icons.arrow_forward,
-//                                           color: Colors.black),
-//                                     ],
-//                                   ),
-//                           ),
-//                         ),
-
-//                         const SizedBox(height: 28),
-
-//                         /// DIVIDER
-//                         Row(
-//                           children: [
-//                             Expanded(
-//                               child: Divider(
-//                                   color: Colors.white.withOpacity(0.15)),
-//                             ),
-//                             Padding(
-//                               padding:
-//                                   const EdgeInsets.symmetric(horizontal: 12),
-//                               child: Text(
-//                                 'or continue with',
-//                                 style: TextStyle(
-//                                   fontSize: 12,
-//                                   color: Colors.white.withOpacity(0.5),
-//                                 ),
-//                               ),
-//                             ),
-//                             Expanded(
-//                               child: Divider(
-//                                   color: Colors.white.withOpacity(0.15)),
-//                             ),
-//                           ],
-//                         ),
-
-//                         const SizedBox(height: 16),
-
-//                         /// SOCIAL LOGIN
-//                         Row(
-//                           children: const [
-//                             Expanded(
-//                               child: _SocialButton(
-//                                 icon: Icons.g_mobiledata,
-//                                 label: 'Google',
-//                               ),
-//                             ),
-//                             SizedBox(width: 12),
-//                             Expanded(
-//                               child: _SocialButton(
-//                                 icon: Icons.apple,
-//                                 label: 'Apple',
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// /* ============================================================
-//    INPUT FIELD (REUSABLE)
-//    ============================================================ */
-// class _InputField extends StatelessWidget {
-//   final TextEditingController controller;
-//   final IconData icon;
-//   final String hint;
-//   final bool obscure;
-//   final Color fillColor;
-//   final String? Function(String?)? validator;
-
-//   const _InputField({
-//     required this.controller,
-//     required this.icon,
-//     required this.hint,
-//     required this.fillColor,
-//     this.obscure = false,
-//     this.validator,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextFormField(
-//       controller: controller,
-//       obscureText: obscure,
-//       validator: validator,
-//       style: const TextStyle(color: Colors.white),
-//       decoration: InputDecoration(
-//         prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.7)),
-//         hintText: hint,
-//         hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
-//         filled: true,
-//         fillColor: fillColor,
-//         border: OutlineInputBorder(
-//           borderRadius: BorderRadius.circular(14),
-//           borderSide: BorderSide.none,
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// /* ============================================================
-//    SOCIAL BUTTON (REUSABLE)
-//    ============================================================ */
-// class _SocialButton extends StatelessWidget {
-//   final IconData icon;
-//   final String label;
-
-//   const _SocialButton({
-//     required this.icon,
-//     required this.label,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return OutlinedButton.icon(
-//       onPressed: () {
-//         // TODO: Social auth
-//       },
-//       icon: Icon(icon, color: const Color(0xFF1DB954)),
-//       label: Text(
-//         label,
-//         style: const TextStyle(color: Color(0xFF1DB954)),
-//       ),
-//       style: OutlinedButton.styleFrom(
-//         padding: const EdgeInsets.symmetric(vertical: 12),
-//         side: BorderSide(color: Colors.white.withOpacity(0.15)),
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(12),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:redesign/view/USER/Home/home.dart';
 import 'package:redesign/user_navigation.dart';
 import 'package:redesign/register.dart';
 import 'package:redesign/controller/User_Controller/registerController.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sms_autofill/sms_autofill.dart';
+import 'dart:async';
 
 const kSpotifyGreen = Color(0xFF1DB954);
 const kBg = Color(0xFF000000);
@@ -426,30 +14,9 @@ const kSurface = Color(0xFF0E0E0E);
 const kCard = Color(0xFF1A1A1A);
 const kMuted = Color(0xFFA7A7A7);
 
-void main() {
-  runApp(const MyApp());
-}
-
 /* ============================================================
    APP ROOT
    ============================================================ */
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'PlayZ Login',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        fontFamily: 'Roboto',
-      ),
-      home: const LoginScreen(),
-    );
-  }
-}
 
 /* ============================================================
    LOGIN SCREEN (STATEFUL FOR FUTURE UPGRADES)
@@ -483,6 +50,84 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _showPhoneLoginSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return const PhoneLoginSheet();
+      },
+    );
+  }
+
+  Future<void> _forgotPassword() async {
+    TextEditingController resetController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: kSurface,
+          title: const Text(
+            "Reset Password",
+            style: TextStyle(color: Colors.white),
+          ),
+          content: TextField(
+            controller: resetController,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: "Enter your email",
+              hintStyle: const TextStyle(color: kMuted),
+              filled: true,
+              fillColor: kCard,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kSpotifyGreen,
+              ),
+              child: const Text(
+                "Send Reset Link",
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () async {
+                try {
+                  await FirebaseAuth.instance.sendPasswordResetEmail(
+                    email: resetController.text.trim(),
+                  );
+
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Password reset email sent"),
+                    ),
+                  );
+                } catch (e) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Error: $e")),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _handleLogin() async {
@@ -698,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const Spacer(),
                               TextButton(
-                                onPressed: () {},
+                                onPressed: _forgotPassword,
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
@@ -817,8 +462,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               SizedBox(width: 12),
                               Expanded(
                                 child: _SocialButton(
-                                  icon: Icons.apple,
-                                  label: 'Apple',
+                                  icon: Icons.phone,
+                                  label: 'Phone',
+                                  onPressed: () {
+                                    _showPhoneLoginSheet();
+                                  },
                                 ),
                               ),
                             ],
@@ -939,6 +587,363 @@ class _SocialButton extends StatelessWidget {
         side: BorderSide(color: Colors.white.withOpacity(0.15)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+    );
+  }
+}
+
+class PhoneLoginSheet extends StatefulWidget {
+  const PhoneLoginSheet({super.key});
+
+  @override
+  State<PhoneLoginSheet> createState() => _PhoneLoginSheetState();
+}
+
+class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController phoneController = TextEditingController(text: '+91');
+  String verificationId = "";
+
+  bool otpSent = false;
+  List<TextEditingController> otpControllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
+
+  int secondsLeft = 120;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    SmsAutoFill().unregisterListener();
+    phoneController.dispose();
+    for (var controller in otpControllers) {
+      controller.dispose();
+    }
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void codeUpdated() {
+    if (code != null && code!.length == 6) {
+      for (int i = 0; i < 6; i++) {
+        otpControllers[i].text = code![i];
+      }
+      setState(() {});
+      Future.delayed(const Duration(milliseconds: 200), () {
+        verifyOTP();
+      });
+    }
+  }
+
+  void _startTimer() {
+    secondsLeft = 120;
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (secondsLeft == 0) {
+        timer.cancel();
+      } else {
+        if (mounted) setState(() => secondsLeft--);
+      }
+    });
+  }
+
+  Future<void> sendOTP(String phone) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phone,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await _auth.signInWithCredential(credential);
+
+        await UserPreferences.saveUserLogin(
+          true,
+          "User", // You can update this later if you have user profiles
+          phoneController.text.trim(),
+        );
+
+        if (mounted) {
+          Navigator.pop(context); // Close sheet
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+          );
+        }
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? "Verification failed")),
+          );
+        }
+      },
+      codeSent: (String verId, int? resendToken) async {
+        if (mounted) {
+          setState(() {
+            verificationId = verId;
+            otpSent = true;
+          });
+          _startTimer();
+          await SmsAutoFill().listenForCode();
+        }
+      },
+      codeAutoRetrievalTimeout: (String verId) {
+        verificationId = verId;
+      },
+    );
+  }
+
+  Future<void> verifyOTP() async {
+    String otp = otpControllers.map((c) => c.text).join();
+    if (otp.length < 6) return;
+
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: otp,
+      );
+
+      await _auth.signInWithCredential(credential);
+
+      await UserPreferences.saveUserLogin(
+        true,
+        "User", 
+        phoneController.text.trim(),
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context); // Close sheet
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Invalid OTP")),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: kSurface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            /// DRAG HANDLE
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 18),
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            otpSent ? _buildOTPUI() : _buildPhoneUI(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// PHONE INPUT UI
+  Widget _buildPhoneUI() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          "Enter your phone number",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          "We'll send you a verification code",
+          style: TextStyle(color: kMuted),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: phoneController,
+                autofocus: true,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  hintText: "Phone number",
+                  filled: true,
+                  fillColor: kCard,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            onPressed: () {
+              String phone = phoneController.text.trim();
+              if (!phone.startsWith('+')) {
+                phone = "+$phone"; // ensure + prefix is there for Firebase
+              }
+              sendOTP(phone);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1DB954),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: const Text(
+              "Send OTP",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// OTP UI
+  Widget _buildOTPUI() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          "Enter the 6-digit code",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(6, (index) {
+            return SizedBox(
+              width: 45,
+              child: TextField(
+                controller: otpControllers[index],
+                autofocus: index == 0,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+                maxLength: 1,
+                onChanged: (value) {
+                  // PASTE HANDLING
+                  if (value.length > 1) {
+                    for (int i = 0; i < value.length && i < 6; i++) {
+                      otpControllers[i].text = value[i];
+                    }
+                    FocusScope.of(context).unfocus();
+                    setState(() {});
+
+                    // Optional Auto-Submit after paste
+                    if (otpControllers.every((c) => c.text.isNotEmpty)) {
+                      Future.delayed(const Duration(milliseconds: 200), () {
+                        verifyOTP();
+                      });
+                    }
+                    return;
+                  }
+
+                  // FORWARD FOCUS
+                  if (value.isNotEmpty && index < 5) {
+                    FocusScope.of(context).nextFocus();
+                  }
+
+                  // BACKSPACE FOCUS
+                  if (value.isEmpty && index > 0) {
+                    FocusScope.of(context).previousFocus();
+                  }
+
+                  // AUTO SUBMIT
+                  if (otpControllers.every((c) => c.text.isNotEmpty)) {
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      verifyOTP();
+                    });
+                  }
+                },
+                decoration: InputDecoration(
+                  counterText: "",
+                  filled: true,
+                  fillColor: kCard,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          "Resend code in ${secondsLeft ~/ 60}:${(secondsLeft % 60).toString().padLeft(2, '0')}",
+          style: const TextStyle(color: kMuted, fontSize: 13),
+        ),
+        const SizedBox(height: 10),
+        TextButton(
+          onPressed: secondsLeft == 0
+              ? () {
+                  // Optimistically reset timer and clear old OTP
+                  setState(() {
+                    secondsLeft = 120;
+                  });
+                  for (var c in otpControllers) {
+                    c.clear();
+                  }
+
+                  String phone = phoneController.text.trim();
+                  if (!phone.startsWith('+')) phone = "+$phone";
+                  sendOTP(phone);
+                }
+              : null,
+          child: Text(
+            "RESEND CODE",
+            style: TextStyle(
+              color: secondsLeft == 0 ? kSpotifyGreen : kMuted,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            onPressed: verifyOTP,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1DB954),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: const Text(
+              "Verify & Continue",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 }

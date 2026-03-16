@@ -1,31 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:redesign/login.dart';
 
-void main() {
-  runApp(const PlayZApp());
-}
-
-/* ============================================================
-   APP ROOT
-   ============================================================ */
-class PlayZApp extends StatelessWidget {
-  const PlayZApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'PlayZ Onboarding',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        fontFamily: 'Inter',
-      ),
-      home: const OnboardingScreen(),
-    );
-  }
-}
-
 /* ============================================================
    ONBOARDING SCREEN (STATEFUL)
    ============================================================ */
@@ -54,32 +29,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: 'India’s Sports Community,\nin Your Pocket',
       subtitle:
           'Book top-rated turfs, find local players instantly, and track your match stats — all in one place.',
-      image:
-          'https://images.unsplash.com/photo-1546519638-68e109498ffc',
+      image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc',
     ),
     _OnboardData(
       tag: 'FAST & EASY',
       title: 'Instant Booking\nMade Simple',
       subtitle:
           'Find nearby turfs, check real-time availability, and book your slot in seconds.',
-      image:
-          'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
+      image: 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
     ),
     _OnboardData(
       tag: 'COMMUNITY',
       title: 'Never Play\nAlone Again',
       subtitle:
           'Join solo queue, connect with players nearby, and build your dream squad.',
-      image:
-          'https://images.unsplash.com/photo-1517649763962-0c623066013b',
+      image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b',
     ),
     _OnboardData(
       tag: 'LEADERBOARDS',
       title: 'Gamify Your\nGame',
       subtitle:
           'Track your performance, climb ranks, and stay motivated to play more.',
-      image:
-          'https://images.unsplash.com/photo-1518611012118-696072aa579a',
+      image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a',
     ),
   ];
 
@@ -157,20 +128,14 @@ class _TopBar extends StatelessWidget {
               SizedBox(width: 6),
               Text(
                 'PlayZ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
             ],
           ),
           const Spacer(),
           TextButton(
             onPressed: onSkip,
-            child: const Text(
-              'Skip',
-              style: TextStyle(color: Colors.white70),
-            ),
+            child: const Text('Skip', style: TextStyle(color: Colors.white70)),
           ),
         ],
       ),
@@ -298,8 +263,7 @@ class _BottomControls extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1DB954),
               foregroundColor: Colors.black,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
