@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:redesign/user_navigation.dart';
 import 'package:redesign/register.dart';
+import 'package:redesign/favorite_sports.dart';
 import 'package:redesign/controller/User_Controller/registerController.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sms_autofill/sms_autofill.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 
 const kSpotifyGreen = Color(0xFF1DB954);
@@ -144,10 +147,20 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
-      );
+      final docId = _emailController.text.trim();
+      final exists = await _checkAndFetchUserDoc(docId);
+      if (!mounted) return;
+      if (exists) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoriteSportsScreen()),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_controller.errorMessage ?? "Login failed")),
@@ -164,16 +177,71 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
-      );
+      final user = FirebaseAuth.instance.currentUser;
+      final docId = user?.email ?? '';
+      if (docId.isEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoriteSportsScreen()),
+        );
+        return;
+      }
+      final exists = await _checkAndFetchUserDoc(docId);
+      if (!mounted) return;
+      if (exists) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoriteSportsScreen()),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_controller.errorMessage ?? "Google Sign-In failed"),
         ),
       );
+    }
+  }
+
+  /// Checks if the user doc exists in Firestore. If yes, populates
+  /// SharedPreferences with all profile data, marks profile complete, and returns true.
+  Future<bool> _checkAndFetchUserDoc(String docId) async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('User')
+          .doc(docId)
+          .get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data()!;
+        await UserPreferences.saveDocId(docId);
+        await UserPreferences.saveUserProfile(
+          data['fullName'] ?? '',
+          data['primaryPhone'] ?? '',
+          data['primaryEmail'] ?? '',
+          data['dob'] ?? '',
+          data['bio'] ?? '',
+          data['profileImageUrl'] ?? '',
+        );
+        final sports = data['favoriteSports'];
+        if (sports != null && sports is List) {
+          await UserPreferences.saveFavoriteSports(
+            sports.map((e) => e.toString()).toList(),
+          );
+        }
+        await UserPreferences.setPublicProfile(data['isPublicProfile'] ?? true);
+        await UserPreferences.setProfileComplete(true);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error fetching user doc: $e');
+      return false;
     }
   }
 
@@ -608,9 +676,31 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
     6,
     (_) => TextEditingController(),
   );
+  List<FocusNode> otpFocusNodes = List.generate(6, (_) => FocusNode());
 
   int secondsLeft = 120;
   Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    listenForCode();
+    SmsAutoFill().getAppSignature.then((signature) {
+      print("APP SIGNATURE: $signature");
+    });
+    
+    for (int i = 0; i < 6; i++) {
+      otpFocusNodes[i].onKeyEvent = (node, event) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.backspace) {
+          if (otpControllers[i].text.isEmpty && i > 0) {
+            otpFocusNodes[i - 1].requestFocus();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      };
+    }
+  }
 
   @override
   void dispose() {
@@ -618,6 +708,9 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
     phoneController.dispose();
     for (var controller in otpControllers) {
       controller.dispose();
+    }
+    for (var node in otpFocusNodes) {
+      node.dispose();
     }
     _timer?.cancel();
     super.dispose();
@@ -656,16 +749,25 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
 
         await UserPreferences.saveUserLogin(
           true,
-          "User", // You can update this later if you have user profiles
+          "User",
           phoneController.text.trim(),
         );
 
         if (mounted) {
+          final docId = phoneController.text.trim();
+          final exists = await _checkAndFetchPhoneUserDoc(docId);
           Navigator.pop(context); // Close sheet
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const UserAppNavShell()),
-          );
+          if (exists) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const FavoriteSportsScreen()),
+            );
+          }
         }
       },
       verificationFailed: (FirebaseAuthException e) {
@@ -682,7 +784,7 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
             otpSent = true;
           });
           _startTimer();
-          await SmsAutoFill().listenForCode();
+          listenForCode();
         }
       },
       codeAutoRetrievalTimeout: (String verId) {
@@ -705,22 +807,68 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
 
       await UserPreferences.saveUserLogin(
         true,
-        "User", 
+        "User",
         phoneController.text.trim(),
       );
 
       if (!mounted) return;
+      final docId = phoneController.text.trim();
+      final exists = await _checkAndFetchPhoneUserDoc(docId);
       Navigator.pop(context); // Close sheet
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
-      );
+
+      if (exists) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoriteSportsScreen()),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Invalid OTP")),
         );
       }
+    }
+  }
+
+  /// Checks if phone-based user doc exists in Firestore.
+  Future<bool> _checkAndFetchPhoneUserDoc(String docId) async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('User')
+          .doc(docId)
+          .get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data()!;
+        await UserPreferences.saveDocId(docId);
+        await UserPreferences.saveUserProfile(
+          data['fullName'] ?? '',
+          data['primaryPhone'] ?? '',
+          data['primaryEmail'] ?? '',
+          data['dob'] ?? '',
+          data['bio'] ?? '',
+          data['profileImageUrl'] ?? '',
+        );
+        final sports = data['favoriteSports'];
+        if (sports != null && sports is List) {
+          await UserPreferences.saveFavoriteSports(
+            sports.map((e) => e.toString()).toList(),
+          );
+        }
+        await UserPreferences.setPublicProfile(data['isPublicProfile'] ?? true);
+        await UserPreferences.setProfileComplete(true);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error fetching user doc: $e');
+      return false;
     }
   }
 
@@ -839,21 +987,29 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
               width: 45,
               child: TextField(
                 controller: otpControllers[index],
+                focusNode: otpFocusNodes[index],
                 autofocus: index == 0,
                 textAlign: TextAlign.center,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
-                maxLength: 1,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(6),
+                ],
                 onChanged: (value) {
-                  // PASTE HANDLING
+                  // PASTE HANDLING & FAST TYPING
                   if (value.length > 1) {
-                    for (int i = 0; i < value.length && i < 6; i++) {
-                      otpControllers[i].text = value[i];
+                    int pasteLength = value.length;
+                    for (int i = 0; i < pasteLength && (index + i) < 6; i++) {
+                      otpControllers[index + i].text = value[i];
                     }
-                    FocusScope.of(context).unfocus();
+                    if (index + pasteLength < 6) {
+                      otpFocusNodes[index + pasteLength].requestFocus();
+                    } else {
+                      FocusScope.of(context).unfocus();
+                    }
                     setState(() {});
 
-                    // Optional Auto-Submit after paste
+                    // AUTO SUBMIT
                     if (otpControllers.every((c) => c.text.isNotEmpty)) {
                       Future.delayed(const Duration(milliseconds: 200), () {
                         verifyOTP();
@@ -864,12 +1020,12 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
 
                   // FORWARD FOCUS
                   if (value.isNotEmpty && index < 5) {
-                    FocusScope.of(context).nextFocus();
+                    otpFocusNodes[index + 1].requestFocus();
                   }
 
                   // BACKSPACE FOCUS
                   if (value.isEmpty && index > 0) {
-                    FocusScope.of(context).previousFocus();
+                    otpFocusNodes[index - 1].requestFocus();
                   }
 
                   // AUTO SUBMIT

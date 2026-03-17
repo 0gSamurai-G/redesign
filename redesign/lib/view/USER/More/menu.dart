@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:redesign/view/USER/More/edit_profile.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
 
 
 class AppColors {
@@ -88,8 +90,36 @@ class _MoreScreenState extends State<MoreScreen> {
 }
 
 
-class _ProfileHeader extends StatelessWidget {
+class _ProfileHeader extends StatefulWidget {
   const _ProfileHeader();
+
+  @override
+  State<_ProfileHeader> createState() => _ProfileHeaderState();
+}
+
+class _ProfileHeaderState extends State<_ProfileHeader> {
+  String _name = '';
+  String _imageUrl = '';
+  String _email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final name = await UserPreferences.getUserName();
+    final imageUrl = await UserPreferences.getProfileImageUrl();
+    final email = await UserPreferences.getUserEmail();
+    if (mounted) {
+      setState(() {
+        _name = name ?? 'User';
+        _imageUrl = imageUrl ?? '';
+        _email = email ?? '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,17 +128,28 @@ class _ProfileHeader extends StatelessWidget {
       child: Row(
         children: [
           ClipOval(
-            child: CachedNetworkImage(
-              imageUrl: 'https://i.pravatar.cc/150',
-              width: 52,
-              height: 52,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => Shimmer.fromColors(
-                baseColor: Colors.grey.shade800,
-                highlightColor: Colors.grey.shade700,
-                child: const CircleAvatar(radius: 26),
-              ),
-            ),
+            child: _imageUrl.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: _imageUrl,
+                    width: 52,
+                    height: 52,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Shimmer.fromColors(
+                      baseColor: Colors.grey.shade800,
+                      highlightColor: Colors.grey.shade700,
+                      child: const CircleAvatar(radius: 26),
+                    ),
+                    errorWidget: (_, __, ___) => const CircleAvatar(
+                      radius: 26,
+                      backgroundColor: Color(0xFF1A1A1A),
+                      child: Icon(Icons.person, color: Colors.white38),
+                    ),
+                  )
+                : const CircleAvatar(
+                    radius: 26,
+                    backgroundColor: Color(0xFF1A1A1A),
+                    child: Icon(Icons.person, color: Colors.white38),
+                  ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -117,14 +158,16 @@ class _ProfileHeader extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      'Deepankar Rokade',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
+                    Flexible(
+                      child: Text(
+                        _name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -133,7 +176,9 @@ class _ProfileHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Shivajinagar, Pune',
+                  _email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
                     color: AppColors.muted,
                     fontSize: 12,
@@ -143,15 +188,21 @@ class _ProfileHeader extends StatelessWidget {
             ),
           ),
           TextButton(
-  onPressed: () {},
+  onPressed: () async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+    );
+    _loadProfile(); // Refresh after returning from edit
+  },
   style: TextButton.styleFrom(
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    backgroundColor: AppColors.surface, // dark surface
-    foregroundColor: Colors.white,      // text color
+    backgroundColor: AppColors.surface,
+    foregroundColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),
       side: BorderSide(
-        color: Colors.white.withOpacity(0.15), // subtle outline
+        color: Colors.white.withOpacity(0.15),
       ),
     ),
   ),

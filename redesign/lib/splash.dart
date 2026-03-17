@@ -8,6 +8,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:redesign/onboarding.dart';
 import 'package:redesign/user_navigation.dart';
+import 'package:redesign/favorite_sports.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -77,10 +78,19 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     if (loggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const UserAppNavShell()),
-      );
+      bool isProfileComplete = await UserPreferences.isProfileComplete();
+      if (!mounted) return;
+      if (isProfileComplete) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const UserAppNavShell()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoriteSportsScreen()),
+        );
+      }
     } else {
       Navigator.pushReplacement(
         context,
