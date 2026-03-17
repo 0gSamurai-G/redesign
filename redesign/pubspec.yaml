@@ -23,6 +23,7 @@ dependencies:
   material_symbols_icons: ^4.2906.0
   path: ^1.9.1
   qr_flutter: ^4.1.0
+  get: ^4.7.3
   shared_preferences: ^2.5.3
   shimmer: ^3.0.0
   sms_autofill: ^2.4.1

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:io';
+import 'package:get/get.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
+import 'package:redesign/controller/user_profile_controller.dart';
+import 'package:redesign/model/user_profile_model.dart';
 
 const _kBg = Color(0xFF000000);
 const _kCard = Color(0xFF141414);
@@ -26,13 +27,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _dobController = TextEditingController();
   final _bioController = TextEditingController();
 
-  bool _isLoading = false;
-  bool _isPublicProfile = true;
-  String _existingImageUrl = '';
-  String _docId = '';
-
-  File? _imageFile;
+  final _controller = Get.put(UserProfileController());
   final ImagePicker _picker = ImagePicker();
+  File? _imageFile;
 
   @override
   void initState() {
@@ -41,26 +38,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _loadData() async {
-    final name = await UserPreferences.getUserName();
-    final phone = await UserPreferences.getUserPhone();
-    final email = await UserPreferences.getUserEmail();
-    final dob = await UserPreferences.getUserDob();
-    final bio = await UserPreferences.getUserBio();
-    final imageUrl = await UserPreferences.getProfileImageUrl();
     final docId = await UserPreferences.getDocId();
-    final isPublic = await UserPreferences.isPublicProfile();
-
-    if (mounted) {
-      setState(() {
-        _nameController.text = name ?? '';
-        _phoneController.text = phone ?? '';
-        _emailController.text = email ?? '';
-        _dobController.text = dob ?? '';
-        _bioController.text = bio ?? '';
-        _existingImageUrl = imageUrl ?? '';
-        _docId = docId ?? '';
-        _isPublicProfile = isPublic;
-      });
+    if (docId != null) {
+      await _controller.fetchUserProfile(docId);
+      final user = _controller.rxUser.value;
+      if (user != null) {
+        _nameController.text = user.fullName;
+        _phoneController.text = user.secondaryPhone;
+        _emailController.text = user.primaryEmail;
+        _dobController.text = user.dob;
+        _bioController.text = user.bio;
+      }
     }
   }
 
@@ -93,64 +81,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return;
     }
 
-    setState(() => _isLoading = true);
-
-    try {
-      if (_docId.isEmpty) {
-        throw Exception("Document ID not found. Please re-login.");
-      }
-
-      // Upload new image if selected
-      String profileImageUrl = _existingImageUrl;
-      if (_imageFile != null) {
-        final storageRef = FirebaseStorage.instance.ref().child(
-          'Users/Profile/$_docId.jpg',
-        );
-        await storageRef.putFile(_imageFile!);
-        profileImageUrl = await storageRef.getDownloadURL();
-      }
-
-      // Update Firestore — edits go to secondary fields only
-      final Map<String, dynamic> updatedData = {
-        'secondaryEmail': _emailController.text.trim(),
-        'secondaryPhone': _phoneController.text.trim(),
-        'fullName': _nameController.text.trim(),
-        'bio': _bioController.text.trim(),
-        'dob': _dobController.text.trim(),
-        'profileImageUrl': profileImageUrl,
-        'isPublicProfile': _isPublicProfile,
-        'updatedAt': FieldValue.serverTimestamp(),
-      };
-
-      await FirebaseFirestore.instance
-          .collection('User')
-          .doc(_docId)
-          .update(updatedData);
-
-      // Update locally
-      await UserPreferences.saveUserProfile(
-        _nameController.text.trim(),
-        _phoneController.text.trim(),
-        _emailController.text.trim(),
-        _dobController.text.trim(),
-        _bioController.text.trim(),
-        profileImageUrl,
+    final user = _controller.rxUser.value;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User data not found")),
       );
-      await UserPreferences.setPublicProfile(_isPublicProfile);
+      return;
+    }
 
+    final updatedUser = user.copyWith(
+      fullName: _nameController.text.trim(),
+      secondaryPhone: _phoneController.text.trim(),
+      secondaryEmail: _emailController.text.trim(),
+      dob: _dobController.text.trim(),
+      bio: _bioController.text.trim(),
+    );
+
+    final success = await _controller.updateUserProfile(
+      updatedUser: updatedUser,
+      imageFile: _imageFile,
+    );
+
+    if (success) {
       if (!mounted) return;
-      setState(() => _isLoading = false);
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile updated successfully")),
       );
       Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error updating profile: $e")),
-      );
     }
   }
 
@@ -175,9 +132,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         centerTitle: false,
         actions: [
-          TextButton(
-            onPressed: _isLoading ? null : _saveProfile,
-            child: _isLoading
+          Obx(() => TextButton(
+            onPressed: _controller.isLoading.value ? null : _saveProfile,
+            child: _controller.isLoading.value
                 ? const SizedBox(
                     width: 20,
                     height: 20,
@@ -194,7 +151,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-          ),
+          ),)
         ],
       ),
       body: SingleChildScrollView(
@@ -229,10 +186,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 fit: BoxFit.cover,
                               ),
                             )
-                          : _existingImageUrl.isNotEmpty
+                          : Obx(() => _controller.profileImageUrl.isNotEmpty
                               ? ClipOval(
                                   child: CachedNetworkImage(
-                                    imageUrl: _existingImageUrl,
+                                    imageUrl: _controller.profileImageUrl,
                                     width: 100,
                                     height: 100,
                                     fit: BoxFit.cover,
@@ -251,7 +208,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     errorWidget: (_, __, ___) => _buildPlaceholderAvatar(),
                                   ),
                                 )
-                              : _buildPlaceholderAvatar(),
+                              : _buildPlaceholderAvatar()),
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -362,18 +319,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ],
                 ),
-                Switch(
-                  value: _isPublicProfile,
+                Obx(() => Switch(
+                  value: _controller.rxUser.value?.isPublicProfile ?? true,
                   onChanged: (value) {
-                    setState(() {
-                      _isPublicProfile = value;
-                    });
+                    final user = _controller.rxUser.value;
+                    if (user != null) {
+                      _controller.setUser(user.copyWith(isPublicProfile: value));
+                    }
                   },
                   activeColor: Colors.black,
                   activeTrackColor: _kGreen,
                   inactiveThumbColor: Colors.white54,
                   inactiveTrackColor: Colors.white.withOpacity(0.1),
-                ),
+                ),),
               ],
             ),
             const SizedBox(height: 40),

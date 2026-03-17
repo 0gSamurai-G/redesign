@@ -6,6 +6,8 @@ import 'package:redesign/view/USER/More/edit_profile.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:redesign/login.dart';
+import 'package:get/get.dart';
+import 'package:redesign/controller/user_profile_controller.dart';
 
 
 class AppColors {
@@ -25,7 +27,21 @@ class MoreScreen extends StatefulWidget {
 }
 
 class _MoreScreenState extends State<MoreScreen> {
+  final _controller = Get.find<UserProfileController>();
   bool darkMode = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final docId = await UserPreferences.getDocId();
+    if (docId != null) {
+      _controller.fetchUserProfile(docId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,135 +209,113 @@ class _MoreScreenState extends State<MoreScreen> {
 }
 
 
-class _ProfileHeader extends StatefulWidget {
+class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader();
 
   @override
-  State<_ProfileHeader> createState() => _ProfileHeaderState();
-}
-
-class _ProfileHeaderState extends State<_ProfileHeader> {
-  String _name = '';
-  String _imageUrl = '';
-  String _email = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfile();
-  }
-
-  Future<void> _loadProfile() async {
-    final name = await UserPreferences.getUserName();
-    final imageUrl = await UserPreferences.getProfileImageUrl();
-    final email = await UserPreferences.getUserEmail();
-    if (mounted) {
-      setState(() {
-        _name = name ?? 'User';
-        _imageUrl = imageUrl ?? '';
-        _email = email ?? '';
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          ClipOval(
-            child: _imageUrl.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: _imageUrl,
-                    width: 52,
-                    height: 52,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade800,
-                      highlightColor: Colors.grey.shade700,
-                      child: const CircleAvatar(radius: 26),
-                    ),
-                    errorWidget: (_, __, ___) => const CircleAvatar(
+    final _controller = Get.find<UserProfileController>();
+    return Obx(() {
+      final user = _controller.rxUser.value;
+      final name = user?.fullName ?? 'User';
+      final imageUrl = _controller.profileImageUrl;
+      final email = user?.primaryEmail ?? '';
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            ClipOval(
+              child: imageUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      width: 52,
+                      height: 52,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => Shimmer.fromColors(
+                        baseColor: Colors.grey.shade800,
+                        highlightColor: Colors.grey.shade700,
+                        child: const CircleAvatar(radius: 26),
+                      ),
+                      errorWidget: (_, __, ___) => const CircleAvatar(
+                        radius: 26,
+                        backgroundColor: Color(0xFF1A1A1A),
+                        child: Icon(Icons.person, color: Colors.white38),
+                      ),
+                    )
+                  : const CircleAvatar(
                       radius: 26,
                       backgroundColor: Color(0xFF1A1A1A),
                       child: Icon(Icons.person, color: Colors.white38),
                     ),
-                  )
-                : const CircleAvatar(
-                    radius: 26,
-                    backgroundColor: Color(0xFF1A1A1A),
-                    child: Icon(Icons.person, color: Colors.white38),
-                  ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        _name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 6),
+                      _Badge('ELITE'),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    email,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: AppColors.muted,
+                      fontSize: 12,
                     ),
-                    const SizedBox(width: 6),
-                    _Badge('ELITE'),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _email,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: AppColors.muted,
-                    fontSize: 12,
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                );
+              },
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                backgroundColor: AppColors.surface,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: Colors.white.withOpacity(0.15),
                   ),
                 ),
-              ],
-            ),
-          ),
-          TextButton(
-  onPressed: () async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-    );
-    _loadProfile(); // Refresh after returning from edit
-  },
-  style: TextButton.styleFrom(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    backgroundColor: AppColors.surface,
-    foregroundColor: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20),
-      side: BorderSide(
-        color: Colors.white.withOpacity(0.15),
-      ),
-    ),
-  ),
-  child: Text(
-    'Edit',
-    style: GoogleFonts.inter(
-      fontSize: 13,
-      fontWeight: FontWeight.w600,
-      letterSpacing: 0.2,
-    ),
-  ),
-)
-
-        ],
-      ),
-    );
+              ),
+              child: Text(
+                'Edit',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    });
   }
 }
 

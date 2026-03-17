@@ -3,9 +3,10 @@ import 'package:redesign/user_navigation.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
+import 'package:get/get.dart';
+import 'package:redesign/controller/user_profile_controller.dart';
+import 'package:redesign/model/user_profile_model.dart';
 
 const kSpotifyGreen = Color(0xFF1DB954);
 const kBg = Color(0xFF121212);
@@ -327,8 +328,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _dobController = TextEditingController();
   final _bioController = TextEditingController();
 
-  bool _isLoading = false;
-  bool _isPublicProfile = true;
+  final _controller = Get.put(UserProfileController());
 
   @override
   void initState() {
@@ -337,16 +337,15 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   }
 
   Future<void> _loadInitialData() async {
-    final name = await UserPreferences.getUserName();
-    final email = await UserPreferences.getUserEmail();
-    final phone = await UserPreferences.getUserPhone();
-
-    if (mounted) {
-      setState(() {
-        _nameController.text = name ?? '';
-        _emailController.text = email ?? '';
-        _phoneController.text = phone ?? '';
-      });
+    final docId = await UserPreferences.getDocId();
+    if (docId != null) {
+      await _controller.fetchUserProfile(docId);
+      final user = _controller.rxUser.value;
+      if (user != null && mounted) {
+        _nameController.text = user.fullName;
+        _emailController.text = user.primaryEmail;
+        _phoneController.text = user.primaryPhone;
+      }
     }
   }
 
@@ -382,80 +381,46 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final String docId = email.isNotEmpty ? email : phone;
 
-    try {
-      // 1. Determine Document ID (email or phone)
-      final email = _emailController.text.trim();
-      final phone = _phoneController.text.trim();
-      final String docId = email.isNotEmpty ? email : phone;
+    if (docId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("An email or phone number is required.")),
+      );
+      return;
+    }
 
-      if (docId.isEmpty) {
-        throw Exception("An email or phone number is required.");
-      }
+    final newUser = UserProfileModel(
+      docId: docId,
+      fullName: _nameController.text.trim(),
+      primaryEmail: email,
+      secondaryEmail: email,
+      primaryPhone: phone,
+      secondaryPhone: phone,
+      bio: _bioController.text.trim(),
+      dob: _dobController.text.trim(),
+      favoriteSports: widget.selectedSports,
+      isPublicProfile: _controller.rxUser.value?.isPublicProfile ?? true,
+    );
 
-      // 2. Upload Image if selected
-      String profileImageUrl = '';
-      if (_imageFile != null) {
-        final storageRef = FirebaseStorage.instance.ref().child(
-          'Users/Profile/$docId.jpg',
-        );
-        await storageRef.putFile(_imageFile!);
-        profileImageUrl = await storageRef.getDownloadURL();
-      }
+    final success = await _controller.updateUserProfile(
+      updatedUser: newUser,
+      imageFile: _imageFile,
+    );
 
-      // 3. Create/Update Firestore Document
-      final Map<String, dynamic> userData = {
-        'primaryEmail': email,
-        'secondaryEmail': email,
-        'primaryPhone': phone,
-        'secondaryPhone': phone,
-        'fullName': _nameController.text.trim(),
-        'bio': _bioController.text.trim(),
-        'dob': _dobController.text.trim(),
-        'profileImageUrl': profileImageUrl,
-        'isTrainer': false,
-        'favoriteSports': widget.selectedSports,
-        'isPublicProfile': _isPublicProfile,
-        'createdAt': FieldValue.serverTimestamp(),
-      };
-
-      await FirebaseFirestore.instance
-          .collection('User')
-          .doc(docId)
-          .set(userData, SetOptions(merge: true));
-
-      // 4. Save Locally
-      await UserPreferences.saveDocId(docId);
-      await UserPreferences.setPublicProfile(_isPublicProfile);
+    if (success) {
       await UserPreferences.saveFavoriteSports(widget.selectedSports);
       await UserPreferences.setTrainer(false);
-
-      await UserPreferences.saveUserProfile(
-        _nameController.text.trim(),
-        _phoneController.text.trim(),
-        _emailController.text.trim(),
-        _dobController.text.trim(),
-        _bioController.text.trim(),
-        profileImageUrl,
-      );
-
       await UserPreferences.setProfileComplete(true);
 
       if (!mounted) return;
-      setState(() => _isLoading = false);
-
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const UserAppNavShell()),
         (route) => false,
       );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error completing setup: $e")));
     }
   }
 
@@ -636,7 +601,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               onTap: () async {
                 final date = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+                  initialDate: DateTime.now().subtract(
+                    const Duration(days: 365 * 18),
+                  ),
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                   builder: (context, child) {
@@ -672,7 +639,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             ),
 
             const SizedBox(height: 20),
-            
+
             // Public Profile Toggle
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -698,17 +665,32 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                   ],
                 ),
-                Switch(
-                  value: _isPublicProfile,
-                  onChanged: (value) {
-                    setState(() {
-                      _isPublicProfile = value;
-                    });
-                  },
-                  activeColor: Colors.black,
-                  activeTrackColor: const Color(0xFF00FF7F),
-                  inactiveThumbColor: Colors.white54,
-                  inactiveTrackColor: Colors.white.withOpacity(0.1),
+                Obx(
+                  () => Switch(
+                    value: _controller.rxUser.value?.isPublicProfile ?? true,
+                    onChanged: (value) {
+                      final user = _controller.rxUser.value;
+                      if (user != null) {
+                        _controller.setUser(
+                          user.copyWith(isPublicProfile: value),
+                        );
+                      } else {
+                        // For first time setup, we might not have a model yet in RX
+                        // But we can create a temporary one or just use a local bool if it's easier.
+                        // Actually, I'll just create a dummy one with current values.
+                        _controller.setUser(
+                          UserProfileModel(
+                            docId: 'temp',
+                            isPublicProfile: value,
+                          ),
+                        );
+                      }
+                    },
+                    activeColor: Colors.black,
+                    activeTrackColor: const Color(0xFF00FF7F),
+                    inactiveThumbColor: Colors.white54,
+                    inactiveTrackColor: Colors.white.withOpacity(0.1),
+                  ),
                 ),
               ],
             ),
@@ -719,7 +701,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: _isLoading ? null : _completeSetup,
+                onPressed: () =>
+                    _controller.isLoading.value ? null : _completeSetup(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00FF7F), // bright neon green
                   shape: RoundedRectangleBorder(
@@ -727,16 +710,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                   elevation: 0,
                 ),
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.black)
-                    : const Text(
-                        'Complete Setup',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                child: Obx(
+                  () => _controller.isLoading.value
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : const Text(
+                          'Complete Setup',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
             const SizedBox(height: 24),

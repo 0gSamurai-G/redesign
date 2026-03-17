@@ -13,6 +13,8 @@ import 'package:redesign/togglemode.dart';
 import 'package:redesign/trainer_navigation.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:get/get.dart';
+import 'package:redesign/controller/user_profile_controller.dart';
 // enum AppMode { player, trainer }
 
 /* ============================================================
@@ -32,10 +34,9 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
+  final _controller = Get.find<UserProfileController>();
   AppMode _mode = AppMode.player;
-  String _firstName = '';
   bool _isTrainer = false;
-  String _profileImageUrl = '';
 
   @override
   void initState() {
@@ -44,15 +45,14 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
   Future<void> _loadUserData() async {
-    final name = await UserPreferences.getUserName();
     final isTrainer = await UserPreferences.getIsTrainer();
-    final imageUrl = await UserPreferences.getProfileImageUrl();
+    final docId = await UserPreferences.getDocId();
+    if (docId != null) {
+      _controller.fetchUserProfile(docId);
+    }
     if (mounted) {
       setState(() {
-        // Extract first name
-        _firstName = (name ?? 'User').split(' ').first;
         _isTrainer = isTrainer;
-        _profileImageUrl = imageUrl ?? '';
       });
     }
   }
@@ -68,11 +68,10 @@ class _UserHomePageState extends State<UserHomePage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(0, 0, 00, 80),
           children: [
-            _TopAppBar(profileImageUrl: _profileImageUrl),
+            _TopAppBar(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _HomeHeader(
-                firstName: _firstName,
                 isTrainer: _isTrainer,
                 mode: _mode,
                 onChanged: (m) {
@@ -110,13 +109,12 @@ class _UserHomePageState extends State<UserHomePage> {
    HOME HEADER (GREETING + TOGGLE)
    ============================================================ */
 class _HomeHeader extends StatelessWidget {
-  final String firstName;
   final bool isTrainer;
   final AppMode mode;
   final ValueChanged<AppMode> onChanged;
+  final _controller = Get.find<UserProfileController>();
 
-  const _HomeHeader({
-    required this.firstName,
+  _HomeHeader({
     required this.isTrainer,
     required this.mode,
     required this.onChanged,
@@ -145,32 +143,36 @@ class _HomeHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start, // ✅ FIX: Align to left
       children: [
         const SizedBox(height: 10),
-        RichText(
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: "Hey $firstName! 👋\n",
-                style: TextStyle(
-                  fontSize: width < 360 ? 16 : 20,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.1,
+        Obx(() {
+          final fullName = _controller.rxUser.value?.fullName ?? 'User';
+          final firstName = fullName.split(' ').first;
+          return RichText(
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: "Hey $firstName! 👋\n",
+                  style: TextStyle(
+                    fontSize: width < 360 ? 16 : 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    height: 1.1,
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: "Ready for some competition?",
-                style: TextStyle(
-                  fontSize: width < 360 ? 8 : 13,
-                  fontWeight: FontWeight.w500,
-                  color: UserHomePage.muted,
-                  height: 1.2,
+                TextSpan(
+                  text: "Ready for some competition?",
+                  style: TextStyle(
+                    fontSize: width < 360 ? 8 : 13,
+                    fontWeight: FontWeight.w500,
+                    color: UserHomePage.muted,
+                    height: 1.2,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
       ],
     );
   }
@@ -198,8 +200,7 @@ class _HomeHeader extends StatelessWidget {
    TOP APP BAR
    ============================================================ */
 class _TopAppBar extends StatelessWidget {
-  final String profileImageUrl;
-  const _TopAppBar({this.profileImageUrl = ''});
+  _TopAppBar();
 
   @override
   Widget build(BuildContext context) {
@@ -252,34 +253,38 @@ class _TopAppBar extends StatelessWidget {
           const SizedBox(width: 16),
 
           /// AVATAR
-          ClipOval(
-            child: profileImageUrl.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: profileImageUrl,
-                    width: width < 360 ? 32 : 36,
-                    height: width < 360 ? 32 : 36,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade800,
-                      highlightColor: Colors.grey.shade700,
-                      child: CircleAvatar(radius: width < 360 ? 16 : 18),
-                    ),
-                    errorWidget: (_, __, ___) => CircleAvatar(
+          Obx(() {
+            final profileImageUrl = _controller.profileImageUrl;
+            return ClipOval(
+              child: profileImageUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: profileImageUrl,
+                      width: width < 360 ? 32 : 36,
+                      height: width < 360 ? 32 : 36,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => Shimmer.fromColors(
+                        baseColor: Colors.grey.shade800,
+                        highlightColor: Colors.grey.shade700,
+                        child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                      ),
+                      errorWidget: (_, __, ___) => CircleAvatar(
+                        radius: width < 360 ? 16 : 18,
+                        backgroundColor: const Color(0xFF1A1A1A),
+                        child: const Icon(Icons.person, color: Colors.white38),
+                      ),
+                    )
+                  : CircleAvatar(
                       radius: width < 360 ? 16 : 18,
                       backgroundColor: const Color(0xFF1A1A1A),
                       child: const Icon(Icons.person, color: Colors.white38),
                     ),
-                  )
-                : CircleAvatar(
-                    radius: width < 360 ? 16 : 18,
-                    backgroundColor: const Color(0xFF1A1A1A),
-                    child: const Icon(Icons.person, color: Colors.white38),
-                  ),
-          ),
+            );
+          }),
         ],
       ),
     );
   }
+  final _controller = Get.find<UserProfileController>();
 }
 
 /* ============================================================

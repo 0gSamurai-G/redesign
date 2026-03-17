@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:redesign/view/USER/Home/home.dart';
 import 'package:redesign/view/USER/Book/turfdetails.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:get/get.dart';
+import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 
 /* ============================================================
@@ -22,7 +23,7 @@ class BookTurfScreen extends StatefulWidget {
 }
 
 class _BookTurfScreenState extends State<BookTurfScreen> {
-  String _profileImageUrl = '';
+  final _controller = Get.find<UserProfileController>();
 
   @override
   void initState() {
@@ -31,11 +32,9 @@ class _BookTurfScreenState extends State<BookTurfScreen> {
   }
 
   Future<void> _loadUserData() async {
-    final imageUrl = await UserPreferences.getProfileImageUrl();
-    if (mounted) {
-      setState(() {
-        _profileImageUrl = imageUrl ?? '';
-      });
+    final docId = await UserPreferences.getDocId();
+    if (docId != null) {
+      _controller.fetchUserProfile(docId);
     }
   }
 
@@ -50,7 +49,7 @@ class _BookTurfScreenState extends State<BookTurfScreen> {
         child: ListView(
           padding: const EdgeInsets.only(bottom: 80),
           children: [
-            _TopBar(profileImageUrl: _profileImageUrl),
+            const _TopBar(),
             const SizedBox(height: 14),
             const _SearchBar(),
             const SizedBox(height: 16),
@@ -78,11 +77,11 @@ class _BookTurfScreenState extends State<BookTurfScreen> {
    TOP BAR
    ============================================================ */
 class _TopBar extends StatelessWidget {
-  final String profileImageUrl;
-  const _TopBar({this.profileImageUrl = ''});
+  const _TopBar();
 
   @override
   Widget build(BuildContext context) {
+    final _controller = Get.find<UserProfileController>();
     final width = MediaQuery.of(context).size.width;
 
     return Padding(
@@ -132,30 +131,33 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 16),
 
           /// AVATAR
-          ClipOval(
-            child: profileImageUrl.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: profileImageUrl,
-                    width: width < 360 ? 32 : 36,
-                    height: width < 360 ? 32 : 36,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade800,
-                      highlightColor: Colors.grey.shade700,
-                      child: CircleAvatar(radius: width < 360 ? 16 : 18),
-                    ),
-                    errorWidget: (_, __, ___) => CircleAvatar(
+          Obx(() {
+            final profileImageUrl = _controller.profileImageUrl;
+            return ClipOval(
+              child: profileImageUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: profileImageUrl,
+                      width: width < 360 ? 32 : 36,
+                      height: width < 360 ? 32 : 36,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => Shimmer.fromColors(
+                        baseColor: Colors.grey.shade800,
+                        highlightColor: Colors.grey.shade700,
+                        child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                      ),
+                      errorWidget: (_, __, ___) => CircleAvatar(
+                        radius: width < 360 ? 16 : 18,
+                        backgroundColor: const Color(0xFF1A1A1A),
+                        child: const Icon(Icons.person, color: Colors.white38),
+                      ),
+                    )
+                  : CircleAvatar(
                       radius: width < 360 ? 16 : 18,
                       backgroundColor: const Color(0xFF1A1A1A),
                       child: const Icon(Icons.person, color: Colors.white38),
                     ),
-                  )
-                : CircleAvatar(
-                    radius: width < 360 ? 16 : 18,
-                    backgroundColor: const Color(0xFF1A1A1A),
-                    child: const Icon(Icons.person, color: Colors.white38),
-                  ),
-          ),
+            );
+          }),
         ],
       ),
     );

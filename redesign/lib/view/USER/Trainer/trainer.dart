@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:redesign/view/USER/Trainer/trainer_info.dart';
 import 'package:redesign/view/USER/Trainer/trainer_register.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:get/get.dart';
+import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 
 class AppColors {
@@ -44,8 +46,8 @@ class TrainerDiscoveryScreen extends StatefulWidget {
 }
 
 class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
+  final _controller = Get.find<UserProfileController>();
   bool showMyTrainers = true;
-  String _profileImageUrl = '';
 
   @override
   void initState() {
@@ -54,11 +56,9 @@ class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
   }
 
   Future<void> _loadUserData() async {
-    final imageUrl = await UserPreferences.getProfileImageUrl();
-    if (mounted) {
-      setState(() {
-        _profileImageUrl = imageUrl ?? '';
-      });
+    final docId = await UserPreferences.getDocId();
+    if (docId != null) {
+      _controller.fetchUserProfile(docId);
     }
   }
 
@@ -73,7 +73,7 @@ class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: _Header(profileImageUrl: _profileImageUrl),
+              child: const _Header(),
             ),
             SliverToBoxAdapter(
               child: TrainersToggle(
@@ -101,11 +101,11 @@ class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
 }
 
 class _Header extends StatelessWidget {
-  final String profileImageUrl;
-  const _Header({this.profileImageUrl = ''});
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
+    final _controller = Get.find<UserProfileController>();
     final width = MediaQuery.of(context).size.width;
 
     return Padding(
@@ -157,33 +157,37 @@ class _Header extends StatelessWidget {
               const SizedBox(width: 16),
 
               /// AVATAR
-              ClipOval(
-                child: profileImageUrl.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: profileImageUrl,
-                        width: width < 360 ? 32 : 36,
-                        height: width < 360 ? 32 : 36,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => Shimmer.fromColors(
-                          baseColor: Colors.grey.shade800,
-                          highlightColor: Colors.grey.shade700,
-                          child: CircleAvatar(radius: width < 360 ? 16 : 18),
-                        ),
-                        errorWidget: (_, __, ___) => CircleAvatar(
+              Obx(() {
+                final profileImageUrl = _controller.profileImageUrl;
+                return ClipOval(
+                  child: profileImageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: profileImageUrl,
+                          width: width < 360 ? 32 : 36,
+                          height: width < 360 ? 32 : 36,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Shimmer.fromColors(
+                            baseColor: Colors.grey.shade800,
+                            highlightColor: Colors.grey.shade700,
+                            child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                          ),
+                          errorWidget: (_, __, ___) => CircleAvatar(
+                            radius: width < 360 ? 16 : 18,
+                            backgroundColor: const Color(0xFF1A1A1A),
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.white38,
+                            ),
+                          ),
+                        )
+                      : CircleAvatar(
                           radius: width < 360 ? 16 : 18,
                           backgroundColor: const Color(0xFF1A1A1A),
-                          child: const Icon(
-                            Icons.person,
-                            color: Colors.white38,
-                          ),
+                          child:
+                              const Icon(Icons.person, color: Colors.white38),
                         ),
-                      )
-                    : CircleAvatar(
-                        radius: width < 360 ? 16 : 18,
-                        backgroundColor: const Color(0xFF1A1A1A),
-                        child: const Icon(Icons.person, color: Colors.white38),
-                      ),
-              ),
+                );
+              }),
             ],
           ),
           const SizedBox(height: 14),
