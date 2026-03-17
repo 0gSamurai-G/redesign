@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
 import 'play_game_card.dart';
 
 class AppColors {
@@ -12,8 +13,30 @@ class AppColors {
   static const accent = Color(0xFF1DB954);
 }
 
-class GameDiaryScreen extends StatelessWidget {
+class GameDiaryScreen extends StatefulWidget {
   const GameDiaryScreen({super.key});
+
+  @override
+  State<GameDiaryScreen> createState() => _GameDiaryScreenState();
+}
+
+class _GameDiaryScreenState extends State<GameDiaryScreen> {
+  String _profileImageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final imageUrl = await UserPreferences.getProfileImageUrl();
+    if (mounted) {
+      setState(() {
+        _profileImageUrl = imageUrl ?? '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +48,16 @@ class GameDiaryScreen extends StatelessWidget {
         bottom: false,
         child: ListView(
           children: [
-            _TopBar(),
-            _Tabs(),
-            SizedBox(height: 12),
-            _SportFilters(),
-            SizedBox(height: 22),
-            _DateSelector(),
-            SizedBox(height: 10),
-            _ActionRow(),
-            SizedBox(height: 12),
-            _GameList(),
+            _TopBar(profileImageUrl: _profileImageUrl),
+            const _Tabs(),
+            const SizedBox(height: 12),
+            const _SportFilters(),
+            const SizedBox(height: 22),
+            const _DateSelector(),
+            const SizedBox(height: 10),
+            const _ActionRow(),
+            const SizedBox(height: 12),
+            const _GameList(),
             // SizedBox(height: 24),
             const _EndOfResults(),
           ],
@@ -45,26 +68,84 @@ class GameDiaryScreen extends StatelessWidget {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar();
+  final String profileImageUrl;
+  const _TopBar({this.profileImageUrl = ''});
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          const Icon(Icons.location_on, color: AppColors.accent, size: 18),
+          Icon(
+            Icons.location_on,
+            color: AppColors.accent,
+            size: width < 360 ? 18 : 22,
+          ),
           const SizedBox(width: 6),
-          Text(
-            'Shivajinagar',
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
+
+          /// LOCATION TEXT + DROPDOWN ICON (Dynamic)
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    'Shivajinagar',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: width < 360 ? 14 : 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: Colors.white70,
+                  size: width < 360 ? 20 : 24,
+                ),
+              ],
             ),
           ),
-          const Icon(Icons.keyboard_arrow_down, color: Colors.white54),
-          const Spacer(),
-          const Icon(Icons.notifications_none, color: Colors.white),
+
+          const SizedBox(width: 8),
+
+          /// NOTIFICATIONS BELL
+          Icon(
+            Icons.notifications_none_rounded,
+            color: Colors.white,
+            size: width < 360 ? 20 : 24,
+          ),
+          const SizedBox(width: 16),
+
+          /// AVATAR
+          ClipOval(
+            child: profileImageUrl.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: profileImageUrl,
+                    width: width < 360 ? 32 : 36,
+                    height: width < 360 ? 32 : 36,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Shimmer.fromColors(
+                      baseColor: Colors.grey.shade800,
+                      highlightColor: Colors.grey.shade700,
+                      child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                    ),
+                    errorWidget: (_, __, ___) => CircleAvatar(
+                      radius: width < 360 ? 16 : 18,
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      child: const Icon(Icons.person, color: Colors.white38),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: width < 360 ? 16 : 18,
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    child: const Icon(Icons.person, color: Colors.white38),
+                  ),
+          ),
         ],
       ),
     );

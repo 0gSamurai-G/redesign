@@ -11,6 +11,7 @@ import 'package:redesign/view/USER/Home/Ranking/ranking.dart';
 import 'package:redesign/view/USER/Home/Scoreboard/scoreboards.dart';
 import 'package:redesign/togglemode.dart';
 import 'package:redesign/trainer_navigation.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
 import 'package:shimmer/shimmer.dart';
 // enum AppMode { player, trainer }
 
@@ -32,23 +33,47 @@ class UserHomePage extends StatefulWidget {
 
 class _UserHomePageState extends State<UserHomePage> {
   AppMode _mode = AppMode.player;
+  String _firstName = '';
+  bool _isTrainer = false;
+  String _profileImageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final name = await UserPreferences.getUserName();
+    final isTrainer = await UserPreferences.getIsTrainer();
+    final imageUrl = await UserPreferences.getProfileImageUrl();
+    if (mounted) {
+      setState(() {
+        // Extract first name
+        _firstName = (name ?? 'User').split(' ').first;
+        _isTrainer = isTrainer;
+        _profileImageUrl = imageUrl ?? '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
       backgroundColor: UserHomePage.bg,
-      // bottomNavigationBar: const _BottomNav(),
       body: SafeArea(
         top: true,
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(0, 0, 00, 80),
           children: [
-            _TopAppBar(),
+            _TopAppBar(profileImageUrl: _profileImageUrl),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _HomeHeader(
+                firstName: _firstName,
+                isTrainer: _isTrainer,
                 mode: _mode,
                 onChanged: (m) {
                   setState(() => _mode = m);
@@ -85,79 +110,86 @@ class _UserHomePageState extends State<UserHomePage> {
    HOME HEADER (GREETING + TOGGLE)
    ============================================================ */
 class _HomeHeader extends StatelessWidget {
+  final String firstName;
+  final bool isTrainer;
   final AppMode mode;
   final ValueChanged<AppMode> onChanged;
 
-  const _HomeHeader({required this.mode, required this.onChanged});
+  const _HomeHeader({
+    required this.firstName,
+    required this.isTrainer,
+    required this.mode,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// LEFT SIDE (Texts)
-            Expanded(
-              child: Column(
-                children: [
-                  SizedBox(height: 10),
-                  RichText(
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Hey Deepankar! 👋\n",
-                          style: TextStyle(
-                            fontSize: width < 360 ? 16 : 20,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            height: 1.1,
-                          ),
-                        ),
-                        TextSpan(
-                          text: "Ready for some competition?",
-                          style: TextStyle(
-                            fontSize: width < 360 ? 8 : 13,
-                            fontWeight: FontWeight.w500,
-                            color: UserHomePage.muted,
-                            height: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+    if (isTrainer) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: _greeting(width)),
+          const SizedBox(width: 20),
+          _toggle(),
+        ],
+      );
+    } else {
+      return _greeting(width);
+    }
+  }
+
+  Widget _greeting(double width) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // ✅ FIX: Align to left
+      children: [
+        const SizedBox(height: 10),
+        RichText(
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "Hey $firstName! 👋\n",
+                style: TextStyle(
+                  fontSize: width < 360 ? 16 : 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  height: 1.1,
+                ),
               ),
-            ),
-
-            const SizedBox(width: 20),
-
-            /// RIGHT SIDE (Toggle)
-            Flexible(
-              child: Column(
-                children: [
-                  SizedBox(height: 15),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 150,
-                      minWidth: 110,
-                    ),
-                    child: TrainerModePillToggle(
-                      mode: mode,
-                      onChanged: onChanged,
-                      compact: true,
-                    ),
-                  ),
-                ],
+              TextSpan(
+                text: "Ready for some competition?",
+                style: TextStyle(
+                  fontSize: width < 360 ? 8 : 13,
+                  fontWeight: FontWeight.w500,
+                  color: UserHomePage.muted,
+                  height: 1.2,
+                ),
               ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _toggle() {
+    return Flexible(
+      child: Column(
+        children: [
+          const SizedBox(height: 15),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 150, minWidth: 110),
+            child: TrainerModePillToggle(
+              mode: mode,
+              onChanged: onChanged,
+              compact: true,
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -166,7 +198,8 @@ class _HomeHeader extends StatelessWidget {
    TOP APP BAR
    ============================================================ */
 class _TopAppBar extends StatelessWidget {
-  const _TopAppBar();
+  final String profileImageUrl;
+  const _TopAppBar({this.profileImageUrl = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -179,37 +212,69 @@ class _TopAppBar extends StatelessWidget {
           Icon(
             Icons.location_on,
             color: BookTurfScreen.accent,
-            size: width < 360 ? 18 : 22, // responsive icon size
+            size: width < 360 ? 18 : 22,
           ),
           const SizedBox(width: 6),
 
-          /// LOCATION TEXT (RESPONSIVE + SAFE)
+          /// LOCATION TEXT + DROPDOWN ICON together
           Expanded(
-            child: Text(
-              'Shivajinagar',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: width < 360 ? 14 : 16,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    'Shivajinagar',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: width < 360 ? 14 : 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: Colors.white70,
+                  size: width < 360 ? 20 : 24,
+                ),
+              ],
             ),
           ),
 
-          Icon(
-            Icons.keyboard_arrow_down,
-            color: Colors.white70,
-            size: width < 360 ? 20 : 24,
-          ),
           const SizedBox(width: 8),
 
-          /// AVATAR (FIXED, NO OVERFLOW)
-          CircleAvatar(
-            radius: width < 360 ? 16 : 18,
-            backgroundImage: const NetworkImage(
-              'https://i.pravatar.cc/150?img=8',
-            ),
+          /// NOTIFICATIONS BELL
+          Icon(
+            Icons.notifications_none_rounded,
+            color: Colors.white,
+            size: width < 360 ? 20 : 24,
+          ),
+          const SizedBox(width: 16),
+
+          /// AVATAR
+          ClipOval(
+            child: profileImageUrl.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: profileImageUrl,
+                    width: width < 360 ? 32 : 36,
+                    height: width < 360 ? 32 : 36,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Shimmer.fromColors(
+                      baseColor: Colors.grey.shade800,
+                      highlightColor: Colors.grey.shade700,
+                      child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                    ),
+                    errorWidget: (_, __, ___) => CircleAvatar(
+                      radius: width < 360 ? 16 : 18,
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      child: const Icon(Icons.person, color: Colors.white38),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: width < 360 ? 16 : 18,
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    child: const Icon(Icons.person, color: Colors.white38),
+                  ),
           ),
         ],
       ),

@@ -235,6 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
         await UserPreferences.setPublicProfile(data['isPublicProfile'] ?? true);
+        await UserPreferences.setTrainer(data['isTrainer'] ?? false);
         await UserPreferences.setProfileComplete(true);
         return true;
       }
@@ -862,6 +863,7 @@ class _PhoneLoginSheetState extends State<PhoneLoginSheet> with CodeAutoFill {
           );
         }
         await UserPreferences.setPublicProfile(data['isPublicProfile'] ?? true);
+        await UserPreferences.setTrainer(data['isTrainer'] ?? false);
         await UserPreferences.setProfileComplete(true);
         return true;
       }

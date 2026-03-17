@@ -429,6 +429,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       await UserPreferences.saveDocId(docId);
       await UserPreferences.setPublicProfile(_isPublicProfile);
       await UserPreferences.saveFavoriteSports(widget.selectedSports);
+      await UserPreferences.setTrainer(false);
 
       await UserPreferences.saveUserProfile(
         _nameController.text.trim(),

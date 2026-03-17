@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:redesign/view/USER/Trainer/trainer_info.dart';
 import 'package:redesign/view/USER/Trainer/trainer_register.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
 
 class AppColors {
   static const bg = Color(0xFF000000);
@@ -44,6 +45,22 @@ class TrainerDiscoveryScreen extends StatefulWidget {
 
 class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
   bool showMyTrainers = true;
+  String _profileImageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final imageUrl = await UserPreferences.getProfileImageUrl();
+    if (mounted) {
+      setState(() {
+        _profileImageUrl = imageUrl ?? '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +72,9 @@ class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
         bottom: false,
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(child: _Header()),
+            SliverToBoxAdapter(
+              child: _Header(profileImageUrl: _profileImageUrl),
+            ),
             SliverToBoxAdapter(
               child: TrainersToggle(
                 isMyTrainers: showMyTrainers,
@@ -82,28 +101,89 @@ class _TrainerDiscoveryScreenState extends State<TrainerDiscoveryScreen> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header();
+  final String profileImageUrl;
+  const _Header({this.profileImageUrl = ''});
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.location_on, color: Colors.white, size: 18),
+              Icon(
+                Icons.location_on,
+                color: AppColors.accent,
+                size: width < 360 ? 18 : 22,
+              ),
               const SizedBox(width: 6),
-              Text(
-                'Shivajinagar',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+
+              /// LOCATION TEXT + DROPDOWN ICON (Dynamic)
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Shivajinagar',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: width < 360 ? 14 : 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Colors.white70,
+                      size: width < 360 ? 20 : 24,
+                    ),
+                  ],
                 ),
               ),
-              const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-              const Spacer(),
-              const Icon(Icons.notifications_none, color: Colors.white),
+
+              const SizedBox(width: 8),
+
+              /// NOTIFICATIONS BELL
+              Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+                size: width < 360 ? 20 : 24,
+              ),
+              const SizedBox(width: 16),
+
+              /// AVATAR
+              ClipOval(
+                child: profileImageUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: profileImageUrl,
+                        width: width < 360 ? 32 : 36,
+                        height: width < 360 ? 32 : 36,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Shimmer.fromColors(
+                          baseColor: Colors.grey.shade800,
+                          highlightColor: Colors.grey.shade700,
+                          child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                        ),
+                        errorWidget: (_, __, ___) => CircleAvatar(
+                          radius: width < 360 ? 16 : 18,
+                          backgroundColor: const Color(0xFF1A1A1A),
+                          child: const Icon(
+                            Icons.person,
+                            color: Colors.white38,
+                          ),
+                        ),
+                      )
+                    : CircleAvatar(
+                        radius: width < 360 ? 16 : 18,
+                        backgroundColor: const Color(0xFF1A1A1A),
+                        child: const Icon(Icons.person, color: Colors.white38),
+                      ),
+              ),
             ],
           ),
           const SizedBox(height: 14),

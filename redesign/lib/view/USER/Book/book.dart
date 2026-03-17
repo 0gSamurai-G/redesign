@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
 
 /* ============================================================
    BOOK TURF SCREEN
    ============================================================ */
-class BookTurfScreen extends StatelessWidget {
+class BookTurfScreen extends StatefulWidget {
   const BookTurfScreen({super.key});
 
   static const bg = Color(0xFF000000);
@@ -13,31 +16,53 @@ class BookTurfScreen extends StatelessWidget {
   static const muted = Color(0xFFB3B3B3);
 
   @override
+  State<BookTurfScreen> createState() => _BookTurfScreenState();
+}
+
+class _BookTurfScreenState extends State<BookTurfScreen> {
+  String _profileImageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final imageUrl = await UserPreferences.getProfileImageUrl();
+    if (mounted) {
+      setState(() {
+        _profileImageUrl = imageUrl ?? '';
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: BookTurfScreen.bg,
       extendBody: true,
       body: SafeArea(
         top: true,
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
-          children: const [
-            _TopBar(),
-            SizedBox(height: 14),
-            _SearchBar(),
-            SizedBox(height: 16),
-            _SportFilters(),
-            SizedBox(height: 28),
-            _SectionHeader(title: 'Trending Near You'),
-            SizedBox(height: 14),
-            _TrendingList(),
-            SizedBox(height: 16),
-            _FilterRow(),
-            SizedBox(height: 28),
-            _SectionHeader(title: 'Available Turfs'),
-            SizedBox(height: 14),
-            _AvailableTurfsList(),
+          children: [
+            _TopBar(profileImageUrl: _profileImageUrl),
+            const SizedBox(height: 14),
+            const _SearchBar(),
+            const SizedBox(height: 16),
+            const _SportFilters(),
+            const SizedBox(height: 28),
+            const _SectionHeader(title: 'Trending Near You'),
+            const SizedBox(height: 14),
+            const _TrendingList(),
+            const SizedBox(height: 16),
+            const _FilterRow(),
+            const SizedBox(height: 28),
+            const _SectionHeader(title: 'Available Turfs'),
+            const SizedBox(height: 14),
+            const _AvailableTurfsList(),
           ],
         ),
       ),
@@ -49,27 +74,84 @@ class BookTurfScreen extends StatelessWidget {
    TOP BAR
    ============================================================ */
 class _TopBar extends StatelessWidget {
-  const _TopBar();
+  final String profileImageUrl;
+  const _TopBar({this.profileImageUrl = ''});
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Padding(
-      padding: const EdgeInsets.only(right: 20,left: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          const Icon(Icons.location_on, color: BookTurfScreen.accent),
+          Icon(
+            Icons.location_on,
+            color: BookTurfScreen.accent,
+            size: width < 360 ? 18 : 22,
+          ),
           const SizedBox(width: 6),
-          Text(
-            'Shivajinagar',
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+
+          /// LOCATION TEXT + DROPDOWN ICON (Dynamic)
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    'Shivajinagar',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: width < 360 ? 14 : 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: Colors.white70,
+                  size: width < 360 ? 20 : 24,
+                ),
+              ],
             ),
           ),
-          const Icon(Icons.keyboard_arrow_down, color: BookTurfScreen.muted),
-          const Spacer(),
-          const Icon(Icons.notifications_none, color: Colors.white),
+
+          const SizedBox(width: 8),
+
+          /// NOTIFICATIONS BELL
+          Icon(
+            Icons.notifications_none_rounded,
+            color: Colors.white,
+            size: width < 360 ? 20 : 24,
+          ),
+          const SizedBox(width: 16),
+
+          /// AVATAR
+          ClipOval(
+            child: profileImageUrl.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: profileImageUrl,
+                    width: width < 360 ? 32 : 36,
+                    height: width < 360 ? 32 : 36,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Shimmer.fromColors(
+                      baseColor: Colors.grey.shade800,
+                      highlightColor: Colors.grey.shade700,
+                      child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                    ),
+                    errorWidget: (_, __, ___) => CircleAvatar(
+                      radius: width < 360 ? 16 : 18,
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      child: const Icon(Icons.person, color: Colors.white38),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: width < 360 ? 16 : 18,
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    child: const Icon(Icons.person, color: Colors.white38),
+                  ),
+          ),
         ],
       ),
     );

@@ -12,6 +12,7 @@ class UserPreferences {
   static const String _keyProfileImageUrl = 'profileImageUrl';
   static const String _keyDocId = 'docId';
   static const String _keyIsPublicProfile = 'isPublicProfile';
+  static const String _keyIsTrainer = 'isTrainer';
 
   static Future<void> saveUserLogin(
     bool isLoggedIn,
@@ -52,6 +53,7 @@ class UserPreferences {
     await prefs.remove(_keyProfileImageUrl);
     await prefs.remove(_keyDocId);
     await prefs.remove(_keyIsPublicProfile);
+    await prefs.remove(_keyIsTrainer);
   }
 
   // Profile setup status
@@ -134,5 +136,16 @@ class UserPreferences {
   static Future<bool> isPublicProfile() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_keyIsPublicProfile) ?? true; // Default to true
+  }
+
+  // Is Trainer
+  static Future<void> setTrainer(bool isTrainer) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyIsTrainer, isTrainer);
+  }
+
+  static Future<bool> getIsTrainer() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyIsTrainer) ?? false;
   }
 }
