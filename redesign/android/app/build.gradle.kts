@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,6 +8,12 @@ plugins {
     id("com.google.gms.google-services")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+val dotenv = Properties()
+val envFile = project.rootProject.file("../.env")
+if (envFile.exists()) {
+    dotenv.load(FileInputStream(envFile))
 }
 
 android {
@@ -26,10 +35,11 @@ android {
         applicationId = "com.example.redesign"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["google_maps_api_key"] = dotenv.getProperty("GOOGLE_MAPS_API_KEY", "") as String
     }
 
     buildTypes {
