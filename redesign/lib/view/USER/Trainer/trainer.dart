@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
 import 'package:redesign/view/maps_setup.dart';
+import 'package:redesign/controller/maps_controller.dart';
 
 class AppColors {
   static const bg = Color(0xFF000000);
@@ -134,16 +135,26 @@ class _Header extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Flexible(
-                        child: Text(
-                          'Shivajinagar',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: width < 360 ? 14 : 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: Obx(() {
+                          final mapsCtrl = Get.find<MapsController>();
+                          final city = mapsCtrl.displayCity.value;
+                          final locality = mapsCtrl.displayLocality.value;
+                          final displayText = locality.isNotEmpty
+                              ? locality
+                              : city.isNotEmpty
+                                  ? city
+                                  : 'Select Location';
+                          return Text(
+                            displayText,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: width < 360 ? 14 : 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
+                        }),
                       ),
                       Icon(
                         Icons.keyboard_arrow_down_rounded,

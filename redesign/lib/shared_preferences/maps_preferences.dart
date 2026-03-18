@@ -54,7 +54,13 @@ class MapsPreferences {
     list.insert(0, location);
     // Cap at 10
     if (list.length > 10) list.removeRange(10, list.length);
-    await _saveRecentLocations(list);
+    await saveRecentLocations(list);
+  }
+
+  static Future<void> removeRecentLocation(LocationData location) async {
+    final list = await getRecentLocations();
+    list.removeWhere((l) => l.lat == location.lat && l.lng == location.lng);
+    await saveRecentLocations(list);
   }
 
   static Future<List<LocationData>> getRecentLocations() async {
@@ -65,7 +71,7 @@ class MapsPreferences {
     return decoded.map((e) => LocationData.fromMap(e)).toList();
   }
 
-  static Future<void> _saveRecentLocations(List<LocationData> locations) async {
+  static Future<void> saveRecentLocations(List<LocationData> locations) async {
     final prefs = await SharedPreferences.getInstance();
     final encoded = json.encode(locations.map((l) => l.toMap()).toList());
     await prefs.setString(_keyRecentLocations, encoded);
@@ -94,6 +100,12 @@ class MapsPreferences {
       list.removeWhere((l) => l.label == location.label);
     }
     list.add(location);
+    await saveLabeledLocations(list);
+  }
+
+  static Future<void> removeLabeledLocation(LocationData location) async {
+    final list = await getLabeledLocations();
+    list.removeWhere((l) => l.lat == location.lat && l.lng == location.lng);
     await saveLabeledLocations(list);
   }
 

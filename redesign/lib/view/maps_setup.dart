@@ -177,6 +177,26 @@ class _LocationSelectSliverScreenState
                             icon: icons[loc.label] ?? Icons.location_on_outlined,
                             title: loc.label ?? 'Saved',
                             subtitle: loc.fullAddress,
+                            onEdit: () {
+                              _mapsCtrl.currentLocation.value = loc;
+                              _mapsCtrl.displayCity.value = loc.city;
+                              _mapsCtrl.displayLocality.value = loc.subLocality;
+                              _mapsCtrl.displayLandmark.value = loc.landmark;
+                              _mapsCtrl.displayAddress.value = loc.fullAddress;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MapPickerScreen(),
+                                ),
+                              ).then((_) {
+                                _mapsCtrl.recentLocations.refresh();
+                                _mapsCtrl.labeledLocations.refresh();
+                              });
+                            },
+                            onDelete: () {
+                              HapticFeedback.mediumImpact();
+                              _mapsCtrl.removeSavedLocation(loc, isRecent: false);
+                            },
                           ),
                         ),
                       );
@@ -226,6 +246,26 @@ class _LocationSelectSliverScreenState
                                 : loc.city,
                             subtitle: loc.fullAddress,
                             tag: "RECENT",
+                            onEdit: () {
+                              _mapsCtrl.currentLocation.value = loc;
+                              _mapsCtrl.displayCity.value = loc.city;
+                              _mapsCtrl.displayLocality.value = loc.subLocality;
+                              _mapsCtrl.displayLandmark.value = loc.landmark;
+                              _mapsCtrl.displayAddress.value = loc.fullAddress;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MapPickerScreen(),
+                                ),
+                              ).then((_) {
+                                _mapsCtrl.recentLocations.refresh();
+                                _mapsCtrl.labeledLocations.refresh();
+                              });
+                            },
+                            onDelete: () {
+                              HapticFeedback.mediumImpact();
+                              _mapsCtrl.removeSavedLocation(loc, isRecent: true);
+                            },
                           ),
                         ),
                       );
@@ -402,6 +442,7 @@ class _LocationSelectSliverScreenState
     _mapsCtrl.displayAddress.value = loc.fullAddress;
     _mapsCtrl.isLocationResolved.value = true;
     MapsPreferences.saveCurrentLocation(loc);
+    _mapsCtrl.saveLocationToFirebase(loc);
     Navigator.pop(context);
   }
 
@@ -422,6 +463,7 @@ class _LocationSelectSliverScreenState
     _mapsCtrl.displayAddress.value = place.address;
     _mapsCtrl.isLocationResolved.value = true;
     MapsPreferences.saveCurrentLocation(loc);
+    _mapsCtrl.saveLocationToFirebase(loc);
     Navigator.pop(context);
   }
 }
@@ -618,6 +660,8 @@ class LocationTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final String? tag;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const LocationTile({
     super.key,
@@ -625,6 +669,8 @@ class LocationTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.tag,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -704,6 +750,45 @@ class LocationTile extends StatelessWidget {
               ],
             ),
           ),
+          if (onEdit != null || onDelete != null)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: Colors.white54, size: 20),
+              color: kSurface,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Colors.white12)),
+              onSelected: (val) {
+                if (val == 'edit') {
+                  onEdit?.call();
+                } else if (val == 'delete') {
+                  onDelete?.call();
+                }
+              },
+              itemBuilder: (context) => [
+                if (onEdit != null)
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit_outlined, color: kSpotifyGreen, size: 18),
+                        SizedBox(width: 10),
+                        Text('Edit', style: TextStyle(color: Colors.white, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                if (onDelete != null)
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                        SizedBox(width: 10),
+                        Text('Delete', style: TextStyle(color: Colors.white, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
         ],
       ),
     );

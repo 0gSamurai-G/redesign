@@ -6,9 +6,11 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:redesign/model/maps_model.dart';
 import 'package:redesign/shared_preferences/maps_preferences.dart';
+import 'package:redesign/shared_preferences/userPreferences.dart';
 
 class MapsController extends GetxController {
   // ─── API Key ────────────────────────────────────────────────
@@ -57,6 +59,9 @@ class MapsController extends GetxController {
     if (saved != null) {
       currentLocation.value = saved;
       _updateDisplayFields(saved);
+    } else {
+      // Fallback to fetch from Firebase if nothing is cached
+      await fetchLocationFromFirebase();
     }
     recentLocations.value = await MapsPreferences.getRecentLocations();
     labeledLocations.value = await MapsPreferences.getLabeledLocations();
@@ -285,6 +290,101 @@ class MapsController extends GetxController {
     }
   }
 
+  // ─── Firebase Location Sync ─────────────────────────────────
+  Future<void> saveLocationToFirebase(LocationData location) async {
+    try {
+      final docId = await UserPreferences.getDocId();
+      if (docId == null || docId.isEmpty) return;
+
+      final labeled = await MapsPreferences.getLabeledLocations();
+      final labeledMaps = labeled.map((e) => e.toMap()).toList();
+
+      final recents = await MapsPreferences.getRecentLocations();
+      final recentsMaps = recents.map((e) => e.toMap()).toList();
+
+      await FirebaseFirestore.instance
+          .collection('User')
+          .doc(docId)
+          .set({
+        'current_location': location.toMap(),
+        'saved_locations': labeledMaps,
+        'recent_locations': recentsMaps,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error saving location arrays to Firebase: $e');
+    }
+  }
+
+  Future<void> fetchLocationFromFirebase() async {
+    try {
+      final docId = await UserPreferences.getDocId();
+      if (docId == null || docId.isEmpty) return;
+
+      final doc = await FirebaseFirestore.instance
+          .collection('User')
+          .doc(docId)
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        
+        // 1. Restore Current Location
+        if (data.containsKey('current_location')) {
+          final locData = LocationData.fromMap(data['current_location'] as Map<String, dynamic>);
+          currentLocation.value = locData;
+          _updateDisplayFields(locData);
+          await MapsPreferences.saveCurrentLocation(locData);
+        } else if (data.containsKey('location')) {
+          // Fallback reading old location object
+          final locData = LocationData.fromMap(data['location'] as Map<String, dynamic>);
+          currentLocation.value = locData;
+          _updateDisplayFields(locData);
+          await MapsPreferences.saveCurrentLocation(locData);
+        }
+
+        // 2. Restore Saved (Labeled) Locations
+        if (data.containsKey('saved_locations')) {
+          final list = data['saved_locations'] as List<dynamic>;
+          final parsedList = list.map((e) => LocationData.fromMap(e as Map<String, dynamic>)).toList();
+          labeledLocations.value = parsedList;
+          await MapsPreferences.saveLabeledLocations(parsedList);
+        }
+
+        // 3. Restore Recent Locations
+        if (data.containsKey('recent_locations')) {
+          final list = data['recent_locations'] as List<dynamic>;
+          final parsedList = list.map((e) => LocationData.fromMap(e as Map<String, dynamic>)).toList();
+          recentLocations.value = parsedList;
+          await MapsPreferences.saveRecentLocations(parsedList);
+        }
+      }
+    } catch (e) {
+      print('Error fetching location arrays from Firebase: $e');
+    }
+  }
+
+  // ─── Remove Saved/Recent Location ───────────────────────────
+  Future<void> removeSavedLocation(LocationData location, {bool isRecent = false}) async {
+    if (isRecent) {
+      await MapsPreferences.removeRecentLocation(location);
+      recentLocations.value = await MapsPreferences.getRecentLocations();
+    } else {
+      await MapsPreferences.removeLabeledLocation(location);
+      labeledLocations.value = await MapsPreferences.getLabeledLocations();
+    }
+    
+    // Automatically sync over to Firebase so the deletion is reflected
+    LocationData? fallbackLocation = currentLocation.value ?? 
+        (labeledLocations.isNotEmpty ? labeledLocations.first : null);
+        
+    if (fallbackLocation != null) {
+      await saveLocationToFirebase(fallbackLocation);
+    } else {
+      // If we have no locations left, save an empty dummy to force Firebase lists to clear
+      await saveLocationToFirebase(location);
+    }
+  }
+
   // ─── Confirm Location ───────────────────────────────────────
   Future<void> confirmLocation({String? label}) async {
     if (currentLocation.value == null) return;
@@ -314,6 +414,9 @@ class MapsController extends GetxController {
     recentLocations.value = await MapsPreferences.getRecentLocations();
     currentLocation.value = location;
     _updateDisplayFields(location);
+
+    // Automatically sync over to Firebase
+    await saveLocationToFirebase(location);
   }
 
   // ─── Use Current Location Button ────────────────────────────

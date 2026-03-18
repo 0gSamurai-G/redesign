@@ -6,6 +6,8 @@ import 'package:shimmer/shimmer.dart';
 import 'package:get/get.dart';
 import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
+import 'package:redesign/view/maps_setup.dart';
+import 'package:redesign/controller/maps_controller.dart';
 
 /* ============================================================
    BOOK TURF SCREEN
@@ -88,35 +90,53 @@ class _TopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Icon(
-            Icons.location_on,
-            color: BookTurfScreen.accent,
-            size: width < 360 ? 18 : 22,
-          ),
-          const SizedBox(width: 6),
-
           /// LOCATION TEXT + DROPDOWN ICON (Dynamic)
           Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text(
-                    'Shivajinagar',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: width < 360 ? 14 : 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const LocationSelectSliverScreen(),
                   ),
-                ),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: Colors.white70,
-                  size: width < 360 ? 20 : 24,
-                ),
-              ],
+                );
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: BookTurfScreen.accent,
+                    size: width < 360 ? 18 : 22,
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Obx(() {
+                      final mapsCtrl = Get.find<MapsController>();
+                      final city = mapsCtrl.displayCity.value;
+                      final locality = mapsCtrl.displayLocality.value;
+                      final displayText = locality.isNotEmpty
+                          ? locality
+                          : city.isNotEmpty
+                              ? city
+                              : 'Select Location';
+                      return Text(
+                        displayText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: width < 360 ? 14 : 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      );
+                    }),
+                  ),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.white70,
+                    size: width < 360 ? 20 : 24,
+                  ),
+                ],
+              ),
             ),
           ),
 
