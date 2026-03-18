@@ -338,7 +338,7 @@ class _TrendingList extends StatelessWidget {
       'Smash Badminton',
       '4.8',
       '1.8km',
-      'https://images.unsplash.com/photo-1599058917212-d750089bc07c',
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018',
     ),
   ];
 
@@ -541,7 +541,7 @@ class _AvailableTurfsList extends StatelessWidget {
       location: 'Narhe, Pune',
       price: 1000,
       images: [
-        'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+        'https://images.unsplash.com/photo-1529900948632-6aed3065b756',
         'https://images.unsplash.com/photo-1546519638-68e109498ffc',
       ],
     ),
@@ -560,7 +560,7 @@ class _AvailableTurfsList extends StatelessWidget {
       price: 900,
       images: [
         'https://images.unsplash.com/photo-1546519638-68e109498ffc',
-        'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+        'https://images.unsplash.com/photo-1529900948632-6aed3065b756',
       ],
     ),
   ];

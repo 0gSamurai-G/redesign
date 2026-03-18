@@ -7,6 +7,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:get/get.dart';
 import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
+import 'package:redesign/view/maps_setup.dart';
 
 class AppColors {
   static const bg = Color(0xFF000000);
@@ -114,35 +115,43 @@ class _Header extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.location_on,
-                color: AppColors.accent,
-                size: width < 360 ? 18 : 22,
-              ),
-              const SizedBox(width: 6),
-
               /// LOCATION TEXT + DROPDOWN ICON (Dynamic)
               Expanded(
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Shivajinagar',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: width < 360 ? 14 : 16,
-                          fontWeight: FontWeight.w600,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const LocationSelectSliverScreen(),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        color: AppColors.accent,
+                        size: width < 360 ? 18 : 22,
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Shivajinagar',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: width < 360 ? 14 : 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Colors.white70,
-                      size: width < 360 ? 20 : 24,
-                    ),
-                  ],
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Colors.white70,
+                        size: width < 360 ? 20 : 24,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

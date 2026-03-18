@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
+import 'package:redesign/view/maps_setup.dart';
 
 /* ============================================================
    BOOK TURF SCREEN
@@ -85,35 +86,43 @@ class _TopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Icon(
-            Icons.location_on,
-            color: BookTurfScreen.accent,
-            size: width < 360 ? 18 : 22,
-          ),
-          const SizedBox(width: 6),
-
           /// LOCATION TEXT + DROPDOWN ICON (Dynamic)
           Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text(
-                    'Shivajinagar',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: width < 360 ? 14 : 16,
-                      fontWeight: FontWeight.w600,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const LocationSelectSliverScreen(),
+                  ),
+                );
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: BookTurfScreen.accent,
+                    size: width < 360 ? 18 : 22,
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'Shivajinagar',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: width < 360 ? 14 : 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: Colors.white70,
-                  size: width < 360 ? 20 : 24,
-                ),
-              ],
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.white70,
+                    size: width < 360 ? 20 : 24,
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -296,7 +305,7 @@ class _TrendingList extends StatelessWidget {
     _TrendingData('Pro Cricket Arena', '4.7', '3.5km',
         'https://images.unsplash.com/photo-1521412644187-c49fa049e84d'),
     _TrendingData('Smash Badminton', '4.8', '1.8km',
-        'https://images.unsplash.com/photo-1599058917212-d750089bc07c'),
+        'https://images.unsplash.com/photo-1574629810360-7efbbe195018'),
   ];
 
   @override
@@ -421,7 +430,7 @@ class _AvailableTurfsList extends StatelessWidget {
       location: 'Narhe, Pune',
       price: 1000,
       images: [
-        'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+        'https://images.unsplash.com/photo-1529900948632-6aed3065b756',
         'https://images.unsplash.com/photo-1546519638-68e109498ffc',
       ],
     ),

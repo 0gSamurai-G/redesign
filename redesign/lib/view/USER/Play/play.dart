@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:redesign/shared_preferences/userPreferences.dart';
+import 'package:redesign/view/maps_setup.dart';
 import 'play_game_card.dart';
 
 class AppColors {
@@ -79,35 +80,43 @@ class _TopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Icon(
-            Icons.location_on,
-            color: AppColors.accent,
-            size: width < 360 ? 18 : 22,
-          ),
-          const SizedBox(width: 6),
-
           /// LOCATION TEXT + DROPDOWN ICON (Dynamic)
           Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text(
-                    'Shivajinagar',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: width < 360 ? 14 : 16,
-                      fontWeight: FontWeight.w600,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const LocationSelectSliverScreen(),
+                  ),
+                );
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: AppColors.accent,
+                    size: width < 360 ? 18 : 22,
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'Shivajinagar',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: width < 360 ? 14 : 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: Colors.white70,
-                  size: width < 360 ? 20 : 24,
-                ),
-              ],
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.white70,
+                    size: width < 360 ? 20 : 24,
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -695,7 +704,7 @@ class _EndOfResults extends StatelessWidget {
   const _EndOfResults();
 
   static const _illustrationUrl =
-      'https://illustrations.popsy.co/gray/sporty-man.svg';
+      'https://images.unsplash.com/photo-1517836357463-d25dfeac3438';
 
   @override
   Widget build(BuildContext context) {
