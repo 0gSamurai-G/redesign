@@ -26,8 +26,7 @@ class FriendsHubScreen extends StatelessWidget {
             const _FriendsAppBar(),
             SliverToBoxAdapter(child: _SearchAndFilters()),
             SliverToBoxAdapter(child: _OnlineNowSection()),
-            SliverToBoxAdapter(child: _FriendsListSection()), // 👈 ADD THIS
-            SliverToBoxAdapter(child: _RequestsSection()),
+            SliverToBoxAdapter(child: _MessagesListSection()),
             SliverToBoxAdapter(child: _BuildSquadCTA()),
             SliverToBoxAdapter(child: _SuggestedPlayersSection()),
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
@@ -69,15 +68,6 @@ class _FriendsAppBar extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
-              onPressed: () {},
-            ),
-            const CircleAvatar(
-              radius: 18,
-              backgroundImage:
-                  NetworkImage('https://randomuser.me/api/portraits/men/32.jpg'),
-            ),
           ],
         ),
       ),
@@ -109,44 +99,7 @@ class _SearchAndFilters extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: const [
-                _FilterChip('All', active: true),
-                _FilterChip('Online'),
-                _FilterChip('Nearby'),
-                _FilterChip('Requests (2)'),
-              ],
-            ),
-          ),
         ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool active;
-
-  const _FilterChip(this.label, {this.active = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: active,
-        selectedColor: kGreen,
-        backgroundColor: kSurface,
-        labelStyle: TextStyle(
-          color: active ? Colors.black : Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
-        onSelected: (_) {},
       ),
     );
   }
@@ -156,17 +109,37 @@ class _FilterChip extends StatelessWidget {
 class _OnlineNowSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> onlineUsers = [
+      {'name': 'Marcus', 'img': 'https://randomuser.me/api/portraits/men/32.jpg'},
+      {'name': 'Sarah', 'img': 'https://randomuser.me/api/portraits/women/44.jpg'},
+      {'name': 'Alex P.', 'img': 'https://randomuser.me/api/portraits/men/45.jpg'},
+      {'name': 'Emma', 'img': 'https://randomuser.me/api/portraits/women/68.jpg'},
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader('Online Now', action: 'See All (8)'),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Text(
+            'Online Now',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
         SizedBox(
           height: 110,
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
-            itemCount: 5,
-            itemBuilder: (_, i) => const _OnlineAvatar(),
+            itemCount: onlineUsers.length,
+            itemBuilder: (_, i) => _OnlineAvatar(
+              name: onlineUsers[i]['name']!,
+              imageUrl: onlineUsers[i]['img']!,
+            ),
           ),
         ),
       ],
@@ -175,124 +148,67 @@ class _OnlineNowSection extends StatelessWidget {
 }
 
 class _OnlineAvatar extends StatelessWidget {
-  const _OnlineAvatar();
+  final String name;
+  final String imageUrl;
+
+  const _OnlineAvatar({required this.name, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 14),
+      padding: const EdgeInsets.only(right: 20),
       child: Column(
         children: [
           Stack(
             children: [
-              const CircleAvatar(
-                radius: 28,
-                backgroundImage:
-                    NetworkImage('https://randomuser.me/api/portraits/men/12.jpg'),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: kGreen, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: kGreen.withOpacity(0.3),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(3),
+                child: CircleAvatar(
+                  radius: 32,
+                  backgroundImage: NetworkImage(imageUrl),
+                ),
               ),
               Positioned(
                 bottom: 2,
                 right: 2,
                 child: Container(
-                  height: 10,
-                  width: 10,
-                  decoration: const BoxDecoration(
+                  height: 14,
+                  width: 14,
+                  decoration: BoxDecoration(
                     color: kGreen,
                     shape: BoxShape.circle,
+                    border: Border.all(color: kBg, width: 2.5),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          const Text('Rohan',
-              style: TextStyle(color: Colors.white, fontSize: 12)),
-          const Text('Looking',
-              style: TextStyle(color: kAmber, fontSize: 11)),
+          const SizedBox(height: 8),
+          Text(
+            name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-
-class _RequestsSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        _SectionHeader('Requests', count: '2'),
-        _RequestCard(
-          name: 'Karan Mehra',
-          meta: 'Football · 3 Mutual Friends',
-        ),
-        _RequestCard(
-          name: 'Sara Ali',
-          meta: 'Badminton · 1 Mutual Friend',
-        ),
-      ],
-    );
-  }
-}
-
-class _RequestCard extends StatelessWidget {
-  final String name;
-  final String meta;
-
-  const _RequestCard({required this.name, required this.meta});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: kSurface,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          children: [
-            const CircleAvatar(
-              radius: 22,
-              backgroundImage:
-                  NetworkImage('https://randomuser.me/api/portraits/men/40.jpg'),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700)),
-                  Text(meta,
-                      style:
-                          const TextStyle(color: kMuted, fontSize: 12)),
-                ],
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kGreen,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-              child: const Text('Confirm'),
-            ),
-            IconButton(
-              icon: const Icon(Icons.close, color: kMuted),
-              onPressed: () {},
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 
 class _BuildSquadCTA extends StatelessWidget {
@@ -449,9 +365,8 @@ class _LevelBadge extends StatelessWidget {
 class _SectionHeader extends StatelessWidget {
   final String title;
   final String? action;
-  final String? count;
 
-  const _SectionHeader(this.title, {this.action, this.count});
+  const _SectionHeader(this.title, {this.action});
 
   @override
   Widget build(BuildContext context) {
@@ -466,14 +381,6 @@ class _SectionHeader extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w800),
           ),
-          if (count != null)
-            Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: Text(
-                count!,
-                style: const TextStyle(color: kGreen),
-              ),
-            ),
           const Spacer(),
           if (action != null)
             Text(
@@ -488,31 +395,90 @@ class _SectionHeader extends StatelessWidget {
 }
 
 
-class _FriendsListSection extends StatelessWidget {
-  const _FriendsListSection();
+class _MessagesListSection extends StatelessWidget {
+  const _MessagesListSection();
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> messages = [
+      {
+        'name': 'David Miller',
+        'subtitle': '3 new messages',
+        'isNew': true,
+        'hasDot': true,
+        'img': 'https://randomuser.me/api/portraits/men/33.jpg',
+      },
+      {
+        'name': 'Lia Chen',
+        'subtitle': 'Active 5m ago',
+        'isNew': false,
+        'hasDot': false,
+        'img': 'https://randomuser.me/api/portraits/women/40.jpg',
+      },
+      {
+        'name': 'Tom Wilson',
+        'subtitle': 'Sent 2h ago',
+        'isNew': false,
+        'hasDot': false,
+        'img': 'https://randomuser.me/api/portraits/men/22.jpg',
+      },
+      {
+        'name': 'Rachel G.',
+        'subtitle': '1 new message',
+        'isNew': true,
+        'hasDot': true,
+        'img': 'https://randomuser.me/api/portraits/women/65.jpg',
+      },
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader('Friends'),
-
-        ListView.separated(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'MESSAGES',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(4),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Text(
+                    '2 Requests',
+                    style: TextStyle(
+                      color: kGreen,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          itemCount: 6,
-          separatorBuilder: (_, __) => const Divider(
-            height: 1,
-            color: Colors.white12,
-          ),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          itemCount: messages.length,
           itemBuilder: (_, i) {
-            return _FriendListTile(
-              name: _names[i],
-              subtitle: _statuses[i],
-              statusColor: _statusColors[i],
-              unreadCount: 2,
+            final msg = messages[i];
+            return _MessageListTile(
+              name: msg['name'] as String,
+              subtitle: msg['subtitle'] as String,
+              isNew: msg['isNew'] as bool,
+              hasDot: msg['hasDot'] as bool,
+              imageUrl: msg['img'] as String,
             );
           },
         ),
@@ -521,59 +487,35 @@ class _FriendsListSection extends StatelessWidget {
   }
 }
 
-
-class _FriendListTile extends StatelessWidget {
+class _MessageListTile extends StatelessWidget {
   final String name;
   final String subtitle;
-  final Color statusColor;
-  final int unreadCount;
+  final bool isNew;
+  final bool hasDot;
+  final String imageUrl;
 
-  const _FriendListTile({
+  const _MessageListTile({
     required this.name,
     required this.subtitle,
-    required this.statusColor,
-    this.unreadCount = 0,
+    required this.isNew,
+    required this.hasDot,
+    required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(14),
-      onTap: () {
-        // TODO: Open chat thread
-      },
+      onTap: () {},
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            /// AVATAR + STATUS DOT
-            Stack(
-              children: [
-                const CircleAvatar(
-                  radius: 24,
-                  backgroundImage: NetworkImage(
-                    'https://randomuser.me/api/portraits/men/45.jpg',
-                  ),
-                ),
-                Positioned(
-                  bottom: 2,
-                  right: 2,
-                  child: Container(
-                    height: 10,
-                    width: 10,
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: kBg, width: 2),
-                    ),
-                  ),
-                ),
-              ],
+            CircleAvatar(
+              radius: 26,
+              backgroundImage: NetworkImage(imageUrl),
             ),
-
-            const SizedBox(width: 14),
-
-            /// NAME + STATUS
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -584,26 +526,34 @@ class _FriendListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 4),
                   Text(
                     subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: kMuted,
-                      fontSize: 13,
+                    style: TextStyle(
+                      color: isNew ? kGreen : kMuted,
+                      fontSize: 14,
+                      fontWeight: isNew ? FontWeight.w500 : FontWeight.w400,
                     ),
                   ),
                 ],
               ),
             ),
-
-            /// UNREAD COUNT
-            _UnreadCountBadge(unreadCount),
+            if (hasDot)
+              Container(
+                width: 10,
+                height: 10,
+                decoration: const BoxDecoration(
+                  color: kGreen,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            const SizedBox(width: 8),
           ],
         ),
       ),
@@ -611,67 +561,3 @@ class _FriendListTile extends StatelessWidget {
   }
 }
 
-
-
-final _names = [
-  'Rohan',
-  'Priya',
-  'Amit',
-  'Neha',
-  'Vikram',
-  'Sneha',
-];
-
-final _statuses = [
-  'Looking for a game',
-  'In match · Football',
-  'Available nearby',
-  'Offline',
-  'In game',
-  'Online',
-];
-
-final _statusColors = [
-  kAmber, // Looking
-  kBlue,  // In game
-  kGreen, // Online
-  Colors.grey, // Offline
-  kBlue,
-  kGreen,
-];
-
-
-class _UnreadCountBadge extends StatelessWidget {
-  final int count;
-
-  const _UnreadCountBadge(this.count, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    if (count <= 0) return const SizedBox.shrink();
-
-    final display = count > 99 ? '99+' : '$count';
-
-    return Container(
-      height: 26,
-      constraints: const BoxConstraints(minWidth: 26),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: kGreen, // Spotify dark surface
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: kGreen.withOpacity(0.35),
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        display,
-        style: const TextStyle(
-          color: kBg,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
