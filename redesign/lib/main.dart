@@ -10,11 +10,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
-  
+
   // Initialize UserProfileController globally
   Get.put(UserProfileController());
   Get.put(MapsController(), permanent: true);
-  
+
   runApp(const PlayZApp());
 }
 

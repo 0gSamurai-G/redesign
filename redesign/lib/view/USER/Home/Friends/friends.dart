@@ -1,8 +1,7 @@
-
-
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:redesign/view/USER/Home/Friends/friends_chat.dart';
 
 const kBg = Color(0xFF000000);
 const kSurface = Color(0xFF0E0E0E);
@@ -36,7 +35,6 @@ class FriendsHubScreen extends StatelessWidget {
     );
   }
 }
-
 
 class _FriendsAppBar extends StatelessWidget {
   const _FriendsAppBar();
@@ -75,7 +73,6 @@ class _FriendsAppBar extends StatelessWidget {
   }
 }
 
-
 class _SearchAndFilters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -105,15 +102,26 @@ class _SearchAndFilters extends StatelessWidget {
   }
 }
 
-
 class _OnlineNowSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> onlineUsers = [
-      {'name': 'Marcus', 'img': 'https://randomuser.me/api/portraits/men/32.jpg'},
-      {'name': 'Sarah', 'img': 'https://randomuser.me/api/portraits/women/44.jpg'},
-      {'name': 'Alex P.', 'img': 'https://randomuser.me/api/portraits/men/45.jpg'},
-      {'name': 'Emma', 'img': 'https://randomuser.me/api/portraits/women/68.jpg'},
+      {
+        'name': 'Marcus',
+        'img': 'https://randomuser.me/api/portraits/men/32.jpg',
+      },
+      {
+        'name': 'Sarah',
+        'img': 'https://randomuser.me/api/portraits/women/44.jpg',
+      },
+      {
+        'name': 'Alex P.',
+        'img': 'https://randomuser.me/api/portraits/men/45.jpg',
+      },
+      {
+        'name': 'Emma',
+        'img': 'https://randomuser.me/api/portraits/women/68.jpg',
+      },
     ];
 
     return Column(
@@ -209,8 +217,6 @@ class _OnlineAvatar extends StatelessWidget {
   }
 }
 
-
-
 class _BuildSquadCTA extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -231,9 +237,10 @@ class _BuildSquadCTA extends StatelessWidget {
                   Text(
                     'Build a New Squad',
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800),
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   SizedBox(height: 2),
                   Text(
@@ -249,7 +256,8 @@ class _BuildSquadCTA extends StatelessWidget {
                 backgroundColor: Colors.black,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(18),
+                ),
               ),
               child: const Text('Start Now'),
             ),
@@ -259,7 +267,6 @@ class _BuildSquadCTA extends StatelessWidget {
     );
   }
 }
-
 
 class _SuggestedPlayersSection extends StatelessWidget {
   @override
@@ -307,8 +314,9 @@ class _SuggestedPlayerCard extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 22,
-              backgroundImage:
-                  NetworkImage('https://randomuser.me/api/portraits/women/44.jpg'),
+              backgroundImage: NetworkImage(
+                'https://randomuser.me/api/portraits/women/44.jpg',
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -317,17 +325,21 @@ class _SuggestedPlayerCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(name,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700)),
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                       const SizedBox(width: 6),
                       _LevelBadge(level),
                     ],
                   ),
-                  Text(meta,
-                      style:
-                          const TextStyle(color: kMuted, fontSize: 12)),
+                  Text(
+                    meta,
+                    style: const TextStyle(color: kMuted, fontSize: 12),
+                  ),
                 ],
               ),
             ),
@@ -355,12 +367,10 @@ class _LevelBadge extends StatelessWidget {
         color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(label,
-          style: TextStyle(color: color, fontSize: 11)),
+      child: Text(label, style: TextStyle(color: color, fontSize: 11)),
     );
   }
 }
-
 
 class _SectionHeader extends StatelessWidget {
   final String title;
@@ -377,23 +387,25 @@ class _SectionHeader extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w800),
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const Spacer(),
           if (action != null)
             Text(
               action!,
               style: const TextStyle(
-                  color: kGreen, fontWeight: FontWeight.w600),
+                color: kGreen,
+                fontWeight: FontWeight.w600,
+              ),
             ),
         ],
       ),
     );
   }
 }
-
 
 class _MessagesListSection extends StatelessWidget {
   const _MessagesListSection();
@@ -506,15 +518,16 @@ class _MessageListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(14),
-      onTap: () {},
+      onTap: () {
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const ChatScreen()));
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 26,
-              backgroundImage: NetworkImage(imageUrl),
-            ),
+            CircleAvatar(radius: 26, backgroundImage: NetworkImage(imageUrl)),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -560,4 +573,3 @@ class _MessageListTile extends StatelessWidget {
     );
   }
 }
-

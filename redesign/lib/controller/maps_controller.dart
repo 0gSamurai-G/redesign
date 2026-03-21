@@ -65,6 +65,47 @@ class MapsController extends GetxController {
     }
     recentLocations.value = await MapsPreferences.getRecentLocations();
     labeledLocations.value = await MapsPreferences.getLabeledLocations();
+    
+    // Automatically fetch latest location on startup and save it
+    _silentlyFetchLatestLocation();
+  }
+
+  Future<void> _silentlyFetchLatestLocation() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        return; // Don't request permission automatically here to avoid spamming the user
+      }
+
+      // Quick fallback to last known to avoid 15s timeout indoors on fresh launch
+      Position? position = await Geolocator.getLastKnownPosition();
+      
+      if (position == null || DateTime.now().difference(position.timestamp) > const Duration(minutes: 10)) {
+        position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium, // faster lock indoors
+            timeLimit: Duration(seconds: 15),
+          ),
+        );
+      }
+
+      await reverseGeocode(position.latitude, position.longitude, isCurrentLocation: true);
+      
+      // Explicitly force GetX to refresh the observables so the UI is guaranteed to rebuild
+      currentLocation.refresh();
+      displayCity.refresh();
+      displayLocality.refresh();
+      displayLandmark.refresh();
+      displayAddress.refresh();
+      
+      // Also fetch nearby places so the suggestions are fresh
+      fetchNearbyPlaces(position.latitude, position.longitude);
+    } catch (e) {
+      // Silently fail if we can't fetch it in the background
+    }
   }
 
   // ─── Detect Current Location (with full permission handling) ─
