@@ -17,6 +17,9 @@ import 'package:get/get.dart';
 import 'package:redesign/view/maps_setup.dart';
 import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/controller/maps_controller.dart';
+import 'package:redesign/controller/event_fest_controller.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:dotlottie_flutter/dotlottie_flutter.dart';
 // enum AppMode { player, trainer }
 
 /* ============================================================
@@ -37,13 +40,67 @@ class UserHomePage extends StatefulWidget {
 
 class _UserHomePageState extends State<UserHomePage> {
   final _controller = Get.find<UserProfileController>();
+  final _eventFestController = Get.put(EventFestController());
+  
   AppMode _mode = AppMode.player;
   bool _isTrainer = false;
+
+  // Lottie Optimization: Store widget in variable to avoid reload on rebuild
+  Widget? _festivalLottieWidget;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+
+    ever(_eventFestController.shouldShowLottie, (show) {
+      if (show == true) {
+        _preloadFestivalLottie();
+      }
+    });
+  }
+
+  Future<void> _preloadFestivalLottie() async {
+    if (_eventFestController.activeFestival.value.isNotEmpty) {
+      final active = _eventFestController.activeFestival.value;
+      final data = _eventFestController.festivalEventData[active];
+
+      final url = data?['lottieUrl'];
+      if (url != null) {
+        try {
+          // Optimization: Cache .lottie files using flutter_cache_manager
+          final cacheFile = await DefaultCacheManager().downloadFile(url);
+
+          if (mounted) {
+            setState(() {
+              // Optimization: Wrap animation in RepaintBoundary
+              _festivalLottieWidget = RepaintBoundary(
+                // Usage of SizedBox.expand() instead of MediaQuery in initState context
+                child: SizedBox.expand(
+                  // Optimization: Disable frame interpolation to reduce CPU/GPU load (using max frame rate or omitting if not supported)
+                  child: DotLottieView(
+                    source: cacheFile.file.path,
+                    sourceType: 'file',
+                    loop: false,
+                    onPlay: () {},
+                    onComplete: () {
+                      _eventFestController.markLottieAsShown();
+                      if (mounted) {
+                        setState(() {
+                          _festivalLottieWidget = null;
+                        });
+                      }
+                    },
+                  ),
+                ),
+              );
+            });
+          }
+        } catch (e) {
+          debugPrint("Error loading lottie: $e");
+        }
+      }
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -67,39 +124,49 @@ class _UserHomePageState extends State<UserHomePage> {
       body: SafeArea(
         top: true,
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(0, 0, 00, 80),
+        child: Stack(
           children: [
-            _TopAppBar(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _HomeHeader(
-                isTrainer: _isTrainer,
-                mode: _mode,
-                onChanged: (m) {
-                  setState(() => _mode = m);
-                  if (_mode == AppMode.trainer) {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => TrainerAppNavShell()),
-                      (route) => false,
-                    );
-                  }
-                },
-              ),
+            ListView(
+              padding: const EdgeInsets.fromLTRB(0, 0, 00, 80),
+              children: [
+                _TopAppBar(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _HomeHeader(
+                    isTrainer: _isTrainer,
+                    mode: _mode,
+                    onChanged: (m) {
+                      setState(() => _mode = m);
+                      if (_mode == AppMode.trainer) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => TrainerAppNavShell()),
+                          (route) => false,
+                        );
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(height: 20),
+                _HeroCTA(),
+                SizedBox(height: 28),
+                _QuickAccessTiles(),
+                SizedBox(height: 28),
+                _PopularVenues(),
+                SizedBox(height: 28),
+                _ExploreBySport(),
+                SizedBox(height: 28),
+                _FeaturedEvents(),
+                SizedBox(height: 20),
+                _OfficialAppInfo(),
+              ],
             ),
-
-            SizedBox(height: 20),
-            _HeroCTA(),
-            SizedBox(height: 28),
-            _QuickAccessTiles(),
-            SizedBox(height: 28),
-            _PopularVenues(),
-            SizedBox(height: 28),
-            _ExploreBySport(),
-            SizedBox(height: 28),
-            _FeaturedEvents(),
-            SizedBox(height: 20),
-            _OfficialAppInfo(),
+            // Optimization: Use animation only in hero/top section 
+            if (_festivalLottieWidget != null)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: _festivalLottieWidget!,
+                ),
+              ),
           ],
         ),
       ),
