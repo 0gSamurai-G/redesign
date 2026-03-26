@@ -19,7 +19,7 @@ import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/controller/maps_controller.dart';
 import 'package:redesign/controller/event_fest_controller.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:dotlottie_flutter/dotlottie_flutter.dart';
+import 'package:lottie/lottie.dart';
 // enum AppMode { player, trainer }
 
 /* ============================================================
@@ -38,20 +38,28 @@ class UserHomePage extends StatefulWidget {
   State<UserHomePage> createState() => _UserHomePageState();
 }
 
-class _UserHomePageState extends State<UserHomePage> {
+class _UserHomePageState extends State<UserHomePage>
+    with TickerProviderStateMixin {
   final _controller = Get.find<UserProfileController>();
-  final _eventFestController = Get.put(EventFestController());
-  
+  final _eventFestController = Get.find<EventFestController>();
+
   AppMode _mode = AppMode.player;
   bool _isTrainer = false;
 
   // Lottie Optimization: Store widget in variable to avoid reload on rebuild
   Widget? _festivalLottieWidget;
+  late final AnimationController _lottieController;
 
   @override
   void initState() {
     super.initState();
+    _lottieController = AnimationController(vsync: this);
     _loadUserData();
+
+    // Check immediately in case the controller already set it to true
+    if (_eventFestController.shouldShowLottie.value) {
+      _preloadFestivalLottie();
+    }
 
     ever(_eventFestController.shouldShowLottie, (show) {
       if (show == true) {
@@ -60,44 +68,79 @@ class _UserHomePageState extends State<UserHomePage> {
     });
   }
 
+  @override
+  void dispose() {
+    _lottieController.dispose();
+    super.dispose();
+  }
+
   Future<void> _preloadFestivalLottie() async {
     if (_eventFestController.activeFestival.value.isNotEmpty) {
       final active = _eventFestController.activeFestival.value;
       final data = _eventFestController.festivalEventData[active];
 
       final url = data?['lottieUrl'];
-      if (url != null) {
-        try {
-          // Optimization: Cache .lottie files using flutter_cache_manager
-          final cacheFile = await DefaultCacheManager().downloadFile(url);
+      final double startingProgress =
+          (data?['lottieProgress'] as num?)?.toDouble() ?? 0.0;
+      final double endProgress =
+          (data?['lottieEndProgress'] as num?)?.toDouble() ?? 1.0;
+      final double speed = (data?['lottieSpeed'] as num?)?.toDouble() ?? 1.0;
+      final String alignmentStr =
+          data?['lottieAlignment']?.toString() ?? 'center';
 
-          if (mounted) {
-            setState(() {
-              // Optimization: Wrap animation in RepaintBoundary
-              _festivalLottieWidget = RepaintBoundary(
-                // Usage of SizedBox.expand() instead of MediaQuery in initState context
-                child: SizedBox.expand(
-                  // Optimization: Disable frame interpolation to reduce CPU/GPU load (using max frame rate or omitting if not supported)
-                  child: DotLottieView(
-                    source: cacheFile.file.path,
-                    sourceType: 'file',
-                    loop: false,
-                    onPlay: () {},
-                    onComplete: () {
-                      _eventFestController.markLottieAsShown();
+      AlignmentGeometry lottieAlignment = Alignment.center;
+      if (alignmentStr == 'bottom') {
+        lottieAlignment = Alignment.bottomCenter;
+      } else if (alignmentStr == 'top') {
+        lottieAlignment = Alignment.topCenter;
+      }
+
+      if (url != null) {
+        if (mounted) {
+          setState(() {
+            // Optimization: Wrap animation in RepaintBoundary
+            _festivalLottieWidget = RepaintBoundary(
+              // Usage of SizedBox.expand() instead of MediaQuery in initState context
+              child: SizedBox.expand(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: alignmentStr == 'bottom' ? 80.0 : 0.0,
+                  ),
+                  child: Lottie.network(
+                    url,
+                    controller: _lottieController,
+                    frameRate: FrameRate.max, // smoother playback
+                    fit: BoxFit.contain,
+                    alignment: lottieAlignment,
+                  onLoaded: (composition) {
+                    _lottieController.duration = Duration(
+                      microseconds:
+                          (composition.duration.inMicroseconds / speed).round(),
+                    );
+                    // Wait for page transition to finish before playing
+                    Future.delayed(const Duration(milliseconds: 500), () {
                       if (mounted) {
-                        setState(() {
-                          _festivalLottieWidget = null;
+                        _lottieController.value = startingProgress;
+                        _lottieController.animateTo(endProgress).then((_) {
+                          if (mounted) {
+                            _eventFestController.markLottieAsShown();
+                            setState(() {
+                              _festivalLottieWidget = null;
+                            });
+                          }
                         });
                       }
-                    },
-                  ),
+                    });
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    debugPrint("Error loading lottie: $error");
+                    return const SizedBox.shrink();
+                  },
                 ),
-              );
-            });
-          }
-        } catch (e) {
-          debugPrint("Error loading lottie: $e");
+              ), // Closes Padding
+              ), // Closes SizedBox.expand
+            );
+          });
         }
       }
     }
@@ -139,7 +182,9 @@ class _UserHomePageState extends State<UserHomePage> {
                       setState(() => _mode = m);
                       if (_mode == AppMode.trainer) {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => TrainerAppNavShell()),
+                          MaterialPageRoute(
+                            builder: (_) => TrainerAppNavShell(),
+                          ),
                           (route) => false,
                         );
                       }
@@ -160,12 +205,10 @@ class _UserHomePageState extends State<UserHomePage> {
                 _OfficialAppInfo(),
               ],
             ),
-            // Optimization: Use animation only in hero/top section 
+            // Optimization: Use animation only in hero/top section
             if (_festivalLottieWidget != null)
               Positioned.fill(
-                child: IgnorePointer(
-                  child: _festivalLottieWidget!,
-                ),
+                child: IgnorePointer(child: _festivalLottieWidget!),
               ),
           ],
         ),
@@ -305,8 +348,8 @@ class _TopAppBar extends StatelessWidget {
                       final displayText = locality.isNotEmpty
                           ? locality
                           : city.isNotEmpty
-                              ? city
-                              : 'Select Location';
+                          ? city
+                          : 'Select Location';
                       return Text(
                         displayText,
                         maxLines: 1,
@@ -349,20 +392,22 @@ class _TopAppBar extends StatelessWidget {
                       width: width < 360 ? 32 : 36,
                       height: width < 360 ? 32 : 36,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) => Shimmer.fromColors(
-                        baseColor: Colors.grey.shade800,
-                        highlightColor: Colors.grey.shade700,
-                        child: CircleAvatar(radius: width < 360 ? 16 : 18),
+                      placeholder: (_, __) => _ZShimmer(
+                        borderRadius: 20,
+                        width: width < 360 ? 32 : 36,
+                        height: width < 360 ? 32 : 36,
                       ),
-                      errorWidget: (_, __, ___) => CircleAvatar(
-                        radius: width < 360 ? 16 : 18,
-                        backgroundColor: const Color(0xFF1A1A1A),
+                      errorWidget: (_, __, ___) => _ZShimmer(
+                        width: width < 360 ? 32 : 36,
+                        height: width < 360 ? 32 : 36,
+                        borderRadius: 20,
                         child: const Icon(Icons.person, color: Colors.white38),
                       ),
                     )
-                  : CircleAvatar(
-                      radius: width < 360 ? 16 : 18,
-                      backgroundColor: const Color(0xFF1A1A1A),
+                  : _ZShimmer(
+                      width: width < 360 ? 32 : 36,
+                      height: width < 360 ? 32 : 36,
+                      borderRadius: 20,
                       child: const Icon(Icons.person, color: Colors.white38),
                     ),
             );
@@ -391,24 +436,7 @@ class _HeroCTA extends StatefulWidget {
 class _HeroCTAState extends State<_HeroCTA> {
   late final PageController _pageController;
   int _currentIndex = 0;
-
-  static const List<Map<String, String>> _slides = [
-    {
-      'image': 'https://images.unsplash.com/photo-1546519638-68e109498ffc',
-      'badge': 'TRENDING NOW',
-      'title': 'Game On with\nPlayZ',
-    },
-    {
-      'image': 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
-      'badge': 'NEAR YOU',
-      'title': 'Book Grounds\nInstantly',
-    },
-    {
-      'image': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
-      'badge': 'COMMUNITY',
-      'title': 'Find Your\nSquad',
-    },
-  ];
+  final _eventFestController = Get.find<EventFestController>();
 
   @override
   void initState() {
@@ -418,12 +446,16 @@ class _HeroCTAState extends State<_HeroCTA> {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 5));
       if (!mounted) return false;
-      _currentIndex = (_currentIndex + 1) % _slides.length;
-      _pageController.animateToPage(
-        _currentIndex,
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-      );
+
+      final slides = _eventFestController.activeSlides;
+      if (slides.length > 1) {
+        _currentIndex = (_currentIndex + 1) % slides.length;
+        _pageController.animateToPage(
+          _currentIndex,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      }
       return true;
     });
   }
@@ -450,139 +482,133 @@ class _HeroCTAState extends State<_HeroCTA> {
             height: cardHeight,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(radius),
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: _slides.length,
-                itemBuilder: (context, index) {
-                  final slide = _slides[index];
+              child: Obx(() {
+                final slides = _eventFestController.activeSlides;
+                if (slides.isEmpty) {
+                  return const _ZShimmer();
+                }
+                return PageView.builder(
+                  controller: _pageController,
+                  itemCount: slides.length,
+                  itemBuilder: (context, index) {
+                    final slide = slides[index];
 
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      /// ✅ CACHED IMAGE + SHIMMER
-                      CachedNetworkImage(
-                        imageUrl: slide['image']!,
-                        cacheKey: slide['image'],
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => const _HeroShimmer(),
-                        errorWidget: (_, __, ___) => const Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Colors.white54,
-                            size: 32,
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        /// ✅ CACHED IMAGE + SHIMMER
+                        CachedNetworkImage(
+                          imageUrl: slide['image']!,
+                          cacheKey: slide['image'],
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => const _ZShimmer(),
+                          errorWidget: (_, __, ___) => const Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              color: Colors.white54,
+                              size: 32,
+                            ),
                           ),
                         ),
-                      ),
 
-                      /// OVERLAY
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.65),
-                              Colors.black.withOpacity(0.35),
-                            ],
+                        /// OVERLAY
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.65),
+                                Colors.black.withOpacity(0.35),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
 
-                      /// CONTENT
-                      Padding(
-                        padding: EdgeInsets.all(padding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            /// BADGE
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: (w * 0.035).clamp(10.0, 16.0),
-                                vertical: (w * 0.014).clamp(4.0, 8.0),
+                        /// CONTENT
+                        Padding(
+                          padding: EdgeInsets.all(padding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              /// BADGE
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: (w * 0.035).clamp(10.0, 16.0),
+                                  vertical: (w * 0.014).clamp(4.0, 8.0),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: UserHomePage.muted.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  slide['badge']!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: (w * 0.028).clamp(10.0, 13.0),
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                              decoration: BoxDecoration(
-                                color: UserHomePage.muted.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                slide['badge']!,
-                                maxLines: 1,
+
+                              const Spacer(),
+
+                              /// TITLE
+                              Text(
+                                slide['title']!,
+                                maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: (w * 0.028).clamp(10.0, 13.0),
+                                  fontSize: (w * 0.065).clamp(18.0, 26.0),
                                   fontWeight: FontWeight.w700,
-                                  letterSpacing: 1,
+                                  height: 1.15,
                                   color: Colors.white,
                                 ),
                               ),
-                            ),
 
-                            const Spacer(),
+                              const Spacer(),
 
-                            /// TITLE
-                            Text(
-                              slide['title']!,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: (w * 0.065).clamp(18.0, 26.0),
-                                fontWeight: FontWeight.w700,
-                                height: 1.15,
-                                color: Colors.white,
-                              ),
-                            ),
-
-                            const Spacer(),
-
-                            /// CTA
-                            SizedBox(
-                              height: (w * 0.11).clamp(40.0, 46.0),
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1DB954),
-                                  foregroundColor: Colors.black,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: (w * 0.06).clamp(16.0, 24.0),
+                              /// CTA
+                              SizedBox(
+                                height: (w * 0.11).clamp(40.0, 46.0),
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF1DB954),
+                                    foregroundColor: Colors.black,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: (w * 0.06).clamp(16.0, 24.0),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                ),
-                                child: const FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    'Explore Games Near You',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      slide['buttonTitle'] ??
+                                          'Explore Games Near You',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+                      ],
+                    );
+                  },
+                );
+              }),
             ),
           );
         },
       ),
-    );
-  }
-}
-
-class _HeroShimmer extends StatelessWidget {
-  const _HeroShimmer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade800,
-      highlightColor: Colors.grey.shade700,
-      child: Container(color: Colors.grey.shade800),
     );
   }
 }
@@ -866,7 +892,7 @@ class _VenueTile extends StatelessWidget {
               height: 70,
               fit: BoxFit.cover,
               placeholder: (_, __) =>
-                  const _ImageShimmer(width: 70, height: 70),
+                  const _ZShimmer(width: 70, height: 70, borderRadius: 12),
               errorWidget: (_, __, ___) =>
                   const Icon(Icons.broken_image, color: Colors.white54),
             ),
@@ -982,9 +1008,9 @@ class _ExploreBySport extends StatelessWidget {
                             cacheKey:
                                 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
                             fit: BoxFit.cover,
-                            placeholder: (_, __) => const _ImageShimmer(),
+                            placeholder: (_, __) => const _ZShimmer(),
                             errorWidget: (_, __, ___) =>
-                                const Icon(Icons.broken_image),
+                                const Icon(Icons.broken_image, color: Colors.white24),
                           ),
 
                           Container(color: Colors.black.withOpacity(0.25)),
@@ -1022,22 +1048,32 @@ class _ExploreBySport extends StatelessWidget {
 /* ============================================================
    SHIMMER PLACEHOLDER (REUSABLE)
    ============================================================ */
-
-class _ImageShimmer extends StatelessWidget {
+class _ZShimmer extends StatelessWidget {
   final double? width;
   final double? height;
+  final double borderRadius;
+  final Widget? child;
 
-  const _ImageShimmer({this.width, this.height});
+  const _ZShimmer({
+    this.width,
+    this.height,
+    this.borderRadius = 0,
+    this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade800,
-      highlightColor: Colors.grey.shade700,
+      baseColor: Colors.grey.shade900.withOpacity(0.5),
+      highlightColor: Colors.grey.shade800.withOpacity(0.4),
       child: Container(
         width: width,
         height: height,
-        color: Colors.grey.shade800,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: child,
       ),
     );
   }
@@ -1146,7 +1182,7 @@ class _FeaturedEventsState extends State<_FeaturedEvents> {
                             imageUrl: event['image']!,
                             fit: BoxFit.cover,
                             cacheKey: event['image'],
-                            placeholder: (context, _) => _ShimmerPlaceholder(),
+                            placeholder: (context, _) => const _ZShimmer(),
                             errorWidget: (context, _, __) => const Center(
                               child: Icon(
                                 Icons.broken_image,
@@ -1237,18 +1273,6 @@ class _FeaturedEventsState extends State<_FeaturedEvents> {
           },
         ),
       ],
-    );
-  }
-}
-
-/// 🔥 SHIMMER WIDGET
-class _ShimmerPlaceholder extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade800,
-      highlightColor: Colors.grey.shade700,
-      child: Container(color: Colors.grey.shade800),
     );
   }
 }

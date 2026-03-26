@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/splash.dart';
 import 'package:redesign/controller/maps_controller.dart';
+import 'package:redesign/controller/event_fest_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,7 @@ void main() async {
   // Initialize UserProfileController globally
   Get.put(UserProfileController());
   Get.put(MapsController(), permanent: true);
+  Get.put(EventFestController(), permanent: true);
 
   runApp(const PlayZApp());
 }
