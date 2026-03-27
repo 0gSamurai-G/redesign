@@ -18,7 +18,6 @@ import 'package:redesign/view/maps_setup.dart';
 import 'package:redesign/controller/user_profile_controller.dart';
 import 'package:redesign/controller/maps_controller.dart';
 import 'package:redesign/controller/event_fest_controller.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lottie/lottie.dart';
 // enum AppMode { player, trainer }
 
@@ -112,32 +111,33 @@ class _UserHomePageState extends State<UserHomePage>
                     frameRate: FrameRate.max, // smoother playback
                     fit: BoxFit.contain,
                     alignment: lottieAlignment,
-                  onLoaded: (composition) {
-                    _lottieController.duration = Duration(
-                      microseconds:
-                          (composition.duration.inMicroseconds / speed).round(),
-                    );
-                    // Wait for page transition to finish before playing
-                    Future.delayed(const Duration(milliseconds: 500), () {
-                      if (mounted) {
-                        _lottieController.value = startingProgress;
-                        _lottieController.animateTo(endProgress).then((_) {
-                          if (mounted) {
-                            _eventFestController.markLottieAsShown();
-                            setState(() {
-                              _festivalLottieWidget = null;
-                            });
-                          }
-                        });
-                      }
-                    });
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    debugPrint("Error loading lottie: $error");
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ), // Closes Padding
+                    onLoaded: (composition) {
+                      _lottieController.duration = Duration(
+                        microseconds:
+                            (composition.duration.inMicroseconds / speed)
+                                .round(),
+                      );
+                      // Wait for page transition to finish before playing
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        if (mounted) {
+                          _lottieController.value = startingProgress;
+                          _lottieController.animateTo(endProgress).then((_) {
+                            if (mounted) {
+                              _eventFestController.markLottieAsShown();
+                              setState(() {
+                                _festivalLottieWidget = null;
+                              });
+                            }
+                          });
+                        }
+                      });
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      debugPrint("Error loading lottie: $error");
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ), // Closes Padding
               ), // Closes SizedBox.expand
             );
           });
@@ -1009,8 +1009,10 @@ class _ExploreBySport extends StatelessWidget {
                                 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d',
                             fit: BoxFit.cover,
                             placeholder: (_, __) => const _ZShimmer(),
-                            errorWidget: (_, __, ___) =>
-                                const Icon(Icons.broken_image, color: Colors.white24),
+                            errorWidget: (_, __, ___) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white24,
+                            ),
                           ),
 
                           Container(color: Colors.black.withOpacity(0.25)),
@@ -1054,12 +1056,7 @@ class _ZShimmer extends StatelessWidget {
   final double borderRadius;
   final Widget? child;
 
-  const _ZShimmer({
-    this.width,
-    this.height,
-    this.borderRadius = 0,
-    this.child,
-  });
+  const _ZShimmer({this.width, this.height, this.borderRadius = 0, this.child});
 
   @override
   Widget build(BuildContext context) {
